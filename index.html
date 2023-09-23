@@ -184,7 +184,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2023-09-23 23:33:59 / 修改时间：23:34:56" itemprop="dateCreated datePublished" datetime="2023-09-23T23:33:59+08:00">2023-09-23</time>
+              <time title="创建时间：2023-09-23 23:33:59 / 修改时间：23:39:14" itemprop="dateCreated datePublished" datetime="2023-09-23T23:33:59+08:00">2023-09-23</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -201,7 +201,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>792</span>
+              <span>782</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -219,8 +219,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="shellcode"><a href="#shellcode" class="headerlink" title="shellcode"></a>shellcode</h1><p>Created: September 6, 2023 8:39 PM<br>Reviewed: No</p>
-<h1 id="一些考点"><a href="#一些考点" class="headerlink" title="一些考点"></a>一些考点</h1><h2 id="沙箱绕过"><a href="#沙箱绕过" class="headerlink" title="沙箱绕过"></a>沙箱绕过</h2><h3 id="常规orw"><a href="#常规orw" class="headerlink" title="常规orw"></a>常规orw</h3><p>要注意常规orw和调用elf里面的open函数不一样，elf里面的实质上是openat函数</p>
+          <h1 id="一些考点"><a href="#一些考点" class="headerlink" title="一些考点"></a>一些考点</h1><h2 id="沙箱绕过"><a href="#沙箱绕过" class="headerlink" title="沙箱绕过"></a>沙箱绕过</h2><h3 id="常规orw"><a href="#常规orw" class="headerlink" title="常规orw"></a>常规orw</h3><p>要注意常规orw和调用elf里面的open函数不一样，elf里面的实质上是openat函数</p>
 <p>王逸伦<br>这个时候要找gadgets控制寄存器，然后再找syscall；ret这种gadgets</p>
 <p>ROPgadget 加上 –multibr就能找这种gadgets</p>
 <p>生成方式：</p>
