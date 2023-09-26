@@ -159,6 +159,115 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/26/house-of-husk/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/26/house-of-husk/" class="post-title-link" itemprop="url">house_of_husk</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-09-26 23:50:24 / 修改时间：23:52:53" itemprop="dateCreated datePublished" datetime="2023-09-26T23:50:24+08:00">2023-09-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>191</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h2><p>house_of_husk是针对带格式化字符输出printf函数的一种攻击</p>
+<p>可以实现控制rip</p>
+<p>适用版本2.23-至今</p>
+<h2 id="攻击方法"><a href="#攻击方法" class="headerlink" title="攻击方法"></a>攻击方法</h2><p><strong>printf会输出前检查是否有自定义格式化字符</strong></p>
+<p>方法是通过两个表：</p>
+<ul>
+<li>__printf_function_table</li>
+<li>__printf_arginfo_table</li>
+</ul>
+<ol>
+<li>先将__printf_function_table的值置为非空</li>
+</ol>
+<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled.png" alt="Untitled"></p>
+<ol>
+<li>然后将__printf_arginfo_table挟持到我们可控的地址</li>
+</ol>
+<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled%201.png" alt="Untitled"></p>
+<p><del>往可控的地方写值，这个有讲究(</del></p>
+<p>最终会调用到__printf_arginfo_table[index]</p>
+<p>这个index和格式化字符的有关：</p>
+<p>比如%d → ord(’d’) → 100</p>
+<p>%s → ord(’s’) → 115</p>
+<p>所以挟持__printf_arginfo_table的时候，比如格式化字符是%d</p>
+<p>那我们就弄成&#x3D;</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__printf_arginfo_table = control_addr - ord(<span class="string">&#x27;d&#x27;</span>)*<span class="number">8</span></span><br></pre></td></tr></table></figure>
+
+<p>然后往control_addr里面写入RIP即可</p>
+<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled%202.png" alt="Untitled"></p>
+<p>其控制流为：</p>
+<p>printf→vfprintf→printf_positional→__parse_one_specmb→RIP</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/25/brics-ctf-pwn-paint%E9%A2%98%E8%A7%A3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -902,7 +1011,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -915,7 +1024,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -966,7 +1075,7 @@
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">15 分钟</span>
+    <span title="站点阅读时长">16 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
