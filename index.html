@@ -184,7 +184,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2023-09-30 23:21:43 / 修改时间：23:22:44" itemprop="dateCreated datePublished" datetime="2023-09-30T23:21:43+08:00">2023-09-30</time>
+              <time title="创建时间：2023-09-30 23:21:43 / 修改时间：23:27:05" itemprop="dateCreated datePublished" datetime="2023-09-30T23:21:43+08:00">2023-09-30</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -219,24 +219,24 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="os读书笔记1"><a href="#os读书笔记1" class="headerlink" title="os读书笔记1"></a>os读书笔记1</h1><h1 id="系统架构概况"><a href="#系统架构概况" class="headerlink" title="系统架构概况"></a>系统架构概况</h1><p><img src="/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled.png" alt="Untitled"></p>
+          <h1 id="os读书笔记1"><a href="#os读书笔记1" class="headerlink" title="os读书笔记1"></a>os读书笔记1</h1><h1 id="系统架构概况"><a href="#系统架构概况" class="headerlink" title="系统架构概况"></a>系统架构概况</h1><p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled.png" alt="Untitled"></p>
 <h3 id="全局描述符表和局部描述符表-GDT和LDT"><a href="#全局描述符表和局部描述符表-GDT和LDT" class="headerlink" title="全局描述符表和局部描述符表(GDT和LDT)"></a>全局描述符表和局部描述符表(GDT和LDT)</h3><hr>
 <p><strong>这两个表有什么用</strong></p>
 <p>进入了保护模式之后，代码段、数据段、堆栈段等内存段不再是通过段寄存器获得段基址即可使用，操作系统把段定义好，记录在全局描述符表。</p>
 <p>而局部描述符表则是局部的，它和全局描述符表相比，就相当于一个是一级描述符表(GDT)、一个是二级描述符表(LDT)</p>
 <p><strong>表里面存的是什么</strong></p>
 <p>描述符表里面保存的都是段描述符，段描述符记录了各个段的信息。如图所示：</p>
-<p><img src="/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%201.png" alt="Untitled"></p>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%201.png" alt="Untitled"></p>
 <p>其中各个标志位都记录着关于段的不同信息</p>
 <p><strong>如何找到GDT和LDT里面的内容</strong></p>
 <p>有了段描述符之后，我们就可以定义各种内存段，并保存到GDT和LDT中，此时CPU通过GDTR和LDTR分别查找GDT和LDT表。</p>
 <p>GDTR寄存器数据格式如下：</p>
-<p><img src="/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%202.png" alt="Untitled"></p>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%202.png" alt="Untitled"></p>
 <p>因此GDT中可以容纳段描述符为8192个</p>
 <p>这GDTR寄存器初始化需要用到lgdt</p>
 <p>定位到某个段描述符，需要用到<strong>段选择子</strong></p>
 <p>保护模式下段寄存器存入的是段选择子</p>
-<p><img src="/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%203.png" alt="Untitled"></p>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%203.png" alt="Untitled"></p>
 <p>如此一来，即可找到指定的段，CPU即可从段描述符中取出段基址，再加上段内偏，形成了-段基址：段内偏移地址-的内存访问形式</p>
 <h3 id="门描述符"><a href="#门描述符" class="headerlink" title="门描述符"></a>门描述符</h3><hr>
 <p>操作系统定义了一套名为门的描述符—调用门、中断门、陷阱门和任务门，门这种描述符提供了一种访问运行在不同于应用程序特权级的系统过程和处理程序的方法。也就是程序&#x2F;进程&#x2F;内核之间的交互。</p>
@@ -280,8 +280,8 @@
 <li><strong>虚拟8086模式</strong>—在保护模式中，处理器提供了一种准模式叫作虚拟8086模式。这种模式允许在多任务的保护模式下处理执行8086程序。</li>
 </ul>
 <p>下图为处理器运行模式之间的转换</p>
-<p><img src="/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%204.png" alt="Untitled"></p>
-<h2 id="EFLAGES寄存器中的系统标志和域"><a href="#EFLAGES寄存器中的系统标志和域" class="headerlink" title="EFLAGES寄存器中的系统标志和域"></a>EFLAGES寄存器中的系统标志和域</h2><p><img src="/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%205.png" alt="Untitled"></p>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%204.png" alt="Untitled"></p>
+<h2 id="EFLAGES寄存器中的系统标志和域"><a href="#EFLAGES寄存器中的系统标志和域" class="headerlink" title="EFLAGES寄存器中的系统标志和域"></a>EFLAGES寄存器中的系统标志和域</h2><p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%205.png" alt="Untitled"></p>
 <p>EFLAGES中的系统标志和IOPL域用于控制I&#x2F;O、可屏蔽硬件中断、调试、任务切换和虚拟8086模式。只有特权代码（通常是操作系统代码）可以修改这些位。</p>
 <ul>
 <li><strong>TF</strong>: <strong>陷阱</strong>（第8位）置1是调试状态下的单步执行，置0是禁用单步执行。在单步执行模式下处理器在每条指令后产生一个调试异常，这样在每条指令执行后都可以查看执行程序的状态。如果程序用POPF、POPFD或者IRET指令修改TF标志，那么调试异常就在执行POPF、POPFD或者IRET指令后产生。</li>
@@ -296,7 +296,7 @@
 <li><strong>ID</strong>: <strong>识别</strong>（位21）软件置1或0表明是否支持CPUID指令。</li>
 </ul>
 <h2 id="内存管理寄存器"><a href="#内存管理寄存器" class="headerlink" title="内存管理寄存器"></a>内存管理寄存器</h2><p>处理器中与内存管理有关的寄存器共有四个—GDTR、LDTR、IDTR和TR</p>
-<p><img src="/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%206.png" alt="Untitled"></p>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%206.png" alt="Untitled"></p>
 <h3 id="全局描述符表寄存器-GDTR"><a href="#全局描述符表寄存器-GDTR" class="headerlink" title="全局描述符表寄存器(GDTR)"></a>全局描述符表寄存器(GDTR)</h3><p>GDTR寄存器用于保存GDT的32位基地址和16位表界限。基地址指的是GDT的第一个字节的线性地址，而表界限表示GDT中的字节数。LGDT和SGDT指令分别用于加载和保存GDTR寄存器的值。在处理器上电或复位时，基地址默认为0，表界限默认为FFFFH。在进行保护模式的操作时，作为处理器初始化的一部分，需要将新的基地址加载到GDTR中。</p>
 <h3 id="局部描述符表寄存器-LDTR"><a href="#局部描述符表寄存器-LDTR" class="headerlink" title="局部描述符表寄存器(LDTR)"></a>局部描述符表寄存器(LDTR)</h3><p>LDTR寄存器存储了16位的段选择符、32位的基地址、16位的段界限以及LDT描述符的属性。基地址指的是LDT段中第一个字节的线性地址，而段界限表示段中的字节个数。LLDT和SLDT指令专用于加载和保存LDTR寄存器中的段选择符部分。任何包含LDT的段必须在GDT中有一个段描述符。当执行LLDT指令来加载LDTR中的段选择符时，LDT描述符的基地址、界限和属性将自动加载到LDTR中。在进行任务切换时，LDTR会自动加载新任务的段选择符和描述符。在将新的LDT信息写入寄存器之前，LDTR的内容不会自动保存。在处理器上电或复位时，段选择符和基地址都被设为默认值0，段界限被设置为FFFFH。</p>
 <h3 id="IDTR中断描述符表寄存器"><a href="#IDTR中断描述符表寄存器" class="headerlink" title="IDTR中断描述符表寄存器"></a>IDTR中断描述符表寄存器</h3><p>IDTR寄存器用于保存IDT的32位基地址和16位表界限。基地址指的是IDT中第一个字节的线性地址，而表界限表示IDT中的字节个数。LIDT和SIDT指令专门用于加载和保存IDTR寄存器的值。在处理器上电或复位时，基地址默认为0，表界限默认为FFFFH。作为处理器初始化的一部分，可以修改寄存器中的基地址和表界限。</p>
@@ -309,7 +309,7 @@
 <li>CR3—包含了页目录的基地址和二个标志（PCD和PWT）。该寄存器也被称为页目录基地址寄存器（PDBR）。页目录基地址只有高20位确定，低12位是0，所以页目录地址必须是页边界对齐的（4K字节）。PCD和PWT标志控制着页目录在处理器内部数据缓冲区的缓存（它们不控制TLB页目录信息的缓存）。</li>
 <li>CR4—包含了一组标志，这些标志启用了架构方面的几个扩展，并指明了系统对某些处理器支持的能力。这个寄存器可以通过MOV指令方式进行读取或修改。在保护模式下MOV指令允许读取或者装载控制寄存器(在0级特权下)。这个限制意味着应用程序或者操作系统过程(运行在1、2、3级特权下)不能读取或者装载控制寄存器。装在控制寄存器时，保留位应该保持以前读取的值。</li>
 </ul>
-<p><img src="/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%207.png" alt="Untitled"></p>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%207.png" alt="Untitled"></p>
 <h2 id="CPUID识别控制寄存器标志"><a href="#CPUID识别控制寄存器标志" class="headerlink" title="CPUID识别控制寄存器标志"></a>CPUID识别控制寄存器标志</h2><p>控制寄存器CR4中的VME、PVI、TSD、DE、PSE、PAE、MCE、PGE、PCE、OSFXSR和OSXMMEXCPT都是与模式相关的。所有的这些标志(除了PCE标志)在使用之前都可以通过CPUID指令来检查他们处理器是否已经实现。</p>
 <h2 id="系统指令总汇"><a href="#系统指令总汇" class="headerlink" title="系统指令总汇"></a>系统指令总汇</h2><table>
 <thead>
