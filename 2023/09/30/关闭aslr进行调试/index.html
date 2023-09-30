@@ -22,17 +22,21 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="hkbin hkbin hkbin">
-<meta property="og:type" content="website">
-<meta property="og:title" content="hkbin的小博客~">
-<meta property="og:url" content="http://example.com/categories/pwn/index.html">
+  <meta name="description" content="ASLR是一种随机化保护的方法，linux自带，它使得栈、库、堆等地址随机化，对攻击达到一个干扰的效果 而在pwn题里面，针对ld的攻击，在ubuntu22.04下不知道为何ld的基址和libc的基址距离一直变化(一般是不变化的，使得我对ld的攻击调试极其不方便 可以通过linux一条命令 临时关闭aslr，进行调试，不过要注意远程的这个距离和本地的距离一般是不一样的(相差会在第1.5个字节到第2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关闭aslr进行调试">
+<meta property="og:url" content="http://example.com/2023/09/30/%E5%85%B3%E9%97%ADaslr%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/index.html">
 <meta property="og:site_name" content="hkbin的小博客~">
-<meta property="og:description" content="hkbin hkbin hkbin">
+<meta property="og:description" content="ASLR是一种随机化保护的方法，linux自带，它使得栈、库、堆等地址随机化，对攻击达到一个干扰的效果 而在pwn题里面，针对ld的攻击，在ubuntu22.04下不知道为何ld的基址和libc的基址距离一直变化(一般是不变化的，使得我对ld的攻击调试极其不方便 可以通过linux一条命令 临时关闭aslr，进行调试，不过要注意远程的这个距离和本地的距离一般是不一样的(相差会在第1.5个字节到第2">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-09-30T08:39:15.000Z">
+<meta property="article:modified_time" content="2023-09-30T08:40:21.165Z">
 <meta property="article:author" content="hkbin">
+<meta property="article:tag" content="ticks">
+<meta property="article:tag" content="aslr">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/categories/pwn/">
+<link rel="canonical" href="http://example.com/2023/09/30/%E5%85%B3%E9%97%ADaslr%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/">
 
 
 <script id="page-configurations">
@@ -40,12 +44,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>分类: pwn | hkbin的小博客~</title>
+  <title>关闭aslr进行调试 | hkbin的小博客~</title>
   
 
 
@@ -153,211 +157,119 @@
         <div class="content-wrap">
           
 
-          <div class="content category">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h2 class="collection-header">pwn
-          <small>分类</small>
-        </h2>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/30/%E5%85%B3%E9%97%ADaslr%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          关闭aslr进行调试
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-09-30 16:39:15 / 修改时间：16:40:21" itemprop="dateCreated datePublished" datetime="2023-09-30T16:39:15+08:00">2023-09-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>193</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2023</span>
-    </div>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-30T16:39:15+08:00"
-              content="2023-09-30">
-          09-30
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/09/30/%E5%85%B3%E9%97%ADaslr%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/" itemprop="url">
-            <span itemprop="name">关闭aslr进行调试</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-27T11:00:48+08:00"
-              content="2023-09-27">
-          09-27
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/09/27/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB/" itemprop="url">
-            <span itemprop="name">针对topchunk的攻击</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-26T23:50:24+08:00"
-              content="2023-09-26">
-          09-26
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/09/26/house-of-husk/" itemprop="url">
-            <span itemprop="name">house_of_husk</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-25T20:22:39+08:00"
-              content="2023-09-25">
-          09-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/09/25/brics-ctf-pwn-paint%E9%A2%98%E8%A7%A3/" itemprop="url">
-            <span itemprop="name">brics-ctf-pwn paint题解</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-24T13:26:08+08:00"
-              content="2023-09-24">
-          09-24
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/09/24/catctf-injection2-0/" itemprop="url">
-            <span itemprop="name">catctf injection2.0</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-24T11:12:11+08:00"
-              content="2023-09-24">
-          09-24
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/09/24/IO-FILE-leak/" itemprop="url">
-            <span itemprop="name">IO_FILE_leak</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-23T23:33:59+08:00"
-              content="2023-09-23">
-          09-23
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/09/23/shellcode/" itemprop="url">
-            <span itemprop="name">shellcode</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-20T22:10:20+08:00"
-              content="2023-09-20">
-          09-20
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/09/20/chunk-overlap/" itemprop="url">
-            <span itemprop="name">chunk_overlap</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-19T11:31:10+08:00"
-              content="2023-09-19">
-          09-19
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/09/19/ssp%E6%94%BB%E5%87%BB/" itemprop="url">
-            <span itemprop="name">ssp攻击</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
+        <p><strong>ASLR是一种随机化保护的方法，linux自带，它使得栈、库、堆等地址随机化，对攻击达到一个干扰的效果</strong></p>
+<p>而在pwn题里面，针对ld的攻击，在ubuntu22.04下不知道为何ld的基址和libc的基址距离一直变化(一般是不变化的，使得我对ld的攻击调试极其不方便</p>
+<p>可以通过linux一条命令 临时关闭aslr，进行调试，不过要注意远程的这个距离和本地的距离一般是不一样的(相差会在第1.5个字节到第2.5个字节之间</p>
+<p>比如0x7ffff7fc3000，所以一般打远程需要爆破两个字节，后面会给出爆破的脚本</p>
+<p>关闭aslr：</p>
+<pre><code class="python">sudo sysctl -w kernel.randomize_va_space=0
+</code></pre>
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ticks/" rel="tag"># ticks</a>
+              <a href="/tags/aslr/" rel="tag"># aslr</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/09/27/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB/" rel="prev" title="针对topchunk的攻击">
+      <i class="fa fa-chevron-left"></i> 针对topchunk的攻击
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
 
