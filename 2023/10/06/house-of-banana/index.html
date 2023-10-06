@@ -29,17 +29,17 @@
 <meta property="og:site_name" content="hkbin的小博客~">
 <meta property="og:description" content="简介house_of_banana是一种全版本通用的针对link_map的打法，函数在main函数&#x2F;主函数正常返回时会调用到fini_array结构，漏洞代码就在其中，效果是可以执行一大段gadgets，破坏力比起apple2还要强，但是对能够控制的内存长度有要求，需要控制长度长达0x320+，而apple2可以控制在多段0x100内 打法模板调试的时候最好把aslr关了，不过还得注意本">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/house_of_banana%207854a7baff6f446693bb8075cd8e0c0e/Untitled.png">
-<meta property="og:image" content="http://example.com/house_of_banana%207854a7baff6f446693bb8075cd8e0c0e/Untitled%201.png">
+<meta property="og:image" content="http://example.com/images/house_of_banana%207854a7baff6f446693bb8075cd8e0c0e/Untitled.png">
+<meta property="og:image" content="http://example.com/images/house_of_banana%207854a7baff6f446693bb8075cd8e0c0e/Untitled%201.png">
 <meta property="article:published_time" content="2023-10-06T07:00:48.000Z">
-<meta property="article:modified_time" content="2023-10-06T07:02:48.344Z">
+<meta property="article:modified_time" content="2023-10-06T07:03:34.943Z">
 <meta property="article:author" content="hkbin">
 <meta property="article:tag" content="house_of">
 <meta property="article:tag" content="glibc*">
 <meta property="article:tag" content="exit&#x2F;rn only">
 <meta property="article:tag" content="gadgets">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/house_of_banana%207854a7baff6f446693bb8075cd8e0c0e/Untitled.png">
+<meta name="twitter:image" content="http://example.com/images/house_of_banana%207854a7baff6f446693bb8075cd8e0c0e/Untitled.png">
 
 <link rel="canonical" href="http://example.com/2023/10/06/house-of-banana/">
 
@@ -193,7 +193,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2023-10-06 15:00:48 / 修改时间：15:02:48" itemprop="dateCreated datePublished" datetime="2023-10-06T15:00:48+08:00">2023-10-06</time>
+              <time title="创建时间：2023-10-06 15:00:48 / 修改时间：15:03:34" itemprop="dateCreated datePublished" datetime="2023-10-06T15:00:48+08:00">2023-10-06</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -248,7 +248,7 @@
 <p>整个link_map链表的入口就是_rtld_global._dl_ns._ns_loaded，然后再通过l→next来访问别的链表。</p>
 <p>链表数量由这个决定：_rtld_global._dl_ns._ns_nloaded</p>
 <p>原本默认是4个，而且都能通过l→l_real &#x3D;&#x3D; l，所以我们也要让我们伪造的能通过</p>
-<p><img src="/house_of_banana%207854a7baff6f446693bb8075cd8e0c0e/Untitled.png" alt="Untitled"></p>
+<p><img src="/./images/house_of_banana%207854a7baff6f446693bb8075cd8e0c0e/Untitled.png" alt="Untitled"></p>
 <h3 id="第二部分校验"><a href="#第二部分校验" class="headerlink" title="第二部分校验"></a>第二部分校验</h3><p>我们知道原来的四个链表是能通过这两个断言校验的</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">92</span>:<span class="keyword">assert</span> (ns != LM_ID_BASE || i == nloaded);</span><br><span class="line"><span class="number">93</span>:<span class="keyword">assert</span> (ns == LM_ID_BASE || i == nloaded || i == nloaded - <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
 
@@ -273,7 +273,7 @@
 
 <p>然后是第二个if：</p>
 <p>宏定义：</p>
-<p><img src="/house_of_banana%207854a7baff6f446693bb8075cd8e0c0e/Untitled%201.png" alt="Untitled"></p>
+<p><img src="/./images/house_of_banana%207854a7baff6f446693bb8075cd8e0c0e/Untitled%201.png" alt="Untitled"></p>
 <p>给l_info对应的位置填点东西即可</p>
 <p><strong>如此即可绕过第二个if和第三个if判断</strong></p>
 <p>最后是确定array和i的代码：</p>
