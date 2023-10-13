@@ -159,6 +159,106 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/13/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E5%AE%9E%E9%AA%8C-%E8%A2%AB%E5%8A%A8%E6%8D%95%E5%8C%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/13/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E5%AE%9E%E9%AA%8C-%E8%A2%AB%E5%8A%A8%E6%8D%95%E5%8C%85/" class="post-title-link" itemprop="url">信息内容安全实验-被动捕包</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-10-13 17:04:24 / 修改时间：17:05:53" itemprop="dateCreated datePublished" datetime="2023-10-13T17:04:24+08:00">2023-10-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AE%9E%E9%AA%8C/" itemprop="url" rel="index"><span itemprop="name">实验</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>680</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="信息内容安全实验-被动捕包"><a href="#信息内容安全实验-被动捕包" class="headerlink" title="信息内容安全实验-被动捕包"></a>信息内容安全实验-被动捕包</h1><h1 id="实验要求"><a href="#实验要求" class="headerlink" title="实验要求"></a>实验要求</h1><p>能够捕抓到流量包，最终能解析到http请求包的头部以及响应包的返回内容即可，不需要gzip解压(如果有gzip压缩的话</p>
+<h1 id="实验分析"><a href="#实验分析" class="headerlink" title="实验分析"></a>实验分析</h1><p>采用linux下Pypcap配合dpkt进行处理即可(后面还添加了scapy处理的部分</p>
+<p>不过好像用scapy可以直接进行抓流量并且分析(更加方便</p>
+<h2 id="Pypcap"><a href="#Pypcap" class="headerlink" title="Pypcap"></a>Pypcap</h2><p>Pypcap在linux下基于libpcap。</p>
+<p>首先我们要选好抓取的网卡接口</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">iface = <span class="string">&#x27;ens33&#x27;</span></span><br><span class="line">pkt = pcap.pcap(iface, promisc=<span class="literal">True</span>, immediate=<span class="literal">True</span>, timeout_ms=<span class="number">50</span>)</span><br></pre></td></tr></table></figure>
+
+<p>写好这两句即可设定抓包的网卡接口</p>
+<p>linux下和windows下这个接口是不一样的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pcap</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查找所有的网卡接口</span></span><br><span class="line">interfaces = pcap.findalldevs()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印所有网卡接口</span></span><br><span class="line"><span class="keyword">for</span> interface <span class="keyword">in</span> interfaces:</span><br><span class="line">    <span class="built_in">print</span>(interface)</span><br></pre></td></tr></table></figure>
+
+<p>这个方法可以打印所有网卡接口</p>
+<p>windows下网卡接口是\devices\xxx这样的，这个时候可以配合wireshark</p>
+<p>想要获取devices\xxx对应的网卡接口昵称，可以在wireshark-编辑-首选项-捕获-默认接口那里可以点开查看</p>
+<p><img src="/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E5%AE%9E%E9%AA%8C-%E8%A2%AB%E5%8A%A8%E6%8D%95%E5%8C%85%20ec2910cdf3aa44c1994bbbb45aed9bb1/Untitled.png" alt="Untitled"></p>
+<h2 id="dpkt解析"><a href="#dpkt解析" class="headerlink" title="dpkt解析"></a>dpkt解析</h2><p>解析方法如下，具体用法可以查看文档</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">anlysisData_requests</span>(<span class="params">data</span>):</span><br><span class="line">    <span class="comment"># 解析以太网帧</span></span><br><span class="line">    eth = dpkt.ethernet.Ethernet(data)</span><br><span class="line">    <span class="comment"># 解析ip数据包</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">isinstance</span>(eth.data, dpkt.ip.IP):</span><br><span class="line">        ip = eth.data</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">isinstance</span>(ip.data, dpkt.tcp.TCP):</span><br><span class="line">            <span class="string">&quot;&quot;&quot;tcp&quot;&quot;&quot;</span></span><br><span class="line">            tcp = ip.data</span><br><span class="line">            <span class="comment"># 解析80端口流量</span></span><br><span class="line">            <span class="keyword">if</span> tcp.dport == <span class="number">80</span> <span class="keyword">or</span> tcp.sport == <span class="number">80</span>:</span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    <span class="comment">#解析到http</span></span><br><span class="line">                    http = dpkt.http.Request(tcp.data)</span><br><span class="line">                    log(<span class="string">&quot;http requests-&gt;&quot;</span>)</span><br><span class="line">                    <span class="built_in">print</span>(http)</span><br><span class="line">                <span class="keyword">except</span> (dpkt.dpkt.NeedData, dpkt.dpkt.UnpackError):</span><br><span class="line">                    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="scapy解析"><a href="#scapy解析" class="headerlink" title="scapy解析"></a>scapy解析</h2><p>解析方法如下，个人认为比dpkt好用(debug的时候可以随时打印)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">anlysisData_response</span>(<span class="params">data</span>):</span><br><span class="line">    ether_pkt = Ether(data)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        ip_pkt = ether_pkt[IP]</span><br><span class="line">        tcp_pkt = ip_pkt[TCP]</span><br><span class="line">        <span class="keyword">if</span> tcp_pkt.haslayer(Raw):</span><br><span class="line">            <span class="keyword">if</span> ip_pkt.flags.DF == <span class="number">1</span>:</span><br><span class="line">                log(<span class="string">&quot;该报文没有分片&quot;</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                log(<span class="string">&quot;该报文分片了&quot;</span>)</span><br><span class="line">            <span class="comment"># log(tcp_pkt.flags)</span></span><br><span class="line">            raw_pkt = tcp_pkt[Raw]</span><br><span class="line">            load = raw_pkt.load</span><br><span class="line">            log(<span class="string">&quot;http response-&gt;&quot;</span>)</span><br><span class="line">            <span class="built_in">print</span>(load)</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="实验代码"><a href="#实验代码" class="headerlink" title="实验代码"></a>实验代码</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pcap</span><br><span class="line"><span class="keyword">import</span> dpkt</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> getopt</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> gzip</span><br><span class="line"><span class="keyword">from</span> dpkt.compat <span class="keyword">import</span> BytesIO</span><br><span class="line"><span class="keyword">from</span> scapy.<span class="built_in">all</span> <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">captureData</span>(<span class="params">iface</span>):</span><br><span class="line">    pkt = pcap.pcap(iface, promisc=<span class="literal">True</span>, immediate=<span class="literal">True</span>, timeout_ms=<span class="number">50</span>)</span><br><span class="line">    <span class="comment"># filter method</span></span><br><span class="line">    filters = &#123;</span><br><span class="line">        <span class="string">&#x27;DNS&#x27;</span>: <span class="string">&#x27;udp port 53&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;HTTP&#x27;</span>: <span class="string">&#x27;tcp port 80&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">    pkt.setfilter(filters[<span class="string">&#x27;HTTP&#x27;</span>])</span><br><span class="line"></span><br><span class="line">    pcap_filepath = <span class="string">&#x27;pkts/pkts_&#123;&#125;.pcap&#x27;</span>.<span class="built_in">format</span>(time.strftime(<span class="string">&quot;%Y%m%d-%H%M%S&quot;</span>,</span><br><span class="line">        time.localtime()))</span><br><span class="line">    pcap_file = <span class="built_in">open</span>(pcap_filepath, <span class="string">&#x27;wb&#x27;</span>)</span><br><span class="line">    writer = dpkt.pcap.Writer(pcap_file)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;Start capture...&#x27;</span>)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        pkts_count = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> ptime, pdata <span class="keyword">in</span> pkt:</span><br><span class="line">            writer.writepkt(pdata, ptime)</span><br><span class="line">            anlysisData_requests(pdata)</span><br><span class="line">            anlysisData_response(pdata)</span><br><span class="line">            pkts_count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">except</span> KeyboardInterrupt <span class="keyword">as</span> e:</span><br><span class="line">        writer.close()</span><br><span class="line">        pcap_file.close()</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> pkts_count:</span><br><span class="line">            os.remove(pcap_filepath)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;%d packets received&#x27;</span>%(pkts_count))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">log</span>(<span class="params">x</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\x1B[36m&#123;&#125;\x1B[0m&quot;</span>.<span class="built_in">format</span>(x))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">anlysisData_requests</span>(<span class="params">data</span>):</span><br><span class="line">    <span class="comment"># 解析以太网帧</span></span><br><span class="line">    eth = dpkt.ethernet.Ethernet(data)</span><br><span class="line">    <span class="comment"># 解析ip数据包</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">isinstance</span>(eth.data, dpkt.ip.IP):</span><br><span class="line">        ip = eth.data</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">isinstance</span>(ip.data, dpkt.tcp.TCP):</span><br><span class="line">            <span class="string">&quot;&quot;&quot;tcp&quot;&quot;&quot;</span></span><br><span class="line">            tcp = ip.data</span><br><span class="line">            <span class="comment"># 解析80端口流量</span></span><br><span class="line">            <span class="keyword">if</span> tcp.dport == <span class="number">80</span> <span class="keyword">or</span> tcp.sport == <span class="number">80</span>:</span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    <span class="comment">#解析到http</span></span><br><span class="line">                    http = dpkt.http.Request(tcp.data)</span><br><span class="line">                    log(<span class="string">&quot;http requests-&gt;&quot;</span>)</span><br><span class="line">                    <span class="built_in">print</span>(http)</span><br><span class="line">                <span class="keyword">except</span> (dpkt.dpkt.NeedData, dpkt.dpkt.UnpackError):</span><br><span class="line">                    <span class="keyword">pass</span></span><br><span class="line">            </span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">anlysisData_response</span>(<span class="params">data</span>):</span><br><span class="line">    ether_pkt = Ether(data)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        ip_pkt = ether_pkt[IP]</span><br><span class="line">        tcp_pkt = ip_pkt[TCP]</span><br><span class="line">        <span class="keyword">if</span> tcp_pkt.haslayer(Raw):</span><br><span class="line">            <span class="keyword">if</span> ip_pkt.flags.DF == <span class="number">1</span>:</span><br><span class="line">                log(<span class="string">&quot;该报文没有分片&quot;</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                log(<span class="string">&quot;该报文分片了&quot;</span>)</span><br><span class="line">            <span class="comment"># log(tcp_pkt.flags)</span></span><br><span class="line">            raw_pkt = tcp_pkt[Raw]</span><br><span class="line">            load = raw_pkt.load</span><br><span class="line">            log(<span class="string">&quot;http response-&gt;&quot;</span>)</span><br><span class="line">            <span class="built_in">print</span>(load)</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    iface = <span class="string">&#x27;ens33&#x27;</span></span><br><span class="line">    captureData(iface)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/12/2023%E6%9F%8F%E9%B9%AD%E6%9D%AFpwn-wp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1412,121 +1512,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/24/IO-FILE-leak/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.png">
-      <meta itemprop="name" content="hkbin">
-      <meta itemprop="description" content="hkbin hkbin hkbin">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hkbin的小博客~">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/24/IO-FILE-leak/" class="post-title-link" itemprop="url">IO_FILE_leak</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-09-24 11:12:11 / 修改时间：11:13:15" itemprop="dateCreated datePublished" datetime="2023-09-24T11:12:11+08:00">2023-09-24</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>811</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="IO-FILE-leak是一种利用IO-FILE来达到leak效果的手法"><a href="#IO-FILE-leak是一种利用IO-FILE来达到leak效果的手法" class="headerlink" title="IO_FILE_leak是一种利用IO_FILE来达到leak效果的手法"></a>IO_FILE_leak是一种利用IO_FILE来达到leak效果的手法</h3><h2 id="利用方式："><a href="#利用方式：" class="headerlink" title="利用方式："></a>利用方式：</h2><p><strong>针对_IO_2_1_stdout_结构体</strong></p>
-<p>_flags改为0xfbad1800</p>
-<p>_IO_read_ptr &#x3D; 0</p>
-<p>_IO_read_end &#x3D; 0</p>
-<p>_IO_read_base &#x3D; 0</p>
-<p>_IO_write_base末字节改为0x58</p>
-<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="title function_">p64</span>(<span class="number">0xfbad1800</span>)+<span class="title function_">p64</span>(<span class="number">0</span>)*<span class="number">3</span>+b<span class="string">&quot;\x58&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>当程序调用_IO_2_1_stdout的时候就会输出_IO_write_base到_IO_write_ptr之间的内容</p>
-<hr>
-<p>另外一种利用手法</p>
-<p>如用下面payload，则会泄露_IO_2_1_stdin_(对于puts函数→不同函数输出不同)</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = p64(<span class="number">0xfbad3887</span>)+p64(<span class="number">0</span>)*<span class="number">3</span>+p8(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
-
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>对于输出函数来说，比如puts</p>
-<p>其调用流为</p>
-<p>_IO_puts→_IO_sputn→_IO_XSPUTN(vtable)→_IO_OVERFLOW(当缓冲区还有东西的时候)→_IO_do_write→_IO_new_do_write</p>
-<p>而当_IO_write_end &gt; _IO_write_ptr时，会调用memcpy拷贝数据到缓冲区，之后判断是否有剩余，也就是拷贝了就会调用_IO_overflow</p>
-<p>缓冲区机制：输出数据会先放到缓冲区，然后缓冲区再发送给用户，比如往缓冲区推了0x50个数据，但是只write了0x40个数据，这个时候缓冲区就会有剩余，在下一次输出的时候，将会输出完剩余的内容，而不是这次要输出的内容。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> _IO_new_file_overflow (_IO_FILE *f, <span class="type">int</span> ch)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (f-&gt;_flags &amp; _IO_NO_WRITES) <span class="comment">/* SET ERROR */</span></span><br><span class="line">    &#123;</span><br><span class="line">      f-&gt;_flags |= _IO_ERR_SEEN;</span><br><span class="line">      __set_errno (EBADF);</span><br><span class="line">      <span class="keyword">return</span> EOF;</span><br><span class="line">    &#125;</span><br><span class="line">  <span class="comment">/* If currently reading or no buffer allocated. */</span></span><br><span class="line">  <span class="keyword">if</span> ((f-&gt;_flags &amp; _IO_CURRENTLY_PUTTING) == <span class="number">0</span> || f-&gt;_IO_write_base == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">/* Allocate a buffer if needed. */</span></span><br><span class="line">      <span class="keyword">if</span> (f-&gt;_IO_write_base == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      _IO_doallocbuf (f);</span><br><span class="line">      _IO_setg (f, f-&gt;_IO_buf_base, f-&gt;_IO_buf_base, f-&gt;_IO_buf_base);</span><br><span class="line">    &#125;</span><br><span class="line">      <span class="comment">/* Otherwise must be currently reading.</span></span><br><span class="line"><span class="comment">     If _IO_read_ptr (and hence also _IO_read_end) is at the buffer end,</span></span><br><span class="line"><span class="comment">     logically slide the buffer forwards one block (by setting the</span></span><br><span class="line"><span class="comment">     read pointers to all point at the beginning of the block).  This</span></span><br><span class="line"><span class="comment">     makes room for subsequent output.</span></span><br><span class="line"><span class="comment">     Otherwise, set the read pointers to _IO_read_end (leaving that</span></span><br><span class="line"><span class="comment">     alone, so it can continue to correspond to the external position). */</span></span><br><span class="line">      <span class="keyword">if</span> (__glibc_unlikely (_IO_in_backup (f)))</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="type">size_t</span> nbackup = f-&gt;_IO_read_end - f-&gt;_IO_read_ptr;</span><br><span class="line">      _IO_free_backup_area (f);</span><br><span class="line">      f-&gt;_IO_read_base -= MIN (nbackup,</span><br><span class="line">                   f-&gt;_IO_read_base - f-&gt;_IO_buf_base);</span><br><span class="line">      f-&gt;_IO_read_ptr = f-&gt;_IO_read_base;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (f-&gt;_IO_read_ptr == f-&gt;_IO_buf_end)</span><br><span class="line">    f-&gt;_IO_read_end = f-&gt;_IO_read_ptr = f-&gt;_IO_buf_base;</span><br><span class="line">      f-&gt;_IO_write_ptr = f-&gt;_IO_read_ptr;</span><br><span class="line">      f-&gt;_IO_write_base = f-&gt;_IO_write_ptr;</span><br><span class="line">      f-&gt;_IO_write_end = f-&gt;_IO_buf_end;</span><br><span class="line">      f-&gt;_IO_read_base = f-&gt;_IO_read_ptr = f-&gt;_IO_read_end;</span><br><span class="line"></span><br><span class="line">      f-&gt;_flags |= _IO_CURRENTLY_PUTTING;</span><br><span class="line">      <span class="keyword">if</span> (f-&gt;_mode &lt;= <span class="number">0</span> &amp;&amp; f-&gt;_flags &amp; (_IO_LINE_BUF | _IO_UNBUFFERED))</span><br><span class="line">    f-&gt;_IO_write_end = f-&gt;_IO_write_ptr;</span><br><span class="line">    &#125;</span><br><span class="line">  <span class="keyword">if</span> (ch == EOF)</span><br><span class="line">    <span class="keyword">return</span> _IO_do_write (f, f-&gt;_IO_write_base,</span><br><span class="line">             f-&gt;_IO_write_ptr - f-&gt;_IO_write_base);</span><br><span class="line">  <span class="keyword">if</span> (f-&gt;_IO_write_ptr == f-&gt;_IO_buf_end ) <span class="comment">/* Buffer is really full */</span></span><br><span class="line">............</span><br></pre></td></tr></table></figure>
-
-<p>我们的目标是调用到_IO_do_write将数据打印出来</p>
-<p>需要绕过的检查：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">f-&gt;_flags &amp; _IO_NO_WRITES == False</span><br><span class="line">((f-&gt;_flags &amp; _IO_CURRENTLY_PUTTING) == <span class="number">0</span> || f-&gt;_IO_write_base == <span class="literal">NULL</span>) == False</span><br><span class="line"></span><br><span class="line">满足上述条件 _flags &amp; <span class="number">8</span> == <span class="number">0</span> , _flags &amp; <span class="number">0x800</span> == <span class="number">1</span>，且 _flags 魔数的常量为 <span class="number">0xfbad0000</span>。 那么此时 _flags == <span class="number">0xfbad0800</span></span><br></pre></td></tr></table></figure>
-
-<p>一些宏定义：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_MAGIC 0xFBAD0000 <span class="comment">/* Magic number */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _OLD_STDIO_MAGIC 0xFABC0000 <span class="comment">/* Emulate old stdio. */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_MAGIC_MASK 0xFFFF0000</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_USER_BUF 1 <span class="comment">/* User owns buffer; don&#x27;t delete it on close. */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_UNBUFFERED 2</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_NO_READS 4 <span class="comment">/* Reading not allowed */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_NO_WRITES 8 <span class="comment">/* Writing not allowd */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_EOF_SEEN 0x10</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_ERR_SEEN 0x20</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_DELETE_DONT_CLOSE 0x40 <span class="comment">/* Don&#x27;t call close(_fileno) on cleanup. */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_LINKED 0x80 <span class="comment">/* Set if linked (using _chain) to streambuf::_list_all.*/</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_IN_BACKUP 0x100</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_LINE_BUF 0x200</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_TIED_PUT_GET 0x400 <span class="comment">/* Set if put and get pointer logicly tied. */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_CURRENTLY_PUTTING 0x800</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_IS_APPENDING 0x1000</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_IS_FILEBUF 0x2000</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_BAD_SEEN 0x4000</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IO_USER_LOCK 0x8000</span></span><br></pre></td></tr></table></figure>
-
-<p>接着进入_IO_new_do_write</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span></span><br><span class="line">_IO_size_t</span><br><span class="line"><span class="title function_">new_do_write</span> <span class="params">(_IO_FILE *fp, <span class="type">const</span> <span class="type">char</span> *data, _IO_size_t to_do)</span></span><br><span class="line">&#123;</span><br><span class="line">  _IO_size_t count;</span><br><span class="line">  <span class="keyword">if</span> (fp-&gt;_flags &amp; _IO_IS_APPENDING)</span><br><span class="line">    <span class="comment">/* On a system without a proper O_APPEND implementation,</span></span><br><span class="line"><span class="comment">       you would need to sys_seek(0, SEEK_END) here, but is</span></span><br><span class="line"><span class="comment">       not needed nor desirable for Unix- or Posix-like systems.</span></span><br><span class="line"><span class="comment">       Instead, just indicate that offset (before and after) is</span></span><br><span class="line"><span class="comment">       unpredictable. */</span></span><br><span class="line">    fp-&gt;_offset = _IO_pos_BAD;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (fp-&gt;_IO_read_end != fp-&gt;_IO_write_base)</span><br><span class="line">    &#123;</span><br><span class="line">      _IO_off64_t new_pos</span><br><span class="line">    = _IO_SYSSEEK (fp, fp-&gt;_IO_write_base - fp-&gt;_IO_read_end, <span class="number">1</span>);</span><br><span class="line">      <span class="keyword">if</span> (new_pos == _IO_pos_BAD)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">      fp-&gt;_offset = new_pos;</span><br><span class="line">    &#125;</span><br><span class="line">  count = _IO_SYSWRITE (fp, data, to_do);</span><br><span class="line">  <span class="keyword">if</span> (fp-&gt;_cur_column &amp;&amp; count)</span><br><span class="line">    fp-&gt;_cur_column = _IO_adjust_column (fp-&gt;_cur_column - <span class="number">1</span>, data, count) + <span class="number">1</span>;</span><br><span class="line">  _IO_setg (fp, fp-&gt;_IO_buf_base, fp-&gt;_IO_buf_base, fp-&gt;_IO_buf_base);</span><br><span class="line">  fp-&gt;_IO_write_base = fp-&gt;_IO_write_ptr = fp-&gt;_IO_buf_base;</span><br><span class="line">  fp-&gt;_IO_write_end = (fp-&gt;_mode &lt;= <span class="number">0</span></span><br><span class="line">               &amp;&amp; (fp-&gt;_flags &amp; (_IO_LINE_BUF | _IO_UNBUFFERED))</span><br><span class="line">               ? fp-&gt;_IO_buf_base : fp-&gt;_IO_buf_end);</span><br><span class="line">  <span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>目标是调用到_IO_SYSWRITE</p>
-<p>校验：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fp-&gt;_flags &amp; _IO_IS_APPENDING == FALSE</span><br><span class="line">fp-&gt;_IO_read_end != fp-&gt;_IO_write_base == FALSE</span><br></pre></td></tr></table></figure>
-
-<p>所以_flags位设为0xfbad1800即可</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1598,20 +1583,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1662,7 +1647,7 @@
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">1:04</span>
+    <span title="站点阅读时长">1:07</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
