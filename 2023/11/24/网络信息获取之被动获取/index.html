@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="网络信息获取之被动获取TCP&#x2F;IP协议  数据包接收：  以太网的通讯以太网处理一二层，也就是我们的链路层和物理层，与TCP&#x2F;IP协议通过ARP和RARP协议进行相互转换。 同时具有载波监听和冲突检测功能。 在以太网中，所有的通讯都是广播的。因此在同一个网段下的所有网络接口都可以访问在物理媒体上传输的数据。 正常情况下，一个网络接口只响应这两种数据：  与自己mac地址相匹配的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络信息获取之被动获取">
+<meta property="og:url" content="http://example.com/2023/11/24/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96/index.html">
+<meta property="og:site_name" content="hkbin的小博客~">
+<meta property="og:description" content="网络信息获取之被动获取TCP&#x2F;IP协议  数据包接收：  以太网的通讯以太网处理一二层，也就是我们的链路层和物理层，与TCP&#x2F;IP协议通过ARP和RARP协议进行相互转换。 同时具有载波监听和冲突检测功能。 在以太网中，所有的通讯都是广播的。因此在同一个网段下的所有网络接口都可以访问在物理媒体上传输的数据。 正常情况下，一个网络接口只响应这两种数据：  与自己mac地址相匹配的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%201.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%202.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%203.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%204.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%205.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%206.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%207.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%208.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%209.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2010.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2011.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2012.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2013.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2014.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2015.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2016.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2017.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2018.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2019.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2020.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2021.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2022.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2023.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2024.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2025.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2026.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2027.png">
+<meta property="og:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2028.png">
+<meta property="article:published_time" content="2023-11-24T12:41:47.000Z">
+<meta property="article:modified_time" content="2023-11-24T12:43:11.242Z">
+<meta property="article:author" content="hkbin">
+<meta property="article:tag" content="信息内容安全">
+<meta property="article:tag" content="网络信息被动获取">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled.png">
+
+<link rel="canonical" href="http://example.com/2023/11/24/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>网络信息获取之被动获取 | hkbin的小博客~</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">hkbin的小博客~</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="heartbeat fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/11/24/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网络信息获取之被动获取
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-11-24 20:41:47 / 修改时间：20:43:11" itemprop="dateCreated datePublished" datetime="2023-11-24T20:41:47+08:00">2023-11-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="网络信息获取之被动获取"><a href="#网络信息获取之被动获取" class="headerlink" title="网络信息获取之被动获取"></a>网络信息获取之被动获取</h1><h1 id="TCP-IP协议"><a href="#TCP-IP协议" class="headerlink" title="TCP&#x2F;IP协议"></a>TCP&#x2F;IP协议</h1><p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%201.png" alt="Untitled"></p>
+<p>数据包接收：</p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%202.png" alt="Untitled"></p>
+<h1 id="以太网的通讯"><a href="#以太网的通讯" class="headerlink" title="以太网的通讯"></a>以太网的通讯</h1><p>以太网处理一二层，也就是我们的链路层和物理层，与TCP&#x2F;IP协议通过ARP和RARP协议进行相互转换。</p>
+<p>同时具有<strong>载波监听</strong>和<strong>冲突检测</strong>功能。</p>
+<p>在以太网中，所有的通讯都是广播的。因此在同一个网段下的所有网络接口都可以访问在物理媒体上传输的数据。</p>
+<p>正常情况下，一<strong>个网络接口只响应这两种数据</strong>：</p>
+<ol>
+<li>与自己mac地址相匹配的数据帧</li>
+<li>发向所有机器的广播数据帧</li>
+</ol>
+<p><strong>网卡收发数据步骤</strong>：</p>
+<ol>
+<li>网卡接收到传输来的数据，由网卡内的单片程序接收数据帧的目的MAC地址，并由网卡驱动程序的接受模式判断该不该接收</li>
+<li>如果认为接收则产生中断信号通知CPU</li>
+<li>认为不接收则直接丢弃</li>
+<li>CPU得到中断信号产生中断，操作系统根据网卡驱动程序设置的网卡中断程序地址调用驱动程序接收数据</li>
+<li>驱动程序接收数据后放入信号堆栈让操作系统处理。</li>
+</ol>
+<p><strong>网卡有四种接收方式</strong></p>
+<ol>
+<li>广播方式：该模式下的网卡能够接收网络中的广播信息。</li>
+<li>组播方式：设置在该模式下的网卡能够接收组播数据。</li>
+<li>直接方式：在这种模式下，只接收目的网卡的数据</li>
+<li>混杂模式：在这种模式下的网卡能够接受一切通过它的数据，而不管这个数据是否是传给他的。</li>
+</ol>
+<h1 id="被动获取"><a href="#被动获取" class="headerlink" title="被动获取"></a>被动获取</h1><p>这里的被动指的是监听&#x2F;嗅探的方式，收集流经设备的流量。</p>
+<p>主要分为串行和旁路模式</p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%203.png" alt="Untitled"></p>
+<p>旁路模式的常见网络设备主要是 <strong>集线器、交换机</strong></p>
+<p>串行模式的常见网络设备主要是 <strong>网桥、网关、路由器</strong></p>
+<p>进而划分<strong>串联监控模式和旁路监控模式</strong></p>
+<p>旁路监控主要依赖”镜像端口”功能来实现监控，也就是将数据复制为两份，一份发给镜像端口，一份发给目的端口。</p>
+<p><strong>优缺点:</strong></p>
+<p>旁路部署起来比较灵活方便，不会影响现有的网络结构，串行需要对现有网络结构进行变动。</p>
+<p>旁路模式对原始传递的数据包不会造成时延，不会对网速造成任何影响。而串联模式是串联在网络中的，所有的数据都需要先经过监控系统，检查之后再发给各个客户端，有一定的时延。</p>
+<p>旁路监控设备一旦故障或者停止运行，不会影响现有网络，而串联监控设备如果出现故障，会导致网络中断，导致网络单点故障。</p>
+<p>总结：</p>
+<ol>
+<li><strong>对网络结构影响</strong></li>
+<li><strong>时延</strong></li>
+<li><strong>单点故障</strong></li>
+</ol>
+<p>但是同样旁路也存在局限性。</p>
+<p><strong>数据获取：</strong>旁路需要交换机支持端口镜像才可以实现监控。</p>
+<p><strong>数据管控：</strong>旁路模式采用发送RST包的方式来断开TCP连接，不能禁止UDP通讯。对于UDP应用，还需要在路由器上面禁止UDP端口进行配合。而串联模式不存在这个问题。</p>
+<p>串行适用的网络产品：防火墙，数据包过滤设备。</p>
+<p>旁路适用的网络设备：内容审计，内容分析，检测设备。</p>
+<p><strong>数据分流技术</strong></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%204.png" alt="Untitled"></p>
+<p>主要有三种分流的方式：</p>
+<ol>
+<li><strong>分光器</strong> 将光缆上的光信号直接备份出一份，最简单的方式，设备要求最高。</li>
+<li><strong>路由交换</strong> 交换机需要通过镜像端口</li>
+<li><strong>HUB</strong> 集线器能够看到所有端口的报文</li>
+</ol>
+<h1 id="包捕获技术"><a href="#包捕获技术" class="headerlink" title="包捕获技术"></a>包捕获技术</h1><p>为了实现被动捕包，将在数据链路层设置旁路监听。</p>
+<h2 id="基于socket的网络的编程方法"><a href="#基于socket的网络的编程方法" class="headerlink" title="基于socket的网络的编程方法"></a>基于socket的网络的编程方法</h2><p>思路是将网络通讯当作”文件”描述字符进行处理，极大地简化了网络程序开发过程。</p>
+<p>Linux内核版本2.0以前的一种套接字类型，可以接收网络上所有的数据包。</p>
+<h2 id="数据链路提供者接口-DLPI"><a href="#数据链路提供者接口-DLPI" class="headerlink" title="数据链路提供者接口(DLPI)"></a>数据链路提供者接口(DLPI)</h2><p><strong>Data Link Provider Interface</strong>，定义了数据链路层向网络层提供的服务，是数据链路服务的提供者和使用者之间的一种标准接口，在实现上基于<strong>Unix</strong>的流机制。数据链路层服务的使用者既可以是用户的应用程序，也可以是访问数据链路服务的高层协议，比如TCP&#x2F;IP等。</p>
+<p>实际上是一种物理设备辅助(</p>
+<h2 id="BPF-伯克利数据包过滤器"><a href="#BPF-伯克利数据包过滤器" class="headerlink" title="BPF 伯克利数据包过滤器"></a>BPF 伯克利数据包过滤器</h2><p>这个过滤器工作在操作系统的内核层，主要由<strong>网络转发部分和数据包过滤两部分组成</strong>。</p>
+<p>效率很高，而且使用了数据缓存机制，使捕获数据包缓存在内核中，达到一定数量再传递给程序。</p>
+<p>实际应用上用Libpcap实现</p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%205.png" alt="Untitled"></p>
+<p>理论上来说即使被iptables封禁了某些数据包，tcpdump仍可以抓到，因为tcpdump作用于网络接口层，而iptables作用于IP协议层，tcpdump理论可以先抓到包。</p>
+<h1 id="一些常用的库"><a href="#一些常用的库" class="headerlink" title="一些常用的库"></a>一些常用的库</h1><h3 id="libnet"><a href="#libnet" class="headerlink" title="libnet"></a>libnet</h3><p>提供的接口函数主要实现和封装了数据包的构造和发送过程</p>
+<h3 id="libpcap"><a href="#libpcap" class="headerlink" title="libpcap"></a>libpcap</h3><p>提供的接口函数主要实现和封装了与数据包截获有关的过程</p>
+<h3 id="libnids"><a href="#libnids" class="headerlink" title="libnids"></a>libnids</h3><p>提供的接口函数主要实现了开发网络入侵监测系统所必须的一些结构框架</p>
+<h3 id="Libdnet"><a href="#Libdnet" class="headerlink" title="Libdnet"></a>Libdnet</h3><p>通用网络安全开发包</p>
+<h3 id="libicmp等"><a href="#libicmp等" class="headerlink" title="libicmp等"></a>libicmp等</h3><p>相对较为简单，封装的是ICMP数据包的主要处理过程(构造、发送、接收等)</p>
+<h1 id="协议的关键字段IP-TCP-UDP"><a href="#协议的关键字段IP-TCP-UDP" class="headerlink" title="协议的关键字段IP&#x2F;TCP&#x2F;UDP"></a>协议的关键字段IP&#x2F;TCP&#x2F;UDP</h1><h2 id="IP数据包"><a href="#IP数据包" class="headerlink" title="IP数据包"></a>IP数据包</h2><p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%206.png" alt="Untitled"></p>
+<p>如图所示，每一行为4Bytes，也就是32bits</p>
+<p>固定部分有20Bytes。对于可选字段来说，一般是32bit(4Bytes)的整数倍，无最小，最大为40Bytes，当有可选项字段不足32bits的时候，余下的部分用无用数据来填充，所以一个完整的IP包头，最小为20Bytes，最大为60Bytes。</p>
+<h3 id="版本号-4bits-："><a href="#版本号-4bits-：" class="headerlink" title="版本号(4bits)："></a>版本号(4bits)：</h3><p>告知IP地址是ipv4地址还是ipv6地址</p>
+<h3 id="首部长度-4bits-："><a href="#首部长度-4bits-：" class="headerlink" title="首部长度(4bits)："></a>首部长度(4bits)：</h3><p>告知这个数据包头的长度，由此推断出有无可选项</p>
+<h3 id="服务类型TOS-8bits-："><a href="#服务类型TOS-8bits-：" class="headerlink" title="服务类型TOS(8bits)："></a>服务类型TOS(8bits)：</h3><p>按位被定义为 PPP DTRM0<br>PPP：定义包的优先级，取值越大数据越重要<br>000 普通 (Routine)<br>001 优先的 (Priority)<br>010 立即的发送 (Immediate)<br>011 闪电式的 (Flash)<br>100 比闪电还闪电式的 (Flash Override)<br>101 CRI&#x2F;TIC&#x2F;ECP(找不到这个词的翻译)<br>110 网间控制 (Internetwork Control)<br>111 网络控制 (Network Control)<br>D 时延: 0:普通 1:延迟尽量小<br>T 吞吐量: 0:普通 1:流量尽量大<br>R 可靠性: 0:普通 1:可靠性尽量大<br>M 传输成本: 0:普通 1:成本尽量小<br>0 最后一位被保留，恒定为0</p>
+<h3 id="总长度-16bits-："><a href="#总长度-16bits-：" class="headerlink" title="总长度(16bits)："></a>总长度(16bits)：</h3><p>告知IP数据报文的总长度（包括被分片数据在内），最大承载量为1500字节，超过将进行数据分片</p>
+<h3 id="片偏移量-13bits-："><a href="#片偏移量-13bits-：" class="headerlink" title="片偏移量(13bits)："></a>片偏移量(13bits)：</h3><p>决定IP分片数据的先后顺序，只能是0或1480的倍数，第一个分片数据发送时偏移量为0，第二个为1480，第三个为2960，以此类推。<br>目的端重组数据包时靠偏移量来按顺序组合分片数据</p>
+<h3 id="标志位-3bits-："><a href="#标志位-3bits-：" class="headerlink" title="标志位(3bits)："></a>标志位(3bits)：</h3><p>第一位bit未启用为0</p>
+<p>第二位bit如果需要分片第二位为0，不需要分片第二位为1</p>
+<p>第三位比特为1代表还有后续分片，为0代表为最后一个分片<br>共有三种情况：<br>001（需要分片且还有后续分片）<br>000（需要分片且当前为最后一个分片）<br>010（不需要分片）</p>
+<h3 id="标识符-16bits-："><a href="#标识符-16bits-：" class="headerlink" title="标识符(16bits)："></a>标识符(16bits)：</h3><p>区分不同的IP数据包的分片数据，在目的端重组分片数据时能快速找到同一数据包的分片数据</p>
+<h3 id="生存时间TTL-8bits-："><a href="#生存时间TTL-8bits-：" class="headerlink" title="生存时间TTL(8bits)："></a>生存时间TTL(8bits)：</h3><p>范围为1-255；<br>单位为跳数，数据包每经过一台路由器即为一跳，TTL值减一；当TTL为0时，丢弃数据包。<br>作用是防止数据包在网络中永久的循环<br>Windows系统TTL一般为128，Linux系统TTL为1-128之间，通常为56,64。<br>注：跳点跟踪命令：tracert IP地址</p>
+<h3 id="协议-8bits-："><a href="#协议-8bits-：" class="headerlink" title="协议(8bits)："></a>协议(8bits)：</h3><p>区分上层协议；6代表TCP协议，17代表UDP协议</p>
+<h3 id="首部校验和-16bits-："><a href="#首部校验和-16bits-：" class="headerlink" title="首部校验和(16bits)："></a>首部校验和(16bits)：</h3><p>校验三层IP包头是否有误</p>
+<h3 id="源IP地址-32-bits-："><a href="#源IP地址-32-bits-：" class="headerlink" title="源IP地址(32 bits)："></a>源IP地址(32 bits)：</h3><p>指发送数据包的主机地址</p>
+<h3 id="目的IP地址-32-bits-："><a href="#目的IP地址-32-bits-：" class="headerlink" title="目的IP地址(32 bits)："></a>目的IP地址(32 bits)：</h3><p>指接收数据包的目标主机地址</p>
+<h3 id="选项字段："><a href="#选项字段：" class="headerlink" title="选项字段："></a>选项字段：</h3><p>通常不会使用到，因为IP包头部分的长度单位为32bit，因此可选项字段的长度必须为32bit的整数倍，<br>当使用时且剩余部分不足32bit会自动填充无用数据来补足32bit。</p>
+<h2 id="UDP数据包"><a href="#UDP数据包" class="headerlink" title="UDP数据包"></a>UDP数据包</h2><p>这个容易理解，首部大小为8 Bytes，注意这里是数据包长度</p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%207.png" alt="Untitled"></p>
+<h2 id="TCP数据包"><a href="#TCP数据包" class="headerlink" title="TCP数据包"></a>TCP数据包</h2><p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%208.png" alt="Untitled"></p>
+<p>flag位：</p>
+<p>1）CWR、ECE，与IP首部的ECN字段对应，ECE标志为1，则通知对方网络拥塞，已将拥塞窗口缩小。<br>2）URG：urgent flag，置1是表示数据需要紧急处置<br>3）ACK：acknowledgement flag，置1时，确认应答字段有效，除了建立连接的SYN包之外均应置1<br>4）PSH：push flag，置1时，应立刻传给上层应用协议，PSH置0时，并不需要立刻传而是先缓存<br>5）RST：reset flag，置1时表示TCP连接出现异常必须紧急断开连接。<br>6）SYN：synchronize flag，用于建立连接，并在其序列号字段进行序列号初始值设置。<br>7）FIN：finish flag，置1时希望断开连接。</p>
+<p>5-1.<strong>校验和</strong>：16位，包括首部和数据这两部分。在计算检验和时，要在TCP报文段的前面加上12字节的伪首部。</p>
+<h1 id="网络捕包的基本流程"><a href="#网络捕包的基本流程" class="headerlink" title="网络捕包的基本流程"></a>网络捕包的基本流程</h1><ol>
+<li><p>把网卡等同于文件进行I&#x2F;O</p>
+<p> 查找网卡：Find all devices()</p>
+<p> 打开网卡：open()</p>
+</li>
+<li><p>从网卡中读取数据</p>
+<p> 监听：loop()</p>
+<p> 数据回传给用户变量</p>
+</li>
+<li><p>处理获取的数据</p>
+<p> 转用户程序执行：Handler()</p>
+</li>
+<li><p>释放I&#x2F;O资源</p>
+</li>
+</ol>
+<h1 id="与TCP有关"><a href="#与TCP有关" class="headerlink" title="与TCP有关"></a>与TCP有关</h1><p>读者不懒，读者不懒不太可能。</p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%209.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2010.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2011.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2012.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2013.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2014.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2015.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2016.png" alt="Untitled"></p>
+<h1 id="高性能捕包"><a href="#高性能捕包" class="headerlink" title="高性能捕包"></a>高性能捕包</h1><p>造成丢包的主要原因是：</p>
+<ol>
+<li>CPU处于频繁中断状态，造成接收数据包效率低下。</li>
+<li>数据包被多次拷贝，浪费了大量的时间和资源。从网卡驱动到内核，再到内核到用户空间。</li>
+</ol>
+<h2 id="Linux传统优化技术-NAPI技术-DMA"><a href="#Linux传统优化技术-NAPI技术-DMA" class="headerlink" title="Linux传统优化技术-NAPI技术(DMA)"></a>Linux传统优化技术-NAPI技术(DMA)</h2><p>NAPI（New API）技术是linux上采用的一种提高网络处理效率的技术，它的核心就是<strong>不采用中断的方式读取数据</strong>，取而代之的是采用中断唤醒数据接收的服务程序(<strong>软中断</strong>)，然后用POLL的方法来轮询数据。</p>
+<p>NAPI技术的设备轮询机制具体特点如下：</p>
+<ol>
+<li>当一个网卡接收到一个数据包，便产生一个中断信号给系统</li>
+<li>系统进行如下操作：</li>
+</ol>
+<p>关闭网卡中断(屏蔽了中断信号，网卡仍然可以接收数据报到缓冲队列)</p>
+<p>激活轮询进程，对该网卡进行轮询(处理缓冲队列)</p>
+<p>打开网卡中断(解除屏蔽中断信号)</p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2017.png" alt="Untitled"></p>
+<h3 id="DMA技术"><a href="#DMA技术" class="headerlink" title="DMA技术"></a>DMA技术</h3><p>DMA技术不过多介绍了，可以在DMA控制器下，将数据从网卡拷贝到主存，拷贝过程中，CPU是不参与的。直接避免开销。</p>
+<h3 id="无锁环形队列"><a href="#无锁环形队列" class="headerlink" title="无锁环形队列"></a>无锁环形队列</h3><p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2018.png" alt="Untitled"></p>
+<h2 id="通过mmap实现零拷贝I-O"><a href="#通过mmap实现零拷贝I-O" class="headerlink" title="通过mmap实现零拷贝I&#x2F;O"></a>通过mmap实现零拷贝I&#x2F;O</h2><p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2019.png" alt="Untitled"></p>
+<p>简单来说就是将内存直接映射到内核区域，不需要经过拷贝了，只是页表的替换(</p>
+<p>mmap原理：虚拟内存可以通过页目录，页表映射到物理内存地址，也可以直接映射到物理磁盘(文件)上。当内核的一块内存区域映射到一个文件，而用户进程(server进程)又关联到这个文件，那么用户即可直接操作这块区域了。此时如果映射的内存是DMA的内存区域，即可实现零拷贝</p>
+<h2 id="传统的报文分组捕获模型和零拷贝报文获取方式对比"><a href="#传统的报文分组捕获模型和零拷贝报文获取方式对比" class="headerlink" title="传统的报文分组捕获模型和零拷贝报文获取方式对比"></a>传统的报文分组捕获模型和零拷贝报文获取方式对比</h2><p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2020.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2021.png" alt="Untitled"></p>
+<h2 id="ebpf技术-kernel-bypass"><a href="#ebpf技术-kernel-bypass" class="headerlink" title="ebpf技术(kernel bypass)"></a>ebpf技术(kernel bypass)</h2><p><del>bpf是linux内核中高度灵活和高效的类似虚拟机的技术，允许以安全的方式在各个挂钩点执行字节码。它用于许多Linux内核子系统，最突出的是网络、跟踪和安全。</del></p>
+<p><del>ebpf是比较新的扩展的BPF技术，具有更为庞大的功能体系。</del></p>
+<p>实际上的运用就是kernel bypass技术，也就是内核旁路技术，跳过内核的网络层，在用户态user-space做全部的包处理。kernel bypass涉及到从user-space管理NIC(network interface controller，网卡)，也就是需要用户态的驱动程序来处理NIC。</p>
+<p>用户态程序完全控制NIC，有什么好处呢？减少了内核开销；等</p>
+<p>坏处呢？用户程序需要直接管理硬件；kernel被完全跳过，所以内核提供的所有网络功能也被跳过，用户程序可能需要实现一些原来内核提供的功能；</p>
+<p>BPF是一个VM，它定义了一个程序执行的环境。除了字节码，它还定义了基于数据包的内存模型(packet-based memory model)、寄存器(A and X; Accumulator ans Index register)、暂存内存(scratch memory)、隐式程序计数器(implicit pc)。</p>
+<h2 id="xdp-kernel-bypass"><a href="#xdp-kernel-bypass" class="headerlink" title="xdp(kernel bypass)"></a>xdp(kernel bypass)</h2><p>XDP的全称是：eXpress Data Path </p>
+<p>XDP是Linux内核中提供高性能、可编程的网络数据包处理框架。</p>
+<ol>
+<li>直接接管网卡的RX数据包(类似DPDK用户态驱动)处理</li>
+<li>通过运行BPF指令快速处理报文</li>
+<li>和linux协议栈无缝对接</li>
+</ol>
+<p>哈哈难蹦，原来是和ebpf一块工作的，如图：</p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2022.png" alt="Untitled"></p>
+<p>NIC中接收到数据包之后。该checkpoint应将数据包传递给eBPF程序，该程序将决定如何处理该数据包：丢弃该数据包(drop)或让其继续通过正常路径(pass). 就像这幅图一样</p>
+<h2 id="DPDK-Data-Plane-Development-Kit-高性能包处理-kernel-bypass"><a href="#DPDK-Data-Plane-Development-Kit-高性能包处理-kernel-bypass" class="headerlink" title="DPDK(Data Plane Development Kit)高性能包处理(kernel bypass)"></a>DPDK(Data Plane Development Kit)高性能包处理(kernel bypass)</h2><h3 id="产生背景"><a href="#产生背景" class="headerlink" title="产生背景"></a>产生背景</h3><p>传统框架的局限性：传统Linux&#x2F;Unix系统中的协议栈对数据包的处理具有一定的局限性。网卡驱动程序运行在Linux的内核态，被动捕包的性能收到以下因素的影响。</p>
+<p>内核态和用户态之间的内容拷贝，多线程调度，系统中断</p>
+<p>互联网网络规模迅速扩张</p>
+<p>高速网络应用开发的需求</p>
+<h3 id="什么是DPDK"><a href="#什么是DPDK" class="headerlink" title="什么是DPDK"></a>什么是DPDK</h3><p>基于linux运行，是一个快速处理数据包的函数库和驱动集合。</p>
+<p>在用户态实现数据包的收发和处理，绕过了kernel协议栈对数据包的处理过程，也就是kernel bypass。</p>
+<h3 id="DPDK关键技术"><a href="#DPDK关键技术" class="headerlink" title="DPDK关键技术"></a>DPDK关键技术</h3><p>传统技术缺点：</p>
+<p>硬件中断导致的线程&#x2F;进程切换</p>
+<p>内存拷贝</p>
+<p>多处理器平台的CPU漂移</p>
+<p>缓存失效</p>
+<p><strong>UIO技术</strong></p>
+<p>当然UIO现在也变成了linux的核心技术</p>
+<p>UIO，即Userspace I&#x2F;O内核驱动，它在Linux kernel的世界比较小众，主要服务于一些定制设备。<strong>UIO负责将中断和设备内存暴露给用户空间，然后再由UIO用户态驱动实现具体的业务。</strong></p>
+<p>UIO干了什么事：</p>
+<p>在内核区域放置了一段代码，用来监听硬件中断轮询 内核空间驱动</p>
+<p>在用户空间实现了读取硬件设备内存，甚至硬件寄存器等 用户空间驱动</p>
+<p>当然这个轮询(<strong>PMD</strong>)是流量大的时候处理的。</p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2023.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2024.png" alt="Untitled"></p>
+<p><strong>对于多核也有支持</strong></p>
+<p>cpu affinity机制，将进程放在指定的CPU上尽量长地运行而不迁移到其他处理器，避免cpu cache missing，也减少了进程和线程地上下文切换，从而提高性能和效率。</p>
+<p>使用NUMA亲和，避免CPU跨NUMA访问内存。CPU访问自己的物理地址(cache)，有较短的响应时间，俗称Local Access，如果要访问其他CPU attach的内存，就需要通过inter-connect通道来访问，要慢一些，俗称Remote Access，在DPDK中，可以灵活地使用Local Access和Remote Access来提高访问速度。</p>
+<p><strong>大页表技术</strong></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2025.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2026.png" alt="Untitled"></p>
+<p><strong>内存池技术</strong></p>
+<p>DPDK在用户空间实现了一套精致的内存池拷贝技术，内核空间和用户空间的内存交互不需要进行拷贝，只做控制权转移，这样就减少了内存拷贝的开销。</p>
+<p><strong>大页内存管理</strong></p>
+<p>兼容上层API申请大内存(</p>
+<p><strong>无锁环境队列</strong></p>
+<p><strong>PMD技术</strong></p>
+<p>无中断开销</p>
+<h2 id="EBPF-XDP和DPDK的区别"><a href="#EBPF-XDP和DPDK的区别" class="headerlink" title="EBPF&#x2F;XDP和DPDK的区别"></a>EBPF&#x2F;XDP和DPDK的区别</h2><p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2027.png" alt="Untitled"></p>
+<p><img src="/./images/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%20346be0c29ec34ad8bc9bbc1dd7589f1b/Untitled%2028.png" alt="Untitled"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8/" rel="tag"># 信息内容安全</a>
+              <a href="/tags/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96/" rel="tag"># 网络信息被动获取</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/11/06/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B01/" rel="prev" title="算法笔记1">
+      <i class="fa fa-chevron-left"></i> 算法笔记1
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96"><span class="nav-number">1.</span> <span class="nav-text">网络信息获取之被动获取</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP-IP%E5%8D%8F%E8%AE%AE"><span class="nav-number">2.</span> <span class="nav-text">TCP&#x2F;IP协议</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A5%E5%A4%AA%E7%BD%91%E7%9A%84%E9%80%9A%E8%AE%AF"><span class="nav-number">3.</span> <span class="nav-text">以太网的通讯</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96"><span class="nav-number">4.</span> <span class="nav-text">被动获取</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8C%85%E6%8D%95%E8%8E%B7%E6%8A%80%E6%9C%AF"><span class="nav-number">5.</span> <span class="nav-text">包捕获技术</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8Esocket%E7%9A%84%E7%BD%91%E7%BB%9C%E7%9A%84%E7%BC%96%E7%A8%8B%E6%96%B9%E6%B3%95"><span class="nav-number">5.1.</span> <span class="nav-text">基于socket的网络的编程方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E6%8F%90%E4%BE%9B%E8%80%85%E6%8E%A5%E5%8F%A3-DLPI"><span class="nav-number">5.2.</span> <span class="nav-text">数据链路提供者接口(DLPI)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BPF-%E4%BC%AF%E5%85%8B%E5%88%A9%E6%95%B0%E6%8D%AE%E5%8C%85%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">5.3.</span> <span class="nav-text">BPF 伯克利数据包过滤器</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E7%9A%84%E5%BA%93"><span class="nav-number">6.</span> <span class="nav-text">一些常用的库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#libnet"><span class="nav-number">6.0.1.</span> <span class="nav-text">libnet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#libpcap"><span class="nav-number">6.0.2.</span> <span class="nav-text">libpcap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#libnids"><span class="nav-number">6.0.3.</span> <span class="nav-text">libnids</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Libdnet"><span class="nav-number">6.0.4.</span> <span class="nav-text">Libdnet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#libicmp%E7%AD%89"><span class="nav-number">6.0.5.</span> <span class="nav-text">libicmp等</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%8F%E8%AE%AE%E7%9A%84%E5%85%B3%E9%94%AE%E5%AD%97%E6%AE%B5IP-TCP-UDP"><span class="nav-number">7.</span> <span class="nav-text">协议的关键字段IP&#x2F;TCP&#x2F;UDP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IP%E6%95%B0%E6%8D%AE%E5%8C%85"><span class="nav-number">7.1.</span> <span class="nav-text">IP数据包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%88%E6%9C%AC%E5%8F%B7-4bits-%EF%BC%9A"><span class="nav-number">7.1.1.</span> <span class="nav-text">版本号(4bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A6%96%E9%83%A8%E9%95%BF%E5%BA%A6-4bits-%EF%BC%9A"><span class="nav-number">7.1.2.</span> <span class="nav-text">首部长度(4bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%B1%BB%E5%9E%8BTOS-8bits-%EF%BC%9A"><span class="nav-number">7.1.3.</span> <span class="nav-text">服务类型TOS(8bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E9%95%BF%E5%BA%A6-16bits-%EF%BC%9A"><span class="nav-number">7.1.4.</span> <span class="nav-text">总长度(16bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%87%E5%81%8F%E7%A7%BB%E9%87%8F-13bits-%EF%BC%9A"><span class="nav-number">7.1.5.</span> <span class="nav-text">片偏移量(13bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E5%BF%97%E4%BD%8D-3bits-%EF%BC%9A"><span class="nav-number">7.1.6.</span> <span class="nav-text">标志位(3bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E8%AF%86%E7%AC%A6-16bits-%EF%BC%9A"><span class="nav-number">7.1.7.</span> <span class="nav-text">标识符(16bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E5%AD%98%E6%97%B6%E9%97%B4TTL-8bits-%EF%BC%9A"><span class="nav-number">7.1.8.</span> <span class="nav-text">生存时间TTL(8bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%8F%E8%AE%AE-8bits-%EF%BC%9A"><span class="nav-number">7.1.9.</span> <span class="nav-text">协议(8bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A6%96%E9%83%A8%E6%A0%A1%E9%AA%8C%E5%92%8C-16bits-%EF%BC%9A"><span class="nav-number">7.1.10.</span> <span class="nav-text">首部校验和(16bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90IP%E5%9C%B0%E5%9D%80-32-bits-%EF%BC%9A"><span class="nav-number">7.1.11.</span> <span class="nav-text">源IP地址(32 bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E7%9A%84IP%E5%9C%B0%E5%9D%80-32-bits-%EF%BC%9A"><span class="nav-number">7.1.12.</span> <span class="nav-text">目的IP地址(32 bits)：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E9%A1%B9%E5%AD%97%E6%AE%B5%EF%BC%9A"><span class="nav-number">7.1.13.</span> <span class="nav-text">选项字段：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UDP%E6%95%B0%E6%8D%AE%E5%8C%85"><span class="nav-number">7.2.</span> <span class="nav-text">UDP数据包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP%E6%95%B0%E6%8D%AE%E5%8C%85"><span class="nav-number">7.3.</span> <span class="nav-text">TCP数据包</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E6%8D%95%E5%8C%85%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B"><span class="nav-number">8.</span> <span class="nav-text">网络捕包的基本流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8ETCP%E6%9C%89%E5%85%B3"><span class="nav-number">9.</span> <span class="nav-text">与TCP有关</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%AB%98%E6%80%A7%E8%83%BD%E6%8D%95%E5%8C%85"><span class="nav-number">10.</span> <span class="nav-text">高性能捕包</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux%E4%BC%A0%E7%BB%9F%E4%BC%98%E5%8C%96%E6%8A%80%E6%9C%AF-NAPI%E6%8A%80%E6%9C%AF-DMA"><span class="nav-number">10.1.</span> <span class="nav-text">Linux传统优化技术-NAPI技术(DMA)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DMA%E6%8A%80%E6%9C%AF"><span class="nav-number">10.1.1.</span> <span class="nav-text">DMA技术</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A0%E9%94%81%E7%8E%AF%E5%BD%A2%E9%98%9F%E5%88%97"><span class="nav-number">10.1.2.</span> <span class="nav-text">无锁环形队列</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87mmap%E5%AE%9E%E7%8E%B0%E9%9B%B6%E6%8B%B7%E8%B4%9DI-O"><span class="nav-number">10.2.</span> <span class="nav-text">通过mmap实现零拷贝I&#x2F;O</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E7%9A%84%E6%8A%A5%E6%96%87%E5%88%86%E7%BB%84%E6%8D%95%E8%8E%B7%E6%A8%A1%E5%9E%8B%E5%92%8C%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%A5%E6%96%87%E8%8E%B7%E5%8F%96%E6%96%B9%E5%BC%8F%E5%AF%B9%E6%AF%94"><span class="nav-number">10.3.</span> <span class="nav-text">传统的报文分组捕获模型和零拷贝报文获取方式对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ebpf%E6%8A%80%E6%9C%AF-kernel-bypass"><span class="nav-number">10.4.</span> <span class="nav-text">ebpf技术(kernel bypass)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xdp-kernel-bypass"><span class="nav-number">10.5.</span> <span class="nav-text">xdp(kernel bypass)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DPDK-Data-Plane-Development-Kit-%E9%AB%98%E6%80%A7%E8%83%BD%E5%8C%85%E5%A4%84%E7%90%86-kernel-bypass"><span class="nav-number">10.6.</span> <span class="nav-text">DPDK(Data Plane Development Kit)高性能包处理(kernel bypass)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A7%E7%94%9F%E8%83%8C%E6%99%AF"><span class="nav-number">10.6.1.</span> <span class="nav-text">产生背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFDPDK"><span class="nav-number">10.6.2.</span> <span class="nav-text">什么是DPDK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DPDK%E5%85%B3%E9%94%AE%E6%8A%80%E6%9C%AF"><span class="nav-number">10.6.3.</span> <span class="nav-text">DPDK关键技术</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EBPF-XDP%E5%92%8CDPDK%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.7.</span> <span class="nav-text">EBPF&#x2F;XDP和DPDK的区别</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="hkbin"
+      src="/images/header.png">
+  <p class="site-author-name" itemprop="name">hkbin</p>
+  <div class="site-description" itemprop="description">hkbin hkbin hkbin</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/17779938@qq.com" title="QQ → 17779938@qq.com"><i class="fab fa-stack-overflow fa-fw"></i>QQ</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/Hkhanbing" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Hkhanbing" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hkbin</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">42k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">2:31</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
