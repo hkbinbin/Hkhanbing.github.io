@@ -159,6 +159,217 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/11/26/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/11/26/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96/" class="post-title-link" itemprop="url">网络信息获取之主动获取</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-11-26 21:09:32 / 修改时间：21:10:54" itemprop="dateCreated datePublished" datetime="2023-11-26T21:09:32+08:00">2023-11-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="网络信息获取之主动获取"><a href="#网络信息获取之主动获取" class="headerlink" title="网络信息获取之主动获取"></a>网络信息获取之主动获取</h1><p>Created: November 26, 2023 4:16 PM<br>Reviewed: No</p>
+<h1 id="网络信息搜索系统的一般结构"><a href="#网络信息搜索系统的一般结构" class="headerlink" title="网络信息搜索系统的一般结构"></a>网络信息搜索系统的一般结构</h1><p>搜索器、索引器、检索器、用户接口</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled.png" alt="Untitled"></p>
+<h2 id="搜索器-爬虫"><a href="#搜索器-爬虫" class="headerlink" title="搜索器(爬虫)"></a>搜索器(爬虫)</h2><p>功能是在互联网中漫游，发现和收集信息。要尽可能多、尽可能快地搜集各种类型地新信息，还需要定期更新旧信息，避免死链接和无效链接。</p>
+<h3 id="爬虫的分类"><a href="#爬虫的分类" class="headerlink" title="爬虫的分类"></a>爬虫的分类</h3><ol>
+<li>批量型爬虫：批量型爬虫有明确的抓取范围和目标，当爬虫达到这个设定的目标后，即停止抓取过程。</li>
+<li>增量型爬虫：增量型爬虫会持续不断地抓取，对于抓取的网页可以实现定期更新，通用的商业搜索引擎爬虫基本属于此类。</li>
+<li>垂直型爬虫(聚焦爬虫)：垂直型爬虫关注特定主题或属于特定行业的网页，其他主题或其他行业的内容不在考虑范围之内。</li>
+</ol>
+<h3 id="主要技术"><a href="#主要技术" class="headerlink" title="主要技术"></a>主要技术</h3><p>爬虫缓冲池：抓取种子url放入队列中，取出URL，抓取页面并将URL放入已抓取队列，分析已抓取URL队列中的URL得到新URL，进入下一个循环。</p>
+<h3 id="在爬虫角度上的互联网划分"><a href="#在爬虫角度上的互联网划分" class="headerlink" title="在爬虫角度上的互联网划分"></a>在爬虫角度上的互联网划分</h3><ol>
+<li>已下载未过期页面</li>
+<li>已下载已过期页面</li>
+<li>待下载页面</li>
+<li>可知页面</li>
+<li>不可知网页</li>
+</ol>
+<h2 id="网络搜索策略"><a href="#网络搜索策略" class="headerlink" title="网络搜索策略"></a>网络搜索策略</h2><h3 id="深度优先"><a href="#深度优先" class="headerlink" title="深度优先"></a>深度优先</h3><p>深度优先遍历策略指网络爬虫会从起始页开始，一个链接一个链接地追踪下去，完整地处理完一条路之后再转入下一个起始页。多数情况下会导致爬虫的trapped问题。</p>
+<h3 id="广度优先"><a href="#广度优先" class="headerlink" title="广度优先"></a>广度优先</h3><p>也就是通用爬虫的思路(</p>
+<p>缺点是大量的无关页面将被下载并过滤，算法的效率会降低。</p>
+<h3 id="最佳优先"><a href="#最佳优先" class="headerlink" title="最佳优先"></a>最佳优先</h3><p>在抓取地过程中，按照一定的页面分析算法，预测候选的URL和目标网页地相似度，或者与主题地相关性，选取评价最好的一个或者几个URL进行抓取。</p>
+<p>缺点是在爬虫抓取路径上的很多相关网页可能被忽略，因为最佳优先策略是一种局部最有搜索算法。</p>
+<p>这样的闭环调整可以将无关页面数量降低30%~90%</p>
+<h2 id="多机抓取算法和单机抓取算法"><a href="#多机抓取算法和单机抓取算法" class="headerlink" title="多机抓取算法和单机抓取算法"></a>多机抓取算法和单机抓取算法</h2><p>多级抓取算法可以理解为多了一个调度器，用来统一分配URL，下面的都是它的线程&#x2F;肉鸡，思路都一样，分配的时候n &#x3D; hash(url) mod N，分配给N节点。</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%201.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%202.png" alt="Untitled"></p>
+<h2 id="索引器"><a href="#索引器" class="headerlink" title="索引器"></a>索引器</h2><p>索引器的功能是<strong>理解搜索器所搜索的信息，从中抽取出索引项，用于表示文档以及生成文档库的索引表</strong>。</p>
+<h3 id="评价网站好坏→PageRank算法"><a href="#评价网站好坏→PageRank算法" class="headerlink" title="评价网站好坏→PageRank算法"></a>评价网站好坏→PageRank算法</h3><p>PageRank根据网站的外部链接和内部链接的数量和质量衡量网站的价值。</p>
+<p>示例：</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%203.png" alt="Untitled"></p>
+<p><strong>中心思想</strong></p>
+<p>数量假设：</p>
+<p>当在网页模型图中，一个网页接受到的其他网页指向的入链(in-links)越多，说明该网页越重要。</p>
+<p>质量假设：</p>
+<p>当一个质量高的网页指向(out-links)一个网页，说明这个被指的网页重要。</p>
+<p><strong>公式：</strong></p>
+<p>$$<br>PR(v_i) &#x3D; \sum_{v_j\in M(v_i)}\frac {PR(j)}{L(v_j)}, i&#x3D;1,2,…,n<br>$$</p>
+<p>其中M(vi)表示指向节点vi的节点集合。</p>
+<p>L(vj)表示节点vj连出的有向边个数。</p>
+<p>例题：</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%204.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%205.png" alt="Untitled"></p>
+<p>上述只是迭代了第一次。需要一直迭代直到极限。</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%206.png" alt="Untitled"></p>
+<h3 id="Dead-Ends问题"><a href="#Dead-Ends问题" class="headerlink" title="Dead Ends问题"></a>Dead Ends问题</h3><p>当一个节点没有任何出链，这就是Dead Links，它会导致网站权重变为0</p>
+<p>一直迭代下去会导致所有节点的PR值为0</p>
+<p>例如：</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%207.png" alt="Untitled"></p>
+<p>这个时候需要一个修正：</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%208.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%209.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2010.png" alt="Untitled"></p>
+<h3 id="Spider-Traps问题"><a href="#Spider-Traps问题" class="headerlink" title="Spider Traps问题"></a>Spider Traps问题</h3><p>这个问题出现在于有节点指向自己，PageRank算法迭代下去会发现，该节点的PR值为1，别的节点为0。</p>
+<p>修正方式：</p>
+<p>随机游走，也就是打开网页B的时候，有概率打开网页C&#x2F;D。</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2011.png" alt="Untitled"></p>
+<h2 id="检索器"><a href="#检索器" class="headerlink" title="检索器"></a>检索器</h2><p>检索器的功能是根据用户的查询在索引库中快速检出文档，进行文档与查询的相关度评价，对将要输出的结果进行排序，并实现某种用户相关性反馈机制。</p>
+<p>检索器常用的四种模型有集合理论模型，代数模型，概率模型和混合模型四种。</p>
+<h2 id="用户接口"><a href="#用户接口" class="headerlink" title="用户接口"></a>用户接口</h2><p>用户接口的作用是输入用户查询，显示查询结果，提供用户相关性反馈机制，主要的目的是方便用户使用搜索引擎，高效率、多方式地从搜索引擎得到有效、及时地信息。</p>
+<h1 id="主被动获取技术比较"><a href="#主被动获取技术比较" class="headerlink" title="主被动获取技术比较"></a>主被动获取技术比较</h1><p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2012.png" alt="Untitled"></p>
+<h1 id="P2P网络"><a href="#P2P网络" class="headerlink" title="P2P网络"></a>P2P网络</h1><h2 id="P2P系统的分类"><a href="#P2P系统的分类" class="headerlink" title="P2P系统的分类"></a>P2P系统的分类</h2><h3 id="基于目录服务器地P2P网络-集中式"><a href="#基于目录服务器地P2P网络-集中式" class="headerlink" title="基于目录服务器地P2P网络(集中式)"></a>基于目录服务器地P2P网络(集中式)</h3><p>三张图理解</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2013.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2014.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2015.png" alt="Untitled"></p>
+<p><strong>不足：</strong></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2016.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2017.png" alt="Untitled"></p>
+<p>(具有分布式雏形</p>
+<h3 id="完全分布式的P2P"><a href="#完全分布式的P2P" class="headerlink" title="完全分布式的P2P"></a>完全分布式的P2P</h3><p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2018.png" alt="Untitled"></p>
+<p>特点就是泛洪</p>
+<p>但是全网泛红又有缺点</p>
+<p>所以出现了层次P2P</p>
+<h3 id="层次P2P"><a href="#层次P2P" class="headerlink" title="层次P2P"></a>层次P2P</h3><p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2019.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2020.png" alt="Untitled"></p>
+<h3 id="分布式哈希表系统-结构化P2P"><a href="#分布式哈希表系统-结构化P2P" class="headerlink" title="分布式哈希表系统(结构化P2P)"></a>分布式哈希表系统(结构化P2P)</h3><p>这个系统可以提高文件搜索效率的同时，又不依赖中心节点或局部中心节点。使用结构化对等网，基于分布式哈希表(Distributed Hash Table，简称DHT)而建。</p>
+<p><strong>结构化P2P：直接根据查询内的关键字定位其索引的存放节点，索引为&lt;key, value&gt;对。</strong></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2021.png" alt="Untitled"></p>
+<p>需要尽可能地保证表小一点，而且能够查询所有节点。需要在O(n)复杂度找到目标。</p>
+<p>参考二分查找，路由表应该这样建</p>
+<p><strong>节点n的路由表：</strong></p>
+<table>
+<thead>
+<tr>
+<th>1</th>
+<th>n+1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2</td>
+<td>n+2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>n+4</td>
+</tr>
+<tr>
+<td>4</td>
+<td>n+8</td>
+</tr>
+<tr>
+<td>5</td>
+<td>n+16</td>
+</tr>
+</tbody></table>
+<h3 id="另外一种操作-Chord-Hash表分布"><a href="#另外一种操作-Chord-Hash表分布" class="headerlink" title="另外一种操作 Chord-Hash表分布"></a>另外一种操作 Chord-Hash表分布</h3><p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2022.png" alt="Untitled"></p>
+<p>简单来说就是对两个值进行hash</p>
+<p>N &#x3D; hash(IP)，这个用来弄出你是第几个节点</p>
+<p>K &#x3D; hash(X)，这个表示你要上传&#x2F;下载的东西应该放在哪</p>
+<p>例如上传K &#x3D; 54，则应该放在N51~N56之间，而且存放在N56，</p>
+<p>查询的时候同理搜索至N56</p>
+<p><strong>优化：</strong></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2023.png" alt="Untitled"></p>
+<p>将每个节点的表变为二分的表，增大了一点，但是查询&#x2F;上传效率高了不少</p>
+<h3 id="Kademlia-Kad-也是一种经典的结构化P2P"><a href="#Kademlia-Kad-也是一种经典的结构化P2P" class="headerlink" title="Kademlia(Kad)也是一种经典的结构化P2P"></a>Kademlia(Kad)也是一种经典的结构化P2P</h3><p>Kad网络中每一个节点都有一个160bits的ID值作为标志符，Key也是一个160bits的标志符，每加入一个Kad，网络都会被分配一个Kad(可以认为ID是随机产生的)，&lt;key, value&gt;对的数据就存放在ID值最接近key值得节点上</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2024.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2025.png" alt="Untitled"></p>
+<p><strong>如何查询：</strong></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2026.png" alt="Untitled"></p>
+<p><strong>K桶</strong></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2027.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2028.png" alt="Untitled"></p>
+<p>总的来说就是每个节点都会有个K桶，这个K桶通过计算距离，可以来搜索目标节点。</p>
+<p>当新节点加入得时候需要泛红来传播新Kad节点信息。</p>
+<p>当然K桶不需要这么大，我觉得二分大小也可以。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><h2 id="P2P结构分类"><a href="#P2P结构分类" class="headerlink" title="P2P结构分类"></a>P2P结构分类</h2><p>非结构化的→完全分布式的P2P网络</p>
+<p>基于目录服务器的P2P网络</p>
+<p>层次P2P网络</p>
+<p>结构化P2P</p>
+<h2 id="P2P技术的特点"><a href="#P2P技术的特点" class="headerlink" title="P2P技术的特点"></a>P2P技术的特点</h2><p>非中心化</p>
+<p>扩展性</p>
+<p>健壮性</p>
+<p>高性价比</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/11/24/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1430,176 +1641,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/14/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B003/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.png">
-      <meta itemprop="name" content="hkbin">
-      <meta itemprop="description" content="hkbin hkbin hkbin">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hkbin的小博客~">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/10/14/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B003/" class="post-title-link" itemprop="url">操作系统读书笔记03</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-10-14 19:54:27 / 修改时间：19:56:34" itemprop="dateCreated datePublished" datetime="2023-10-14T19:54:27+08:00">2023-10-14</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>15 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="os读书笔记3"><a href="#os读书笔记3" class="headerlink" title="os读书笔记3"></a>os读书笔记3</h1><h1 id="中断和异常处理"><a href="#中断和异常处理" class="headerlink" title="中断和异常处理"></a>中断和异常处理</h1><h2 id="中断和异常处理概述"><a href="#中断和异常处理概述" class="headerlink" title="中断和异常处理概述"></a>中断和异常处理概述</h2><h3 id="什么是中断和异常"><a href="#什么是中断和异常" class="headerlink" title="什么是中断和异常?"></a>什么是中断和异常?</h3><p>中断和异常是强制性的执行流转移。效果是从当前正在执行的程序和任务转移到一个特殊的句柄的例程或任务。</p>
-<p>中断产生于硬件发出信号，中断的产生是随机的，对正在执行的程序来说是异步的。</p>
-<p>软件对于外部设备的请求，比如IO读入、调用别的硬件设备的情况下可以产生中断，使用的是INT n指令。</p>
-<p>异常是在处理器执行指令的过程中发现错误而产生的，比如除零异常等。</p>
-<p>处理器可以检测出多种不同的错误，包括保护异常，页错误，内部机器错误。</p>
-<h3 id="处理器如何处理？"><a href="#处理器如何处理？" class="headerlink" title="处理器如何处理？"></a>处理器如何处理？</h3><p>处理器收到中断信号或检测到异常时，便会挂起当前正在运行的进程或任务，前去执行中断或异常处理程序，中断或异常处理程序执行完之后，处理器一般会继续执行被终端的进程或者任务，有两种情况例外：无法从发生的异常中恢复、中断使当前的程序终止。</p>
-<h3 id="实模式和保护模式下，中断向量表一样吗？"><a href="#实模式和保护模式下，中断向量表一样吗？" class="headerlink" title="实模式和保护模式下，中断向量表一样吗？"></a>实模式和保护模式下，中断向量表一样吗？</h3><p>在实模式和保护模式下，中断向量表是不一样的。在实模式下，中断向量表是一个固定的地址，称为中断向量表基址，其中包含了一系列的中断向量，每个向量对应着一个特定的中断号。而在保护模式下，中断向量表被称为中断描述符表，它保存了每个中断的处理程序地址和相关的属性信息。</p>
-<h2 id="有关中断和异常了解性的内容"><a href="#有关中断和异常了解性的内容" class="headerlink" title="有关中断和异常了解性的内容"></a><strong><strong>有关中断和异常了解性的内容</strong></strong></h2><h3 id="异常和中断向量"><a href="#异常和中断向量" class="headerlink" title="异常和中断向量"></a>异常和中断向量</h3><p>异常和中断向量存储着每种异常、中断对应的处理程序的入口地址。</p>
-<p>异常向量和中断向量的作用是将发生的异常和中断与相应的处理程序关联起来，使处理器能够根据异常或中断类型找到对应的处理程序并进行处理。这样可以保证系统能够有效地响应和处理异常和中断事件。</p>
-<p>向量号0到31分配给异常和NMI中断使用，但是未完全使用，部分未使用的作为保留留给未来使用。</p>
-<p>32到255之间的向量号留给用户使用。</p>
-<p>这些中断不在 Intel 的保留部分之列，一般被分配给外部 I&#x2F;O 设备，允许它们通过某个外部硬件中断机制向处理器传递信号。</p>
-<h3 id="中断源和异常源"><a href="#中断源和异常源" class="headerlink" title="中断源和异常源"></a>中断源和异常源</h3><p><strong>中断源</strong></p>
-<p>中断有两个来源，一个是硬件中断(外部中断)，另一个是软件中断。</p>
-<p><strong>硬件中断</strong>是通过处理器的引脚接收的。任何通过 INTR 引脚或局部 APIC 传递到处理器的外部中断都被称作可屏蔽硬件中断。通过INTR 引脚传递的可屏蔽硬件中断可使用所有 Intel 架构定义的中断向量(0<del>255)；而通过局部 APIC 传递的部分只能使用 16</del>255 号向量。使用 EFLAGS 寄存器的 IF 位就可以屏蔽全部可屏蔽硬件中断。当 0 号中断到 15 号中断通过局部 APIC 传递时，APIC 会指出错误的向量号。</p>
-<p><strong>软件中断</strong></p>
-<p>将中断向量号作为 INT 指令的操作数即可通过 INT 指令在程序中产生中断。比如，指令 INT 35 即可调用第 35 号中断处理例程。<br>0 到 255 号中断均可使用 INT 指令调用。但是，当处理器预先定义好的 NMI 中断被这样调用时，处理器作出的响应与真正 NMI 中断发生时的响应并不一样。也就是说，执行 INT 2(NMI的向量号)时，NMI 处理例程被调用，但是处理器的 NMI 硬件处理并未被激活。<br>EFLAGS 的 IF 位并不能屏蔽由 INT 指令产生的中断。</p>
-<p><strong>异常源</strong></p>
-<p>异常信号有三个来源，一个是处理器检测到的程序错误异常，一个是软件产生的异常，另外一个是机器检测异常。</p>
-<ul>
-<li>程序错误异常：当检测到程序错误异常时，处理器产生一个或多个异常。Intel 为每个处理器可检测到的异常定义了一个向量号。异常又进一步被划分为错误，陷阱和终止。</li>
-<li>软件产生的异常：INTO，INT 3和BOUND指令允许在软件中产生异常。这些指令允许在指令流中检测指定的异常条件。</li>
-<li>机器检测异常：P6 系列和 Pentium 处理器同时提供了内部和外部的机器检测机制，用来检查内部芯片部件的操作和总线传输。这些机制组成了扩展异常机制（并不能独立完成）。当检测到一个机器检测错误时，处理器发出一个机器检测异常（18 号向量），并返回一个出错码。</li>
-</ul>
-<h3 id="异常的分类：故障、陷阱和中止"><a href="#异常的分类：故障、陷阱和中止" class="headerlink" title="异常的分类：故障、陷阱和中止"></a>异常的分类：故障、陷阱和中止</h3><p><strong>故障</strong>是一种通常能被修正的异常，修正过后，程序能够不失连续性地继续运行。当报告错误发生时，处理器将机器状态恢复到执行错误之前的状态。</p>
-<p>错误处理程序的返回地址和EIP指向产出错误的指令。</p>
-<p>只有少数几个异常被报告为错误，它们是不可恢复的，且处理器的上下文中的内容也会有部分丢失。</p>
-<p>一个例子：当执行 POPAD<br>指令是堆栈越过了堆栈段的尾部。异常处理例程会看到 CS：EIP 恢复原样，就好象 POPAD从未执行，但处理器状态却被改变了（通用寄存器）。</p>
-<p>这种情况被视为程序错误，若应用程序产生这样的错误则会被操作系统终止。</p>
-<p><strong>陷阱</strong>是一种异常，当引起陷阱的指令发生时，马上产生该异常。陷阱不影响程序的连续性，陷阱处理程序的返回地址指向引起陷阱指令的下一条指令。</p>
-<p><strong>中止</strong>是另一种异常，它并不总是报告产生异常指令的确切位置，也不允许引起终止的进程或任务重新执行。中止被用于报告严重错误，比如硬件错误，不一致或非法系统值。</p>
-<h3 id="程序或任务的重新执行"><a href="#程序或任务的重新执行" class="headerlink" title="程序或任务的重新执行"></a>程序或任务的重新执行</h3><p>对于故障类异常，返回地址指向产生错误的指令。所以当错误处理程序返回时，产生错误的指令将会重新执行。常见的错误就是缺页错误，错误处理程序会调用mmap一段内存再返回，这个时候再执行一次产生错误的指令，使程序不失去连续性。</p>
-<p>对于陷阱类异常，返回地址指向产生陷阱指令的下一条指令。当一条转移指令执行过程中检测到陷阱时，返回地址指针则反映了执行转向的情况。比如当执行JMP指令时，检测到有陷阱异常，返回地址指针指向的是JMP的目的地址，而不是JMP指令后的下一条指令。所有的陷阱异常保证进程或任务的继续执行不失连续性。</p>
-<p>中止类异常不支持程序或任务继续执行。终止处理例程的作用是：当有终止异常发生时，收集处理器的各种相关诊断信息，并关闭进程或系统。</p>
-<h3 id="开启和禁止中断"><a href="#开启和禁止中断" class="headerlink" title="开启和禁止中断"></a>开启和禁止中断</h3><p>根据处理器的状态和 EFLAGS 的 IF 位和 RF 位，处理器可以禁止某些中断的产生。</p>
-<p>任何通过 INTR 引脚或局部 APIC 传递到处理器的外部中断都被称作可屏蔽硬件中断。通过INTR 引脚传递的可屏蔽硬件中断可使用所有 Intel 架构定义的中断向量(0<del>255)；而通过局部 APIC 传递的部分只能使用 16</del>255 号向量。</p>
-<p>使用 EFLAGS 寄存器的 IF 位就可以屏蔽全部可屏蔽硬件中断。当 0 号中断到 15 号中断通过局部 APIC 传递时，APIC 会指出错误的向量号</p>
-<h3 id="异常和中断的优先级"><a href="#异常和中断的优先级" class="headerlink" title="异常和中断的优先级"></a>异常和中断的优先级</h3><p>指令边界有多个异常或中断发生，处理器将以预定的顺序来为它们提供服务。</p>
-<p>各类异常和中断源的优先关系如图所示：</p>
-<p><img src="/./images/images/img1.png" alt="Untitled"></p>
-<h2 id="中断描述符表"><a href="#中断描述符表" class="headerlink" title="中断描述符表"></a><strong><strong>中断描述符表</strong></strong></h2><p>中断描述符表(IDT)为每一个异常或中断向量对应的例程或任务分配了一个门描述符。和GDT和LDT一样，IDT也是由一系列由 8 个字节组成的描述符组成的(保护模式下)。和 GDT 不同的是，IDT 中的第一个元不是 NULL 描述符。异常或中断向量号乘上 8 即可得到IDT 中的描述符的索引（即门描述符包含的字节数）由于只有 256 个中断或异常向量，所以 IDT 不必包含多于 256 个描述符。并且可以包含不足 256 个的描述符，因为只有那些确实发生的异常或中断才需要一个描述符。所有 IDT 中的空描述符须将存在位置位 0。</p>
-<h3 id="如何构成？"><a href="#如何构成？" class="headerlink" title="如何构成？"></a>如何构成？</h3><p>和GDT表类似，构成由：</p>
-<ol>
-<li><p>段选择子：IDT 中的每个条目都由一个段选择子组成，用于标识处理程序所在的代码段或数据段。</p>
-</li>
-<li><p>偏移量：每个中断或异常都有一个关联的处理程序，偏移量用于指示处理程序在代码段中的起始位置。</p>
-</li>
-<li><p>标志位：IDT 中的每个条目还包含一些标志位，用于定义中断或异常的类型、访问权限等。</p>
-</li>
-</ol>
-<p>IDT 的结构是一个数组，每个数组元素代表一个中断向量，从 0 到 255。</p>
-<h3 id="如何获得中断处理程序的地址？"><a href="#如何获得中断处理程序的地址？" class="headerlink" title="如何获得中断处理程序的地址？"></a>如何获得中断处理程序的地址？</h3><p>在操作系统初始化过程中，会将中断处理程序的地址注册到中断向量表中的相应条目中。</p>
-<p>当中断发生时，CPU根据中断号从中断向量表中找到对应的条目，并获取其中保存的中断处理程序的地址。CPU会跳转到这个地址，开始执行中断处理程序。</p>
-<p>即通过访问中断向量表对应的条目来获得中断处理程序的地址。</p>
-<h3 id="如何设置中断描述符表寄存器？"><a href="#如何设置中断描述符表寄存器？" class="headerlink" title="如何设置中断描述符表寄存器？"></a>如何设置中断描述符表寄存器？</h3><p>构建好IDT表之后，在x86架构下，可以使用lidt汇编指令加载IDTR寄存器，IDTR寄存器是CPU的寄存器，用来存储IDT表的基地址和大小。</p>
-<p><img src="/./images/images/img2.png" alt="Untitled"></p>
-<h2 id="IDT-描述符"><a href="#IDT-描述符" class="headerlink" title="IDT 描述符"></a><strong><strong>IDT 描述符</strong></strong></h2><p>IDT包含以下三种门描述符</p>
-<ul>
-<li>任务门描述符</li>
-<li>中断门描述符</li>
-<li>陷阱们描述符</li>
-</ul>
-<p><img src="/./images/images/img3.png" alt="Untitled"></p>
-<p>任务门格式和GDT&#x2F;LDT中的任务门一样，包含异常或中断处理程序的TSS的段选择符</p>
-<p>中断门和陷阱门和调用门类似，包含一个指针(段选择符和offset)，处理器用来将执行流转移至异常或中断处理代码段中的处理程序。但是在处理EFLAGS的IF位的方式上有所不同。</p>
-<h2 id="中断与异常处理"><a href="#中断与异常处理" class="headerlink" title="中断与异常处理"></a><strong><strong>中断与异常处理</strong></strong></h2><h3 id="中断过程调用的流程是怎样的？"><a href="#中断过程调用的流程是怎样的？" class="headerlink" title="中断过程调用的流程是怎样的？"></a>中断过程调用的流程是怎样的？</h3><p>当程序触发中断时，会通过IDTR查询IDT，获得中断处理程序的段选择子和偏移，再查询GDT或LDT获得段描述符，配合生成一个指向中断处理程序的地址，之后将EFLAGS寄存器、CS寄存器、EIP寄存器的当前值压栈保存，然后转到中断处理程序执行，执行完返回到程序中正常执行。</p>
-<p><img src="/./images/images/img4.png" alt="Untitled"></p>
-<h3 id="不同优先级上，处理方式一样吗？"><a href="#不同优先级上，处理方式一样吗？" class="headerlink" title="不同优先级上，处理方式一样吗？"></a>不同优先级上，处理方式一样吗？</h3><p>不一样。</p>
-<p>相同优先级的情况下，不会发生堆栈切换。</p>
-<p>而中断程序优先级高于原程序的情况下，会发生堆栈切换。</p>
-<p>中断程序优先级低于原程序的情况下，则会发生报错。</p>
-<h3 id="如果发生堆栈切换，处理器会做哪些操作？"><a href="#如果发生堆栈切换，处理器会做哪些操作？" class="headerlink" title="如果发生堆栈切换，处理器会做哪些操作？"></a>如果发生堆栈切换，处理器会做哪些操作？</h3><p><img src="/./images/images/img5.png" alt="Untitled"></p>
-<p>指向返回后使用的栈指针也被压入栈中，也就是SS寄存器和ESP寄存器。处理器要用到的堆栈段选择符和栈指针则从当前进程的TSS中得到。</p>
-<p>处理器将 EFLAGS，SS，ESP，CS，EIP，还有出错码从当前进程的堆栈拷贝到处理例程的堆栈。</p>
-<p>在处理程序执行完毕返回的时候还需要还原堆栈。</p>
-<h3 id="如果没发生堆栈切换，处理器会做哪些操作？"><a href="#如果没发生堆栈切换，处理器会做哪些操作？" class="headerlink" title="如果没发生堆栈切换，处理器会做哪些操作？"></a>如果没发生堆栈切换，处理器会做哪些操作？</h3><p>没有发生对战切换，处理程序和原程序将会使用同一个堆栈。处理器会将Error Code，EIP，CS，EFLAGS压入栈中。</p>
-<p>处理程序执行完毕返回的时候只需要还原EIP即可。</p>
-<h3 id="中断处理过程后，如何返回，处理器做了哪些操作？"><a href="#中断处理过程后，如何返回，处理器做了哪些操作？" class="headerlink" title="中断处理过程后，如何返回，处理器做了哪些操作？"></a>中断处理过程后，如何返回，处理器做了哪些操作？</h3><p>处理器会将压入栈的内容弹出来，恢复寄存器。</p>
-<p>弹出EFLAGS寄存器值即可恢复EFLAGS寄存器至执行中断处理程序前。</p>
-<p>弹出CS、EIP等即可恢复。</p>
-<p>如果在调用处理例程时堆栈发生了切换，则在返回时，IRET 指令还将切换回被中断进程的堆栈。</p>
-<h3 id="异常和中断处理过程的保护"><a href="#异常和中断处理过程的保护" class="headerlink" title="异常和中断处理过程的保护"></a>异常和中断处理过程的保护</h3><p>如果异常和中断处理例程的特权级比 CPL 底，则处理器不允许这种调用发生。否则将产生通用保护异常（#GP）。</p>
-<p>因为中断和异常向量没有 RPL，所以当发生中断和异常时，并不检查 RPL。</p>
-<p>仅当中断或异常由 INT n, INT 3，或 INTO 指令产生时，处理器才检查中断或陷阱门的DPL。此时，CPL 必须小于或等于门的 DPL。这种限制防止了运行于 3 级的应用程序或进程使用软件中断来访问异常处理的关键代码，如页错误处理例程，因为这些例程位于更高一级的代码段中（数值上更小的特权级）。对于由硬件产生的中断和处理器检测到的异常，处理器则忽略掉中断或陷阱门中的 DPL。</p>
-<p>异常和中断的发生通常是随机的，这些特权规则有效地为异常和中断处理例程能运行在哪些特权级加上了限制。</p>
-<h3 id="异常和中断处理过程的标志使用方式"><a href="#异常和中断处理过程的标志使用方式" class="headerlink" title="异常和中断处理过程的标志使用方式"></a>异常和中断处理过程的标志使用方式</h3><p>访问异常或中断处理程序时，在将EFLAGS寄存器的内容保存进栈后，处理器会清EFLAGS寄存器的TF位。</p>
-<p>当调用异常和中断处理例程时，处理器在将 EFLAGS寄存器的内容保存进栈后，还会清 VM，RF，和 NT 位。</p>
-<p>清 TF 位则可以禁止指令跟踪，以使中断响应不受影响。后继的 IRET 指令则使用保存在栈中的 EFLAGS 寄存器中的值，恢复TF（和 VM，RF，及 NT）位。</p>
-<h3 id="中断门与陷阱门的唯一区别是什么？"><a href="#中断门与陷阱门的唯一区别是什么？" class="headerlink" title="中断门与陷阱门的唯一区别是什么？"></a>中断门与陷阱门的唯一区别是什么？</h3><p>在于处理器处理EFLAGS寄存器的IF位的方式。</p>
-<p>当通过中断门访问异常或中断处理例程时，处理器清除 IF 位，阻止别的中断干扰当前的中断处理程序。后继的 IRET 指令用存储在栈中的 EFLAGS 的内容恢复 IF 的值。</p>
-<p>而陷阱门调用处理程序时，IF 位不受影响。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1671,7 +1712,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1684,7 +1725,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-count">33</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1729,13 +1770,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">42k</span>
+    <span title="站点总字数">43k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">2:31</span>
+    <span title="站点阅读时长">2:38</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>

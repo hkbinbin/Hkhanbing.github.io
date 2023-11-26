@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="网络信息获取之主动获取Created: November 26, 2023 4:16 PMReviewed: No 网络信息搜索系统的一般结构搜索器、索引器、检索器、用户接口  搜索器(爬虫)功能是在互联网中漫游，发现和收集信息。要尽可能多、尽可能快地搜集各种类型地新信息，还需要定期更新旧信息，避免死链接和无效链接。 爬虫的分类 批量型爬虫：批量型爬虫有明确的抓取范围和目标，当爬虫达到这个设定的目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络信息获取之主动获取">
+<meta property="og:url" content="http://example.com/2023/11/26/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96/index.html">
+<meta property="og:site_name" content="hkbin的小博客~">
+<meta property="og:description" content="网络信息获取之主动获取Created: November 26, 2023 4:16 PMReviewed: No 网络信息搜索系统的一般结构搜索器、索引器、检索器、用户接口  搜索器(爬虫)功能是在互联网中漫游，发现和收集信息。要尽可能多、尽可能快地搜集各种类型地新信息，还需要定期更新旧信息，避免死链接和无效链接。 爬虫的分类 批量型爬虫：批量型爬虫有明确的抓取范围和目标，当爬虫达到这个设定的目">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%201.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%202.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%203.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%204.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%205.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%206.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%207.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%208.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%209.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2010.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2011.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2012.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2013.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2014.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2015.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2016.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2017.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2018.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2019.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2020.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2021.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2022.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2023.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2024.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2025.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2026.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2027.png">
+<meta property="og:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2028.png">
+<meta property="article:published_time" content="2023-11-26T13:09:32.000Z">
+<meta property="article:modified_time" content="2023-11-26T13:10:54.507Z">
+<meta property="article:author" content="hkbin">
+<meta property="article:tag" content="信息内容安全">
+<meta property="article:tag" content="网络信息主动获取">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled.png">
+
+<link rel="canonical" href="http://example.com/2023/11/26/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>网络信息获取之主动获取 | hkbin的小博客~</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">hkbin的小博客~</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="heartbeat fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/11/26/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网络信息获取之主动获取
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-11-26 21:09:32 / 修改时间：21:10:54" itemprop="dateCreated datePublished" datetime="2023-11-26T21:09:32+08:00">2023-11-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="网络信息获取之主动获取"><a href="#网络信息获取之主动获取" class="headerlink" title="网络信息获取之主动获取"></a>网络信息获取之主动获取</h1><p>Created: November 26, 2023 4:16 PM<br>Reviewed: No</p>
+<h1 id="网络信息搜索系统的一般结构"><a href="#网络信息搜索系统的一般结构" class="headerlink" title="网络信息搜索系统的一般结构"></a>网络信息搜索系统的一般结构</h1><p>搜索器、索引器、检索器、用户接口</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled.png" alt="Untitled"></p>
+<h2 id="搜索器-爬虫"><a href="#搜索器-爬虫" class="headerlink" title="搜索器(爬虫)"></a>搜索器(爬虫)</h2><p>功能是在互联网中漫游，发现和收集信息。要尽可能多、尽可能快地搜集各种类型地新信息，还需要定期更新旧信息，避免死链接和无效链接。</p>
+<h3 id="爬虫的分类"><a href="#爬虫的分类" class="headerlink" title="爬虫的分类"></a>爬虫的分类</h3><ol>
+<li>批量型爬虫：批量型爬虫有明确的抓取范围和目标，当爬虫达到这个设定的目标后，即停止抓取过程。</li>
+<li>增量型爬虫：增量型爬虫会持续不断地抓取，对于抓取的网页可以实现定期更新，通用的商业搜索引擎爬虫基本属于此类。</li>
+<li>垂直型爬虫(聚焦爬虫)：垂直型爬虫关注特定主题或属于特定行业的网页，其他主题或其他行业的内容不在考虑范围之内。</li>
+</ol>
+<h3 id="主要技术"><a href="#主要技术" class="headerlink" title="主要技术"></a>主要技术</h3><p>爬虫缓冲池：抓取种子url放入队列中，取出URL，抓取页面并将URL放入已抓取队列，分析已抓取URL队列中的URL得到新URL，进入下一个循环。</p>
+<h3 id="在爬虫角度上的互联网划分"><a href="#在爬虫角度上的互联网划分" class="headerlink" title="在爬虫角度上的互联网划分"></a>在爬虫角度上的互联网划分</h3><ol>
+<li>已下载未过期页面</li>
+<li>已下载已过期页面</li>
+<li>待下载页面</li>
+<li>可知页面</li>
+<li>不可知网页</li>
+</ol>
+<h2 id="网络搜索策略"><a href="#网络搜索策略" class="headerlink" title="网络搜索策略"></a>网络搜索策略</h2><h3 id="深度优先"><a href="#深度优先" class="headerlink" title="深度优先"></a>深度优先</h3><p>深度优先遍历策略指网络爬虫会从起始页开始，一个链接一个链接地追踪下去，完整地处理完一条路之后再转入下一个起始页。多数情况下会导致爬虫的trapped问题。</p>
+<h3 id="广度优先"><a href="#广度优先" class="headerlink" title="广度优先"></a>广度优先</h3><p>也就是通用爬虫的思路(</p>
+<p>缺点是大量的无关页面将被下载并过滤，算法的效率会降低。</p>
+<h3 id="最佳优先"><a href="#最佳优先" class="headerlink" title="最佳优先"></a>最佳优先</h3><p>在抓取地过程中，按照一定的页面分析算法，预测候选的URL和目标网页地相似度，或者与主题地相关性，选取评价最好的一个或者几个URL进行抓取。</p>
+<p>缺点是在爬虫抓取路径上的很多相关网页可能被忽略，因为最佳优先策略是一种局部最有搜索算法。</p>
+<p>这样的闭环调整可以将无关页面数量降低30%~90%</p>
+<h2 id="多机抓取算法和单机抓取算法"><a href="#多机抓取算法和单机抓取算法" class="headerlink" title="多机抓取算法和单机抓取算法"></a>多机抓取算法和单机抓取算法</h2><p>多级抓取算法可以理解为多了一个调度器，用来统一分配URL，下面的都是它的线程&#x2F;肉鸡，思路都一样，分配的时候n &#x3D; hash(url) mod N，分配给N节点。</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%201.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%202.png" alt="Untitled"></p>
+<h2 id="索引器"><a href="#索引器" class="headerlink" title="索引器"></a>索引器</h2><p>索引器的功能是<strong>理解搜索器所搜索的信息，从中抽取出索引项，用于表示文档以及生成文档库的索引表</strong>。</p>
+<h3 id="评价网站好坏→PageRank算法"><a href="#评价网站好坏→PageRank算法" class="headerlink" title="评价网站好坏→PageRank算法"></a>评价网站好坏→PageRank算法</h3><p>PageRank根据网站的外部链接和内部链接的数量和质量衡量网站的价值。</p>
+<p>示例：</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%203.png" alt="Untitled"></p>
+<p><strong>中心思想</strong></p>
+<p>数量假设：</p>
+<p>当在网页模型图中，一个网页接受到的其他网页指向的入链(in-links)越多，说明该网页越重要。</p>
+<p>质量假设：</p>
+<p>当一个质量高的网页指向(out-links)一个网页，说明这个被指的网页重要。</p>
+<p><strong>公式：</strong></p>
+<p>$$<br>PR(v_i) &#x3D; \sum_{v_j\in M(v_i)}\frac {PR(j)}{L(v_j)}, i&#x3D;1,2,…,n<br>$$</p>
+<p>其中M(vi)表示指向节点vi的节点集合。</p>
+<p>L(vj)表示节点vj连出的有向边个数。</p>
+<p>例题：</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%204.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%205.png" alt="Untitled"></p>
+<p>上述只是迭代了第一次。需要一直迭代直到极限。</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%206.png" alt="Untitled"></p>
+<h3 id="Dead-Ends问题"><a href="#Dead-Ends问题" class="headerlink" title="Dead Ends问题"></a>Dead Ends问题</h3><p>当一个节点没有任何出链，这就是Dead Links，它会导致网站权重变为0</p>
+<p>一直迭代下去会导致所有节点的PR值为0</p>
+<p>例如：</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%207.png" alt="Untitled"></p>
+<p>这个时候需要一个修正：</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%208.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%209.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2010.png" alt="Untitled"></p>
+<h3 id="Spider-Traps问题"><a href="#Spider-Traps问题" class="headerlink" title="Spider Traps问题"></a>Spider Traps问题</h3><p>这个问题出现在于有节点指向自己，PageRank算法迭代下去会发现，该节点的PR值为1，别的节点为0。</p>
+<p>修正方式：</p>
+<p>随机游走，也就是打开网页B的时候，有概率打开网页C&#x2F;D。</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2011.png" alt="Untitled"></p>
+<h2 id="检索器"><a href="#检索器" class="headerlink" title="检索器"></a>检索器</h2><p>检索器的功能是根据用户的查询在索引库中快速检出文档，进行文档与查询的相关度评价，对将要输出的结果进行排序，并实现某种用户相关性反馈机制。</p>
+<p>检索器常用的四种模型有集合理论模型，代数模型，概率模型和混合模型四种。</p>
+<h2 id="用户接口"><a href="#用户接口" class="headerlink" title="用户接口"></a>用户接口</h2><p>用户接口的作用是输入用户查询，显示查询结果，提供用户相关性反馈机制，主要的目的是方便用户使用搜索引擎，高效率、多方式地从搜索引擎得到有效、及时地信息。</p>
+<h1 id="主被动获取技术比较"><a href="#主被动获取技术比较" class="headerlink" title="主被动获取技术比较"></a>主被动获取技术比较</h1><p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2012.png" alt="Untitled"></p>
+<h1 id="P2P网络"><a href="#P2P网络" class="headerlink" title="P2P网络"></a>P2P网络</h1><h2 id="P2P系统的分类"><a href="#P2P系统的分类" class="headerlink" title="P2P系统的分类"></a>P2P系统的分类</h2><h3 id="基于目录服务器地P2P网络-集中式"><a href="#基于目录服务器地P2P网络-集中式" class="headerlink" title="基于目录服务器地P2P网络(集中式)"></a>基于目录服务器地P2P网络(集中式)</h3><p>三张图理解</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2013.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2014.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2015.png" alt="Untitled"></p>
+<p><strong>不足：</strong></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2016.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2017.png" alt="Untitled"></p>
+<p>(具有分布式雏形</p>
+<h3 id="完全分布式的P2P"><a href="#完全分布式的P2P" class="headerlink" title="完全分布式的P2P"></a>完全分布式的P2P</h3><p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2018.png" alt="Untitled"></p>
+<p>特点就是泛洪</p>
+<p>但是全网泛红又有缺点</p>
+<p>所以出现了层次P2P</p>
+<h3 id="层次P2P"><a href="#层次P2P" class="headerlink" title="层次P2P"></a>层次P2P</h3><p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2019.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2020.png" alt="Untitled"></p>
+<h3 id="分布式哈希表系统-结构化P2P"><a href="#分布式哈希表系统-结构化P2P" class="headerlink" title="分布式哈希表系统(结构化P2P)"></a>分布式哈希表系统(结构化P2P)</h3><p>这个系统可以提高文件搜索效率的同时，又不依赖中心节点或局部中心节点。使用结构化对等网，基于分布式哈希表(Distributed Hash Table，简称DHT)而建。</p>
+<p><strong>结构化P2P：直接根据查询内的关键字定位其索引的存放节点，索引为&lt;key, value&gt;对。</strong></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2021.png" alt="Untitled"></p>
+<p>需要尽可能地保证表小一点，而且能够查询所有节点。需要在O(n)复杂度找到目标。</p>
+<p>参考二分查找，路由表应该这样建</p>
+<p><strong>节点n的路由表：</strong></p>
+<table>
+<thead>
+<tr>
+<th>1</th>
+<th>n+1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2</td>
+<td>n+2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>n+4</td>
+</tr>
+<tr>
+<td>4</td>
+<td>n+8</td>
+</tr>
+<tr>
+<td>5</td>
+<td>n+16</td>
+</tr>
+</tbody></table>
+<h3 id="另外一种操作-Chord-Hash表分布"><a href="#另外一种操作-Chord-Hash表分布" class="headerlink" title="另外一种操作 Chord-Hash表分布"></a>另外一种操作 Chord-Hash表分布</h3><p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2022.png" alt="Untitled"></p>
+<p>简单来说就是对两个值进行hash</p>
+<p>N &#x3D; hash(IP)，这个用来弄出你是第几个节点</p>
+<p>K &#x3D; hash(X)，这个表示你要上传&#x2F;下载的东西应该放在哪</p>
+<p>例如上传K &#x3D; 54，则应该放在N51~N56之间，而且存放在N56，</p>
+<p>查询的时候同理搜索至N56</p>
+<p><strong>优化：</strong></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2023.png" alt="Untitled"></p>
+<p>将每个节点的表变为二分的表，增大了一点，但是查询&#x2F;上传效率高了不少</p>
+<h3 id="Kademlia-Kad-也是一种经典的结构化P2P"><a href="#Kademlia-Kad-也是一种经典的结构化P2P" class="headerlink" title="Kademlia(Kad)也是一种经典的结构化P2P"></a>Kademlia(Kad)也是一种经典的结构化P2P</h3><p>Kad网络中每一个节点都有一个160bits的ID值作为标志符，Key也是一个160bits的标志符，每加入一个Kad，网络都会被分配一个Kad(可以认为ID是随机产生的)，&lt;key, value&gt;对的数据就存放在ID值最接近key值得节点上</p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2024.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2025.png" alt="Untitled"></p>
+<p><strong>如何查询：</strong></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2026.png" alt="Untitled"></p>
+<p><strong>K桶</strong></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2027.png" alt="Untitled"></p>
+<p><img src="/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96%20b98f42b8c3b048f786cf7acef56bf4db/Untitled%2028.png" alt="Untitled"></p>
+<p>总的来说就是每个节点都会有个K桶，这个K桶通过计算距离，可以来搜索目标节点。</p>
+<p>当新节点加入得时候需要泛红来传播新Kad节点信息。</p>
+<p>当然K桶不需要这么大，我觉得二分大小也可以。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><h2 id="P2P结构分类"><a href="#P2P结构分类" class="headerlink" title="P2P结构分类"></a>P2P结构分类</h2><p>非结构化的→完全分布式的P2P网络</p>
+<p>基于目录服务器的P2P网络</p>
+<p>层次P2P网络</p>
+<p>结构化P2P</p>
+<h2 id="P2P技术的特点"><a href="#P2P技术的特点" class="headerlink" title="P2P技术的特点"></a>P2P技术的特点</h2><p>非中心化</p>
+<p>扩展性</p>
+<p>健壮性</p>
+<p>高性价比</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8/" rel="tag"># 信息内容安全</a>
+              <a href="/tags/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96/" rel="tag"># 网络信息主动获取</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/11/24/%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96/" rel="prev" title="网络信息获取之被动获取">
+      <i class="fa fa-chevron-left"></i> 网络信息获取之被动获取
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E8%8E%B7%E5%8F%96%E4%B9%8B%E4%B8%BB%E5%8A%A8%E8%8E%B7%E5%8F%96"><span class="nav-number">1.</span> <span class="nav-text">网络信息获取之主动获取</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F%E7%9A%84%E4%B8%80%E8%88%AC%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">网络信息搜索系统的一般结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2%E5%99%A8-%E7%88%AC%E8%99%AB"><span class="nav-number">2.1.</span> <span class="nav-text">搜索器(爬虫)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%88%AC%E8%99%AB%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">2.1.1.</span> <span class="nav-text">爬虫的分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%8A%80%E6%9C%AF"><span class="nav-number">2.1.2.</span> <span class="nav-text">主要技术</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E7%88%AC%E8%99%AB%E8%A7%92%E5%BA%A6%E4%B8%8A%E7%9A%84%E4%BA%92%E8%81%94%E7%BD%91%E5%88%92%E5%88%86"><span class="nav-number">2.1.3.</span> <span class="nav-text">在爬虫角度上的互联网划分</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E6%90%9C%E7%B4%A2%E7%AD%96%E7%95%A5"><span class="nav-number">2.2.</span> <span class="nav-text">网络搜索策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88"><span class="nav-number">2.2.1.</span> <span class="nav-text">深度优先</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88"><span class="nav-number">2.2.2.</span> <span class="nav-text">广度优先</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E4%BD%B3%E4%BC%98%E5%85%88"><span class="nav-number">2.2.3.</span> <span class="nav-text">最佳优先</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E6%9C%BA%E6%8A%93%E5%8F%96%E7%AE%97%E6%B3%95%E5%92%8C%E5%8D%95%E6%9C%BA%E6%8A%93%E5%8F%96%E7%AE%97%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">多机抓取算法和单机抓取算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E5%99%A8"><span class="nav-number">2.4.</span> <span class="nav-text">索引器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7%E7%BD%91%E7%AB%99%E5%A5%BD%E5%9D%8F%E2%86%92PageRank%E7%AE%97%E6%B3%95"><span class="nav-number">2.4.1.</span> <span class="nav-text">评价网站好坏→PageRank算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dead-Ends%E9%97%AE%E9%A2%98"><span class="nav-number">2.4.2.</span> <span class="nav-text">Dead Ends问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Spider-Traps%E9%97%AE%E9%A2%98"><span class="nav-number">2.4.3.</span> <span class="nav-text">Spider Traps问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E5%99%A8"><span class="nav-number">2.5.</span> <span class="nav-text">检索器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E6%8E%A5%E5%8F%A3"><span class="nav-number">2.6.</span> <span class="nav-text">用户接口</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BB%E8%A2%AB%E5%8A%A8%E8%8E%B7%E5%8F%96%E6%8A%80%E6%9C%AF%E6%AF%94%E8%BE%83"><span class="nav-number">3.</span> <span class="nav-text">主被动获取技术比较</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#P2P%E7%BD%91%E7%BB%9C"><span class="nav-number">4.</span> <span class="nav-text">P2P网络</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#P2P%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">4.1.</span> <span class="nav-text">P2P系统的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%9B%AE%E5%BD%95%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9C%B0P2P%E7%BD%91%E7%BB%9C-%E9%9B%86%E4%B8%AD%E5%BC%8F"><span class="nav-number">4.1.1.</span> <span class="nav-text">基于目录服务器地P2P网络(集中式)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%8C%E5%85%A8%E5%88%86%E5%B8%83%E5%BC%8F%E7%9A%84P2P"><span class="nav-number">4.1.2.</span> <span class="nav-text">完全分布式的P2P</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%82%E6%AC%A1P2P"><span class="nav-number">4.1.3.</span> <span class="nav-text">层次P2P</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E5%93%88%E5%B8%8C%E8%A1%A8%E7%B3%BB%E7%BB%9F-%E7%BB%93%E6%9E%84%E5%8C%96P2P"><span class="nav-number">4.1.4.</span> <span class="nav-text">分布式哈希表系统(结构化P2P)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%A6%E5%A4%96%E4%B8%80%E7%A7%8D%E6%93%8D%E4%BD%9C-Chord-Hash%E8%A1%A8%E5%88%86%E5%B8%83"><span class="nav-number">4.1.5.</span> <span class="nav-text">另外一种操作 Chord-Hash表分布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kademlia-Kad-%E4%B9%9F%E6%98%AF%E4%B8%80%E7%A7%8D%E7%BB%8F%E5%85%B8%E7%9A%84%E7%BB%93%E6%9E%84%E5%8C%96P2P"><span class="nav-number">4.1.6.</span> <span class="nav-text">Kademlia(Kad)也是一种经典的结构化P2P</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#P2P%E7%BB%93%E6%9E%84%E5%88%86%E7%B1%BB"><span class="nav-number">5.1.</span> <span class="nav-text">P2P结构分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#P2P%E6%8A%80%E6%9C%AF%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">5.2.</span> <span class="nav-text">P2P技术的特点</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="hkbin"
+      src="/images/header.png">
+  <p class="site-author-name" itemprop="name">hkbin</p>
+  <div class="site-description" itemprop="description">hkbin hkbin hkbin</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/17779938@qq.com" title="QQ → 17779938@qq.com"><i class="fab fa-stack-overflow fa-fw"></i>QQ</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/Hkhanbing" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Hkhanbing" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hkbin</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">43k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">2:38</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
