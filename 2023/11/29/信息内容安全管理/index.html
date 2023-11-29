@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="信息内容安全管理Created: November 29, 2023 4:36 PMReviewed: No 信息内容安全管理的目标是什么 剔除非授权信息(非法信息、泄密信息、垃圾邮件等) 保护授权信息(知识产权)  TCP重置攻击 伪造的难点：Seg number必须满足：   所以总结一下要干什么：  嗅探通信双方的交换信息。 截获一个ACK标志位置为1的报文段，并读取其ACK号。 伪造一个T">
+<meta property="og:type" content="article">
+<meta property="og:title" content="信息内容安全管理">
+<meta property="og:url" content="http://example.com/2023/11/29/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="hkbin的小博客~">
+<meta property="og:description" content="信息内容安全管理Created: November 29, 2023 4:36 PMReviewed: No 信息内容安全管理的目标是什么 剔除非授权信息(非法信息、泄密信息、垃圾邮件等) 保护授权信息(知识产权)  TCP重置攻击 伪造的难点：Seg number必须满足：   所以总结一下要干什么：  嗅探通信双方的交换信息。 截获一个ACK标志位置为1的报文段，并读取其ACK号。 伪造一个T">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%201.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%202.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%203.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%204.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%205.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%206.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%207.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%208.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%209.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2010.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2011.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2012.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2013.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2014.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2015.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2016.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2017.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2018.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2019.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2020.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2021.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2022.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2023.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2024.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2025.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2026.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2027.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2028.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2029.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2030.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2031.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2032.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2033.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2034.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2035.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2036.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2037.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2038.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2039.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2040.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2041.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2042.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2043.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2044.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2045.png">
+<meta property="og:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2046.png">
+<meta property="article:published_time" content="2023-11-29T13:27:05.000Z">
+<meta property="article:modified_time" content="2023-11-29T13:28:09.474Z">
+<meta property="article:author" content="hkbin">
+<meta property="article:tag" content="信息内容安全">
+<meta property="article:tag" content="信息内容安全管理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled.png">
+
+<link rel="canonical" href="http://example.com/2023/11/29/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>信息内容安全管理 | hkbin的小博客~</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">hkbin的小博客~</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="heartbeat fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/11/29/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          信息内容安全管理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-11-29 21:27:05 / 修改时间：21:28:09" itemprop="dateCreated datePublished" datetime="2023-11-29T21:27:05+08:00">2023-11-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="信息内容安全管理"><a href="#信息内容安全管理" class="headerlink" title="信息内容安全管理"></a>信息内容安全管理</h1><p>Created: November 29, 2023 4:36 PM<br>Reviewed: No</p>
+<h1 id="信息内容安全管理的目标是什么"><a href="#信息内容安全管理的目标是什么" class="headerlink" title="信息内容安全管理的目标是什么"></a>信息内容安全管理的目标是什么</h1><ul>
+<li>剔除非授权信息(非法信息、泄密信息、垃圾邮件等)</li>
+<li>保护授权信息(知识产权)</li>
+</ul>
+<h1 id="TCP重置攻击"><a href="#TCP重置攻击" class="headerlink" title="TCP重置攻击"></a>TCP重置攻击</h1><p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled.png" alt="Untitled"></p>
+<p>伪造的难点：Seg number必须满足：</p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%201.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%202.png" alt="Untitled"></p>
+<p>所以总结一下要干什么：</p>
+<ol>
+<li>嗅探通信双方的交换信息。</li>
+<li>截获一个ACK标志位置为1的报文段，并读取其ACK号。</li>
+<li>伪造一个TCP重置报文段(RST 标志位置为1)，其序号等于上面截获的ACK号</li>
+<li>这只是理想情况下的方法，假设信息交换的速度不是很快。大多数情况下为了增加成功率，可以连续发送序列号不同的重置报文，将伪造好的重置报文发送给任意一方，使TCP链接中断。</li>
+</ol>
+<h1 id="P2P网络的管理方法"><a href="#P2P网络的管理方法" class="headerlink" title="P2P网络的管理方法"></a>P2P网络的管理方法</h1><h2 id="基于用户来源交换的控管技术"><a href="#基于用户来源交换的控管技术" class="headerlink" title="基于用户来源交换的控管技术"></a>基于用户来源交换的控管技术</h2><p>BT协议的脆弱性</p>
+<ul>
+<li>身份验证缺陷</li>
+<li>协议不规范</li>
+</ul>
+<p>伪造用户来进行P2Plink，消耗网络资源</p>
+<h2 id="基于分布式哈希表的隔离管控技术"><a href="#基于分布式哈希表的隔离管控技术" class="headerlink" title="基于分布式哈希表的隔离管控技术"></a>基于分布式哈希表的隔离管控技术</h2><h3 id="索引毒害"><a href="#索引毒害" class="headerlink" title="索引毒害"></a>索引毒害</h3><p>找到所有指向索引节点集的前一跳节点</p>
+<p>发布伪造的Sybil节点</p>
+<h3 id="路由污染"><a href="#路由污染" class="headerlink" title="路由污染"></a>路由污染</h3><p>生成靠近目标InfoHash的节点ID</p>
+<p>主动污染和被动污染</p>
+<h2 id="索引污染"><a href="#索引污染" class="headerlink" title="索引污染"></a>索引污染</h2><p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%203.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%204.png" alt="Untitled"></p>
+<p><a target="_blank" rel="noopener" href="https://www.notion.so/">https://www.notion.so</a></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%205.png" alt="Untitled"></p>
+<h2 id="资源占用攻击"><a href="#资源占用攻击" class="headerlink" title="资源占用攻击"></a>资源占用攻击</h2><p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%206.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%207.png" alt="Untitled"></p>
+<h2 id="数据欺骗"><a href="#数据欺骗" class="headerlink" title="数据欺骗"></a>数据欺骗</h2><p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%208.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%209.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2010.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2011.png" alt="Untitled"></p>
+<p>P2P机制：</p>
+<p>分片机制。<br>BitTorrent像其他文件共享软件一样对文件进行了分片(Piece),Piece是最小的文件共享单位,每个Leecher在下载完一个完整的分片后才会进行完整性校验, 完整性校验成功后通知其他节点自己拥有这部分数据。为了加快文件传输的并行性,每个分片还会分成更小的分块(Block), Block是最小的文件传输单位,数据请求者每次向数据提供者请求一个Block的数据。</p>
+<p>片选择机制。<br>为了保证共享网络的健壮性,延长一个共享网络的生命周期, BitTorrent通过局部最少块优先(Rarest-First)策略在节点间交换数据。下载节点根据自己周围的邻居节点拥有的数据块信息,选择拥有节点最少的分块优先下载,从而维护局部的数据块相对平衡。</p>
+<p>所以会导致别的节点不去下载分块1，从而请求的时候，如果有一个唯一具有分块1退出了网络，则该网络中再也没有分块1。</p>
+<h2 id="数据块污染"><a href="#数据块污染" class="headerlink" title="数据块污染"></a>数据块污染</h2><p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2012.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2013.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2014.png" alt="Untitled"></p>
+<h2 id="Eclipse方法"><a href="#Eclipse方法" class="headerlink" title="Eclipse方法"></a>Eclipse方法</h2><p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2015.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2016.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2017.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2018.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2019.png" alt="Untitled"></p>
+<h1 id="隐私保护技术"><a href="#隐私保护技术" class="headerlink" title="隐私保护技术"></a>隐私保护技术</h1><h2 id="隐私数据的分类"><a href="#隐私数据的分类" class="headerlink" title="隐私数据的分类"></a>隐私数据的分类</h2><ul>
+<li>显示标识符：能够唯一识别一个用户身份的属性，比如姓名、身份证号码等</li>
+<li>准标识符：不能唯一识别一个用户身份的属性，需多个属性组合才能唯一识别一个用户身份，如地址、性别、生日等</li>
+<li>敏感信息：涉及隐私信息的属性，如薪资、健康状况和财务信息等</li>
+</ul>
+<h2 id="隐私度量的概念"><a href="#隐私度量的概念" class="headerlink" title="隐私度量的概念"></a>隐私度量的概念</h2><p>用来评估个人的隐私水平及隐私保护技术能达到的效果，同时也为了测量”隐私”这个概念。</p>
+<h3 id="基于匿名的隐私度量方法：k-anonymity-k-匿名-，I-diversity-I-多样性-，t-closeness-t-近似性"><a href="#基于匿名的隐私度量方法：k-anonymity-k-匿名-，I-diversity-I-多样性-，t-closeness-t-近似性" class="headerlink" title="基于匿名的隐私度量方法：k-anonymity(k-匿名)，I-diversity(I-多样性)，t-closeness(t-近似性)"></a>基于匿名的隐私度量方法：k-anonymity(k-匿名)，I-diversity(I-多样性)，t-closeness(t-近似性)</h3><p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2020.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2021.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2022.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2023.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2024.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2025.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2026.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2027.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2028.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2029.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2030.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2031.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2032.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2033.png" alt="Untitled"></p>
+<h3 id="3）基于差分隐私的度量方法，能解决的问题，了解即可。"><a href="#3）基于差分隐私的度量方法，能解决的问题，了解即可。" class="headerlink" title="3）基于差分隐私的度量方法，能解决的问题，了解即可。"></a><strong>3）基于差分隐私的度量方法，能解决的问题，了解即可。</strong></h3><ul>
+<li><p><strong>差分隐私</strong>：用一种方法使得查询n个记录和查询n-1个记录得到的结果是相对一致的，那么攻击者无法通过比较（差分）查询结果的不同找出第n 个记录的信息。</p>
+<ul>
+<li>对于差别只有一条记录的两个数据集 D 和 D’ (neighboring datasets)，查询他们获得结果相同的概率非常接近。</li>
+<li>攻击者无法通过观察计算结果而获取准确的个体信息.</li>
+</ul>
+<p>  <img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2034.png" alt="Untitled"></p>
+</li>
+</ul>
+<h3 id="4）常用的隐私保护技术的分类，熟练掌握四种类别，各种隐私保护方法的分类归属。"><a href="#4）常用的隐私保护技术的分类，熟练掌握四种类别，各种隐私保护方法的分类归属。" class="headerlink" title="4）常用的隐私保护技术的分类，熟练掌握四种类别，各种隐私保护方法的分类归属。"></a><strong>4）常用的隐私保护技术的分类，熟练掌握四种类别，各种隐私保护方法的分类归属。</strong></h3><ul>
+<li>变换：</li>
+</ul>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2035.png" alt="Untitled"></p>
+<ul>
+<li>分治：</li>
+</ul>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2036.png" alt="Untitled"></p>
+<ul>
+<li>隐匿：</li>
+</ul>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2037.png" alt="Untitled"></p>
+<ul>
+<li>混淆：</li>
+</ul>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2038.png" alt="Untitled"></p>
+<h3 id="5）同态加密技术的原理，了解即可"><a href="#5）同态加密技术的原理，了解即可" class="headerlink" title="5）同态加密技术的原理，了解即可"></a><strong>5）同态加密技术的原理，了解即可</strong></h3><p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2039.png" alt="Untitled"></p>
+<h3 id="6）联邦学习的原理，横向、纵向、迁移学习"><a href="#6）联邦学习的原理，横向、纵向、迁移学习" class="headerlink" title="6）联邦学习的原理，横向、纵向、迁移学习"></a><strong>6）联邦学习的原理，横向、纵向、迁移学习</strong></h3><p>比如业务相同但是分布在不同地区的两家企业，它们的用户群体分别来自各自所在的地区，相互的交集很小。但是，它们的业务很相似，因此，记录的用户特征是相同的。此时，就可以使用横向联邦学习来构建联合模型。</p>
+<p>比如有两个不同机构，一家是某地的银行，另一家是同一个地方的电商。它们的用户群体很有可能包含该地的大部分居民，因此用户的交集较大。但是，由于银行记录的都是用户的收支行为与信用评级，而电商则保有用户的浏览与购买历史，因此它们的用户特征交集较小。纵向联邦学习就是将这些不同特征在加密的状态下加以聚合，以增强模型能力的联邦学习。目前机器学习模型如逻辑回归、决策树等均是建立在纵向联邦学习系统框架之下的。</p>
+<p>比如有两个不同机构，一家是位于中国的银行，另一家是位于美国的电商。由于受到地域限制，这两家机构的用户群体交集很小。同时，由于机构类型的不同，二者的数据特征也只有小部分重合。在这种情况下，要想进行有效的联邦学习，就必须引入迁移学习，来解决单边数据规模小和标签样本少的问题，从而提升模型的效果。</p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2040.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2041.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2042.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2043.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2044.png" alt="Untitled"></p>
+<h3 id="7）基于位置的隐私保护，攻击模型和保护方法了解即可"><a href="#7）基于位置的隐私保护，攻击模型和保护方法了解即可" class="headerlink" title="7）基于位置的隐私保护，攻击模型和保护方法了解即可"></a><strong>7）基于位置的隐私保护，攻击模型和保护方法了解即可</strong></h3><p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2045.png" alt="Untitled"></p>
+<p><img src="/./images/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%20094c69e097514e8f98123a500a03459b/Untitled%2046.png" alt="Untitled"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8/" rel="tag"># 信息内容安全</a>
+              <a href="/tags/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86/" rel="tag"># 信息内容安全管理</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/11/29/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/" rel="prev" title="文本分类">
+      <i class="fa fa-chevron-left"></i> 文本分类
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/11/29/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E6%A6%82%E8%AE%BA/" rel="next" title="信息内容安全概论">
+      信息内容安全概论 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">信息内容安全管理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86%E7%9A%84%E7%9B%AE%E6%A0%87%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">信息内容安全管理的目标是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP%E9%87%8D%E7%BD%AE%E6%94%BB%E5%87%BB"><span class="nav-number">3.</span> <span class="nav-text">TCP重置攻击</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#P2P%E7%BD%91%E7%BB%9C%E7%9A%84%E7%AE%A1%E7%90%86%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">P2P网络的管理方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E6%9D%A5%E6%BA%90%E4%BA%A4%E6%8D%A2%E7%9A%84%E6%8E%A7%E7%AE%A1%E6%8A%80%E6%9C%AF"><span class="nav-number">4.1.</span> <span class="nav-text">基于用户来源交换的控管技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%88%86%E5%B8%83%E5%BC%8F%E5%93%88%E5%B8%8C%E8%A1%A8%E7%9A%84%E9%9A%94%E7%A6%BB%E7%AE%A1%E6%8E%A7%E6%8A%80%E6%9C%AF"><span class="nav-number">4.2.</span> <span class="nav-text">基于分布式哈希表的隔离管控技术</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E6%AF%92%E5%AE%B3"><span class="nav-number">4.2.1.</span> <span class="nav-text">索引毒害</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E6%B1%A1%E6%9F%93"><span class="nav-number">4.2.2.</span> <span class="nav-text">路由污染</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E6%B1%A1%E6%9F%93"><span class="nav-number">4.3.</span> <span class="nav-text">索引污染</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E5%8D%A0%E7%94%A8%E6%94%BB%E5%87%BB"><span class="nav-number">4.4.</span> <span class="nav-text">资源占用攻击</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%AC%BA%E9%AA%97"><span class="nav-number">4.5.</span> <span class="nav-text">数据欺骗</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%9D%97%E6%B1%A1%E6%9F%93"><span class="nav-number">4.6.</span> <span class="nav-text">数据块污染</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Eclipse%E6%96%B9%E6%B3%95"><span class="nav-number">4.7.</span> <span class="nav-text">Eclipse方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E6%8A%80%E6%9C%AF"><span class="nav-number">5.</span> <span class="nav-text">隐私保护技术</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%90%E7%A7%81%E6%95%B0%E6%8D%AE%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">5.1.</span> <span class="nav-text">隐私数据的分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%90%E7%A7%81%E5%BA%A6%E9%87%8F%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">5.2.</span> <span class="nav-text">隐私度量的概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%8C%BF%E5%90%8D%E7%9A%84%E9%9A%90%E7%A7%81%E5%BA%A6%E9%87%8F%E6%96%B9%E6%B3%95%EF%BC%9Ak-anonymity-k-%E5%8C%BF%E5%90%8D-%EF%BC%8CI-diversity-I-%E5%A4%9A%E6%A0%B7%E6%80%A7-%EF%BC%8C%7Ft-closeness-t-%E8%BF%91%E4%BC%BC%E6%80%A7"><span class="nav-number">5.2.1.</span> <span class="nav-text">基于匿名的隐私度量方法：k-anonymity(k-匿名)，I-diversity(I-多样性)，t-closeness(t-近似性)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%BC%89%E5%9F%BA%E4%BA%8E%E5%B7%AE%E5%88%86%E9%9A%90%E7%A7%81%E7%9A%84%E5%BA%A6%E9%87%8F%E6%96%B9%E6%B3%95%EF%BC%8C%E8%83%BD%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%8C%E4%BA%86%E8%A7%A3%E5%8D%B3%E5%8F%AF%E3%80%82"><span class="nav-number">5.2.2.</span> <span class="nav-text">3）基于差分隐私的度量方法，能解决的问题，了解即可。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%EF%BC%89%E5%B8%B8%E7%94%A8%E7%9A%84%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E6%8A%80%E6%9C%AF%E7%9A%84%E5%88%86%E7%B1%BB%EF%BC%8C%E7%86%9F%E7%BB%83%E6%8E%8C%E6%8F%A1%E5%9B%9B%E7%A7%8D%E7%B1%BB%E5%88%AB%EF%BC%8C%E5%90%84%E7%A7%8D%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E6%96%B9%E6%B3%95%E7%9A%84%E5%88%86%E7%B1%BB%E5%BD%92%E5%B1%9E%E3%80%82"><span class="nav-number">5.2.3.</span> <span class="nav-text">4）常用的隐私保护技术的分类，熟练掌握四种类别，各种隐私保护方法的分类归属。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%EF%BC%89%E5%90%8C%E6%80%81%E5%8A%A0%E5%AF%86%E6%8A%80%E6%9C%AF%E7%9A%84%E5%8E%9F%E7%90%86%EF%BC%8C%E4%BA%86%E8%A7%A3%E5%8D%B3%E5%8F%AF"><span class="nav-number">5.2.4.</span> <span class="nav-text">5）同态加密技术的原理，了解即可</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6%EF%BC%89%E8%81%94%E9%82%A6%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%8E%9F%E7%90%86%EF%BC%8C%E6%A8%AA%E5%90%91%E3%80%81%E7%BA%B5%E5%90%91%E3%80%81%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0"><span class="nav-number">5.2.5.</span> <span class="nav-text">6）联邦学习的原理，横向、纵向、迁移学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7%EF%BC%89%E5%9F%BA%E4%BA%8E%E4%BD%8D%E7%BD%AE%E7%9A%84%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%EF%BC%8C%E6%94%BB%E5%87%BB%E6%A8%A1%E5%9E%8B%E5%92%8C%E4%BF%9D%E6%8A%A4%E6%96%B9%E6%B3%95%E4%BA%86%E8%A7%A3%E5%8D%B3%E5%8F%AF"><span class="nav-number">5.2.6.</span> <span class="nav-text">7）基于位置的隐私保护，攻击模型和保护方法了解即可</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="hkbin"
+      src="/images/header.png">
+  <p class="site-author-name" itemprop="name">hkbin</p>
+  <div class="site-description" itemprop="description">hkbin hkbin hkbin</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/17779938@qq.com" title="QQ → 17779938@qq.com"><i class="fab fa-stack-overflow fa-fw"></i>QQ</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/Hkhanbing" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Hkhanbing" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hkbin</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">51k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:07</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

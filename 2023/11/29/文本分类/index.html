@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="文本分类文本分类和文本聚类的区别分类问题：一般是指事先确定好类别，然后将集合中的元素分别划分到相应类别中的问题。 聚类问题：一般是指事先没有确定好类别，而是根据集合中各元素的某些特点而形成的分类，也就是子集。 文本表示方法空间向量模型 也就是用特征构造的向量来表示(N维空间) 将文字转换为坐标值的方法→One-Hot编码 但是语料库太大了，这样表示的话每个向量都巨大无比。 Bags-of-Word">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文本分类">
+<meta property="og:url" content="http://example.com/2023/11/29/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/index.html">
+<meta property="og:site_name" content="hkbin的小博客~">
+<meta property="og:description" content="文本分类文本分类和文本聚类的区别分类问题：一般是指事先确定好类别，然后将集合中的元素分别划分到相应类别中的问题。 聚类问题：一般是指事先没有确定好类别，而是根据集合中各元素的某些特点而形成的分类，也就是子集。 文本表示方法空间向量模型 也就是用特征构造的向量来表示(N维空间) 将文字转换为坐标值的方法→One-Hot编码 但是语料库太大了，这样表示的话每个向量都巨大无比。 Bags-of-Word">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%201.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%202.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%203.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%204.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%205.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%206.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%207.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%208.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%209.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2010.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2011.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2012.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2013.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2014.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2015.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2016.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2017.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2018.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2019.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2020.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2021.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2022.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2023.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2024.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2025.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2026.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2027.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2028.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2029.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2030.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2031.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2032.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2033.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2034.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2035.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2036.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2037.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2038.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2039.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/123.jpg">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2040.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2041.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2042.png">
+<meta property="og:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2043.png">
+<meta property="article:published_time" content="2023-11-29T13:26:10.000Z">
+<meta property="article:modified_time" content="2023-11-29T13:28:43.178Z">
+<meta property="article:author" content="hkbin">
+<meta property="article:tag" content="信息内容安全">
+<meta property="article:tag" content="文本分类">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled.png">
+
+<link rel="canonical" href="http://example.com/2023/11/29/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>文本分类 | hkbin的小博客~</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">hkbin的小博客~</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="heartbeat fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/11/29/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          文本分类
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-11-29 21:26:10 / 修改时间：21:28:43" itemprop="dateCreated datePublished" datetime="2023-11-29T21:26:10+08:00">2023-11-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="文本分类"><a href="#文本分类" class="headerlink" title="文本分类"></a>文本分类</h1><h1 id="文本分类和文本聚类的区别"><a href="#文本分类和文本聚类的区别" class="headerlink" title="文本分类和文本聚类的区别"></a>文本分类和文本聚类的区别</h1><p>分类问题：一般是指事先确定好类别，然后将集合中的元素分别划分到相应类别中的问题。</p>
+<p>聚类问题：一般是指事先没有确定好类别，而是根据集合中各元素的某些特点而形成的分类，也就是子集。</p>
+<h1 id="文本表示方法"><a href="#文本表示方法" class="headerlink" title="文本表示方法"></a>文本表示方法</h1><h2 id="空间向量模型"><a href="#空间向量模型" class="headerlink" title="空间向量模型"></a>空间向量模型</h2><p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled.png" alt="Untitled"></p>
+<p><strong>也就是用特征构造的向量来表示(N维空间)</strong></p>
+<h3 id="将文字转换为坐标值的方法→One-Hot编码"><a href="#将文字转换为坐标值的方法→One-Hot编码" class="headerlink" title="将文字转换为坐标值的方法→One-Hot编码"></a>将文字转换为坐标值的方法→One-Hot编码</h3><p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%201.png" alt="Untitled"></p>
+<p>但是语料库太大了，这样表示的话每个向量都巨大无比。</p>
+<h3 id="Bags-of-Words-BOW，词袋模型"><a href="#Bags-of-Words-BOW，词袋模型" class="headerlink" title="Bags-of-Words(BOW，词袋模型)"></a>Bags-of-Words(BOW，词袋模型)</h3><p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%202.png" alt="Untitled"></p>
+<p><strong>和One-Hot差不多</strong></p>
+<p>我们并没有表达单词在原来句子中出现的次序，这也是 Bag-of-Words 模型的缺点之一。</p>
+<h2 id="N-Gram模型"><a href="#N-Gram模型" class="headerlink" title="N-Gram模型"></a>N-Gram模型</h2><p><a target="_blank" rel="noopener" href="https://www.notion.so/">https://www.notion.so</a></p>
+<p>可以当成是BOW的改进版，多了个滑窗，也就是相近的两个单词为一个，所以考虑了句子原来的次序。</p>
+<h2 id="TF-IDF模型"><a href="#TF-IDF模型" class="headerlink" title="TF-IDF模型"></a>TF-IDF模型</h2><p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%203.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%204.png" alt="Untitled"></p>
+<p><strong>看看例题</strong></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%205.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%206.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%207.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%208.png" alt="Untitled"></p>
+<h1 id="文本预处理-分词"><a href="#文本预处理-分词" class="headerlink" title="文本预处理-分词"></a>文本预处理-分词</h1><p>这一步就是为了获取文本中的词语信息的。</p>
+<p>文本预处理主要包括 分词、去除停用词和特殊符号。</p>
+<p>英语的基本单位是单词，可以根据空格和标点符号进行分词，然后提取词根和词干。</p>
+<p>中文的基本单位是字，需要一些算法来进行分词。</p>
+<h3 id="基于字符串的分词方法"><a href="#基于字符串的分词方法" class="headerlink" title="基于字符串的分词方法"></a>基于字符串的分词方法</h3><p>该方法就是将待分词的字符串从头到尾开始切分出字串，再与现存几乎所有的中文词语的词典匹配，若匹配成功，则字串是一个词语。</p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%209.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2010.png" alt="Untitled"></p>
+<h3 id="基于统计及机器学习的分词方法"><a href="#基于统计及机器学习的分词方法" class="headerlink" title="基于统计及机器学习的分词方法"></a>基于统计及机器学习的分词方法</h3><p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2011.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2012.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2013.png" alt="Untitled"></p>
+<h3 id="jieba分词"><a href="#jieba分词" class="headerlink" title="jieba分词"></a>jieba分词</h3><p>jieba库有三种分词模式：</p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2014.png" alt="Untitled"></p>
+<p>原理是这个：</p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2015.png" alt="Untitled"></p>
+<p>本质就是，构造DAG图。</p>
+<p>然后采取动态规划的策略，查找最大概率的路径(这个是个切分组合)</p>
+<p>对于未登录词，用HMM模型来处理。</p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2016.png" alt="Untitled"></p>
+<h2 id="特征提取"><a href="#特征提取" class="headerlink" title="特征提取"></a>特征提取</h2><p>如果以词为特征的话，特征向量的维度可能过大，学习算法无法处理这个高的维度。</p>
+<p>所以需要特征提取。</p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2017.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2018.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2019.png" alt="Untitled"></p>
+<p>了解就行(</p>
+<h1 id="分类方法"><a href="#分类方法" class="headerlink" title="分类方法"></a>分类方法</h1><h2 id="基于决策树的分类"><a href="#基于决策树的分类" class="headerlink" title="基于决策树的分类"></a>基于决策树的分类</h2><p>决策树中一个重要的定义就是<strong>信息熵。</strong></p>
+<h3 id="熵"><a href="#熵" class="headerlink" title="熵"></a>熵</h3><p>熵在信息论中被用来度量信息量，熵越大，所含的有用信息越多。其不确定性就越大。熵越少，确定性越大。</p>
+<p>在决策树中，用熵来表示样本集的不纯度，如果某个样本集合中只有一个类别，其确定性最高，熵为0。</p>
+<p>反之，熵越大，越不确定，表示样本集中的分类越多样。</p>
+<p>所以信息量的大小，不是数据集的大小，而是不确定性。</p>
+<h3 id="计算信息熵"><a href="#计算信息熵" class="headerlink" title="计算信息熵"></a>计算信息熵</h3><p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2020.png" alt="Untitled"></p>
+<h3 id="信息增益"><a href="#信息增益" class="headerlink" title="信息增益"></a>信息增益</h3><p>信息增益：熵-条件熵。表示在一个条件下，信息不确定性减少的程度。</p>
+<h3 id="计算信息增益"><a href="#计算信息增益" class="headerlink" title="计算信息增益"></a>计算信息增益</h3><p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2021.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2022.png" alt="Untitled"></p>
+<h3 id="信息增益率"><a href="#信息增益率" class="headerlink" title="信息增益率"></a>信息增益率</h3><p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2023.png" alt="Untitled"></p>
+<p>懂了！</p>
+<p>决策树是一棵树，包含所有可能的分支，所以初始化需要训练。</p>
+<p>计算好信息增益之后，将值比较大的放在前面(树的前面)，因为信息增益是表明哪个能够显著减少不确定性的。这样子构建一棵树，每次走的时候按照信息增益判断就行了，目的是最大程度减少不确定性。</p>
+<p><strong>信息增益率</strong></p>
+<p>假如某个条件极其严格，比如某个同学提前知道了所有选题的答案，那么将选题的序号作为条件，不存在任何不确定性，所以可以得到最大的信息增益。但是这个条件是没有意义的，假设老师换一份考卷答案就全部作废了。</p>
+<p>信息增益率在信息增益的基础上增加了惩罚项，惩罚项是特征的固有值，是避免上述情况而设计的。</p>
+<h2 id="基于贝叶斯的分类"><a href="#基于贝叶斯的分类" class="headerlink" title="基于贝叶斯的分类"></a>基于贝叶斯的分类</h2><p>用好这条公式</p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2024.png" alt="Untitled"></p>
+<p>因为比较的时候P(X)是一致的，所以关注P(X|H)*P(H)，也就是概率计算。</p>
+<p>举个例子：</p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2025.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2026.png" alt="Untitled"></p>
+<p>H0为癌症，H1无癌症</p>
+<p>P(H0) &#x3D; 0.008，P(H1) &#x3D; 0.992</p>
+<p>P(+|H0) &#x3D; 0.98，P(-|H0) &#x3D; 0.02</p>
+<p>P(+|H1) &#x3D; 0.03，P(-|H0) &#x3D; 0.97</p>
+<p>所以式子1为0.98 * 0.008 &#x3D; 0.00784</p>
+<p>式子2为0.03 * 0.992 &#x3D; 0.029759999999999998</p>
+<p>所以应该判定为患有癌症。</p>
+<p>tips：当分子出现0的时候，请实用拉普拉斯平滑处理，对每一个特征都+1，分母加上特征量N</p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2027.png" alt="Untitled"></p>
+<h2 id="支持向量机SVM"><a href="#支持向量机SVM" class="headerlink" title="支持向量机SVM"></a>支持向量机SVM</h2><h3 id="基本思想和原理"><a href="#基本思想和原理" class="headerlink" title="基本思想和原理"></a>基本思想和原理</h3><p>SVM是一种监督性学习，对数据进行二元分类的广义线性分类器。</p>
+<p><strong>决策边界是对学习样本求解的最大边距超平面。</strong></p>
+<p>SVM使用<strong>损失函数计算经验风险</strong>并加入了<strong>正则化项以优化结构风险</strong>，是一个具有稀疏性核稳健性的分类器。</p>
+<p><strong>实际上一句话概括就是，SVM是最大间隔线性分类器。通过核函数将数据从低纬映射到高纬，在高维上实现数据可分。</strong></p>
+<p>有一些公式：</p>
+<p>M &#x3D; margin Width &#x3D; 2 &#x2F; iroot(w.w, 2)，这里是w点乘w向量</p>
+<p>w.w’ &#x3D; w1 * w’1 + w2 * w’2 + w3 * w’3 + … + wn * w’n</p>
+<p>计算最小w需要使用 梯度下降&#x2F;退火算法等。这里不在研究范围之内。</p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2028.png" alt="Untitled"></p>
+<h3 id="核函数"><a href="#核函数" class="headerlink" title="核函数"></a>核函数</h3><p>实际上就是低维数据到高维数据的映射</p>
+<p><a target="_blank" rel="noopener" href="https://www.notion.so/">https://www.notion.so</a></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2029.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2030.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2031.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2032.png" alt="Untitled"></p>
+<p>不同的核函数会导致不同的SVM算法</p>
+<h2 id="KNN-K-最近邻分类"><a href="#KNN-K-最近邻分类" class="headerlink" title="KNN K-最近邻分类"></a>KNN K-最近邻分类</h2><h3 id="基本思想和原理-1"><a href="#基本思想和原理-1" class="headerlink" title="基本思想和原理"></a>基本思想和原理</h3><p>距离公式：欧氏距离</p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2033.png" alt="Untitled"></p>
+<p><strong>曼哈顿距离</strong></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2034.png" alt="Untitled"></p>
+<p><strong>闵科夫斯基距离</strong></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2035.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2036.png" alt="Untitled"></p>
+<p>训练阶段主要是通过计算样本之间的相似度来构建一个特征空间模型，并保存训练样本数据。</p>
+<p>在KNN算法中，没有像其他机器学习算法那样需要学习和调整参数的过程。KNN算法的主要任务是在预测阶段根据新样本与训练样本之间的相似性，通过计算最近邻的投票或平均值来进行分类或回归预测。</p>
+<h2 id="k-means算法-聚类-→-基于划分的方法"><a href="#k-means算法-聚类-→-基于划分的方法" class="headerlink" title="k-means算法(聚类) → 基于划分的方法"></a>k-means算法(聚类) → 基于划分的方法</h2><p>这里的k是质心数，也就是有多少个类。</p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2037.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2038.png" alt="Untitled"></p>
+<h2 id="DBSCAN-→-基于密度的方法"><a href="#DBSCAN-→-基于密度的方法" class="headerlink" title="DBSCAN → 基于密度的方法"></a>DBSCAN → 基于密度的方法</h2><p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2039.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/123.jpg" alt="123.jpg"></p>
+<p><strong>DBSCAN算法将数据点分为三类：</strong></p>
+<p> <strong>1、核心点：在半径Eps内含有超过MinPts数目的点。</strong> </p>
+<p><strong>2、边界点：在半径Eps内点的数量小于MinPts，但是落在核心点的邻域内的点</strong>。 </p>
+<p>3、噪音点：既不是核心点也不是边界点的点。</p>
+<p>两个参数：半径r和指定范围内的数目MinPts</p>
+<h2 id="基于层次的聚类"><a href="#基于层次的聚类" class="headerlink" title="基于层次的聚类"></a>基于层次的聚类</h2><h3 id="凝聚法"><a href="#凝聚法" class="headerlink" title="凝聚法"></a>凝聚法</h3><p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2040.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2041.png" alt="Untitled"></p>
+<h3 id="分裂法"><a href="#分裂法" class="headerlink" title="分裂法"></a>分裂法</h3><p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2042.png" alt="Untitled"></p>
+<p><img src="/./images/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%202645345d7af94c369167f9f7a8b4bbae/Untitled%2043.png" alt="Untitled"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8/" rel="tag"># 信息内容安全</a>
+              <a href="/tags/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/" rel="tag"># 文本分类</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/11/27/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/" rel="prev" title="字符串匹配算法">
+      <i class="fa fa-chevron-left"></i> 字符串匹配算法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/11/29/%E4%BF%A1%E6%81%AF%E5%86%85%E5%AE%B9%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86/" rel="next" title="信息内容安全管理">
+      信息内容安全管理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB"><span class="nav-number">1.</span> <span class="nav-text">文本分类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB%E5%92%8C%E6%96%87%E6%9C%AC%E8%81%9A%E7%B1%BB%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">2.</span> <span class="nav-text">文本分类和文本聚类的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E6%9C%AC%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">文本表示方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A9%BA%E9%97%B4%E5%90%91%E9%87%8F%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">空间向量模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86%E6%96%87%E5%AD%97%E8%BD%AC%E6%8D%A2%E4%B8%BA%E5%9D%90%E6%A0%87%E5%80%BC%E7%9A%84%E6%96%B9%E6%B3%95%E2%86%92One-Hot%E7%BC%96%E7%A0%81"><span class="nav-number">3.1.1.</span> <span class="nav-text">将文字转换为坐标值的方法→One-Hot编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bags-of-Words-BOW%EF%BC%8C%E8%AF%8D%E8%A2%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.2.</span> <span class="nav-text">Bags-of-Words(BOW，词袋模型)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#N-Gram%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.</span> <span class="nav-text">N-Gram模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TF-IDF%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.3.</span> <span class="nav-text">TF-IDF模型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E6%9C%AC%E9%A2%84%E5%A4%84%E7%90%86-%E5%88%86%E8%AF%8D"><span class="nav-number">4.</span> <span class="nav-text">文本预处理-分词</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E5%88%86%E8%AF%8D%E6%96%B9%E6%B3%95"><span class="nav-number">4.0.1.</span> <span class="nav-text">基于字符串的分词方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%BB%9F%E8%AE%A1%E5%8F%8A%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%88%86%E8%AF%8D%E6%96%B9%E6%B3%95"><span class="nav-number">4.0.2.</span> <span class="nav-text">基于统计及机器学习的分词方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jieba%E5%88%86%E8%AF%8D"><span class="nav-number">4.0.3.</span> <span class="nav-text">jieba分词</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E6%8F%90%E5%8F%96"><span class="nav-number">4.1.</span> <span class="nav-text">特征提取</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E7%B1%BB%E6%96%B9%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">分类方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%86%B3%E7%AD%96%E6%A0%91%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">5.1.</span> <span class="nav-text">基于决策树的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%86%B5"><span class="nav-number">5.1.1.</span> <span class="nav-text">熵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E4%BF%A1%E6%81%AF%E7%86%B5"><span class="nav-number">5.1.2.</span> <span class="nav-text">计算信息熵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E5%A2%9E%E7%9B%8A"><span class="nav-number">5.1.3.</span> <span class="nav-text">信息增益</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E4%BF%A1%E6%81%AF%E5%A2%9E%E7%9B%8A"><span class="nav-number">5.1.4.</span> <span class="nav-text">计算信息增益</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E5%A2%9E%E7%9B%8A%E7%8E%87"><span class="nav-number">5.1.5.</span> <span class="nav-text">信息增益率</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">5.2.</span> <span class="nav-text">基于贝叶斯的分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BASVM"><span class="nav-number">5.3.</span> <span class="nav-text">支持向量机SVM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3%E5%92%8C%E5%8E%9F%E7%90%86"><span class="nav-number">5.3.1.</span> <span class="nav-text">基本思想和原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%87%BD%E6%95%B0"><span class="nav-number">5.3.2.</span> <span class="nav-text">核函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KNN-K-%E6%9C%80%E8%BF%91%E9%82%BB%E5%88%86%E7%B1%BB"><span class="nav-number">5.4.</span> <span class="nav-text">KNN K-最近邻分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3%E5%92%8C%E5%8E%9F%E7%90%86-1"><span class="nav-number">5.4.1.</span> <span class="nav-text">基本思想和原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#k-means%E7%AE%97%E6%B3%95-%E8%81%9A%E7%B1%BB-%E2%86%92-%E5%9F%BA%E4%BA%8E%E5%88%92%E5%88%86%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">5.5.</span> <span class="nav-text">k-means算法(聚类) → 基于划分的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DBSCAN-%E2%86%92-%E5%9F%BA%E4%BA%8E%E5%AF%86%E5%BA%A6%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">5.6.</span> <span class="nav-text">DBSCAN → 基于密度的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%B1%82%E6%AC%A1%E7%9A%84%E8%81%9A%E7%B1%BB"><span class="nav-number">5.7.</span> <span class="nav-text">基于层次的聚类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%9D%E8%81%9A%E6%B3%95"><span class="nav-number">5.7.1.</span> <span class="nav-text">凝聚法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E8%A3%82%E6%B3%95"><span class="nav-number">5.7.2.</span> <span class="nav-text">分裂法</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="hkbin"
+      src="/images/header.png">
+  <p class="site-author-name" itemprop="name">hkbin</p>
+  <div class="site-description" itemprop="description">hkbin hkbin hkbin</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/17779938@qq.com" title="QQ → 17779938@qq.com"><i class="fab fa-stack-overflow fa-fw"></i>QQ</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/Hkhanbing" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Hkhanbing" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hkbin</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">51k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">3:07</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

