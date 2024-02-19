@@ -25,37 +25,37 @@
   <meta name="description" content="排名 rank10，总共做出22题 Pwn TalkBoom 此题题目远程交互的时候会发给你gzip压缩过的elf文件，解压后得到talkboom的源文件，逆向后可以知道，只要输入对应的0x40字符串，就会有一次读入对应大小(0x100，0x30等)，这里会产生栈溢出。   由于远程每次连接下发的elf都不一样，所以首先交互的字符串也都不一样，这里选择爆破它，指定一个固定的地址，然后每次获取这个地">
 <meta property="og:type" content="article">
 <meta property="og:title" content="2024SICTF ROUND3 wp">
-<meta property="og:url" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/index.html">
+<meta property="og:url" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/index.html">
 <meta property="og:site_name" content="hkbin的小博客~">
 <meta property="og:description" content="排名 rank10，总共做出22题 Pwn TalkBoom 此题题目远程交互的时候会发给你gzip压缩过的elf文件，解压后得到talkboom的源文件，逆向后可以知道，只要输入对应的0x40字符串，就会有一次读入对应大小(0x100，0x30等)，这里会产生栈溢出。   由于远程每次连接下发的elf都不一样，所以首先交互的字符串也都不一样，这里选择爆破它，指定一个固定的地址，然后每次获取这个地">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%201.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%202.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%203.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%204.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%205.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%206.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%207.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%208.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%209.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2010.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2011.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2012.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2013.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2014.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2015.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2016.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2017.png">
-<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2018.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%201.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%202.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%203.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%204.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%205.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%206.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%207.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%208.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%209.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2010.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2011.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2012.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2013.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2014.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2015.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2016.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2017.png">
+<meta property="og:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled%2018.png">
 <meta property="article:published_time" content="2024-02-19T09:16:58.000Z">
 <meta property="article:modified_time" content="2024-02-19T09:28:27.921Z">
 <meta property="article:author" content="hkbin">
 <meta property="article:tag" content="writeup">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled.png">
+<meta name="twitter:image" content="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/images/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/Untitled.png">
 
-<link rel="canonical" href="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/">
+<link rel="canonical" href="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/">
 
 
 <script id="page-configurations">
@@ -183,7 +183,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp%201f79c1b322ee4780be6b8d092b89a367/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/19/SICTF_ROUND3_%E7%88%B9_wp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/header.png">
@@ -231,13 +231,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>31k</span>
+              <span>4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>28 分钟</span>
+              <span>15 分钟</span>
             </span>
 
         </div>
@@ -524,13 +524,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">83k</span>
+    <span title="站点总字数">55k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">1:15</span>
+    <span title="站点阅读时长">3:22</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
