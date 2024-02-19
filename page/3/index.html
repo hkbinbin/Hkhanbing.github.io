@@ -159,6 +159,369 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/30/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B001/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.png">
+      <meta itemprop="name" content="hkbin">
+      <meta itemprop="description" content="hkbin hkbin hkbin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hkbin的小博客~">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/30/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B001/" class="post-title-link" itemprop="url">操作系统读书笔记01</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-09-30 23:21:43 / 修改时间：23:27:05" itemprop="dateCreated datePublished" datetime="2023-09-30T23:21:43+08:00">2023-09-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="os读书笔记1"><a href="#os读书笔记1" class="headerlink" title="os读书笔记1"></a>os读书笔记1</h1><h1 id="系统架构概况"><a href="#系统架构概况" class="headerlink" title="系统架构概况"></a>系统架构概况</h1><p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled.png" alt="Untitled"></p>
+<h3 id="全局描述符表和局部描述符表-GDT和LDT"><a href="#全局描述符表和局部描述符表-GDT和LDT" class="headerlink" title="全局描述符表和局部描述符表(GDT和LDT)"></a>全局描述符表和局部描述符表(GDT和LDT)</h3><hr>
+<p><strong>这两个表有什么用</strong></p>
+<p>进入了保护模式之后，代码段、数据段、堆栈段等内存段不再是通过段寄存器获得段基址即可使用，操作系统把段定义好，记录在全局描述符表。</p>
+<p>而局部描述符表则是局部的，它和全局描述符表相比，就相当于一个是一级描述符表(GDT)、一个是二级描述符表(LDT)</p>
+<p><strong>表里面存的是什么</strong></p>
+<p>描述符表里面保存的都是段描述符，段描述符记录了各个段的信息。如图所示：</p>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%201.png" alt="Untitled"></p>
+<p>其中各个标志位都记录着关于段的不同信息</p>
+<p><strong>如何找到GDT和LDT里面的内容</strong></p>
+<p>有了段描述符之后，我们就可以定义各种内存段，并保存到GDT和LDT中，此时CPU通过GDTR和LDTR分别查找GDT和LDT表。</p>
+<p>GDTR寄存器数据格式如下：</p>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%202.png" alt="Untitled"></p>
+<p>因此GDT中可以容纳段描述符为8192个</p>
+<p>这GDTR寄存器初始化需要用到lgdt</p>
+<p>定位到某个段描述符，需要用到<strong>段选择子</strong></p>
+<p>保护模式下段寄存器存入的是段选择子</p>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%203.png" alt="Untitled"></p>
+<p>如此一来，即可找到指定的段，CPU即可从段描述符中取出段基址，再加上段内偏，形成了-段基址：段内偏移地址-的内存访问形式</p>
+<h3 id="门描述符"><a href="#门描述符" class="headerlink" title="门描述符"></a>门描述符</h3><hr>
+<p>操作系统定义了一套名为门的描述符—调用门、中断门、陷阱门和任务门，门这种描述符提供了一种访问运行在不同于应用程序特权级的系统过程和处理程序的方法。也就是程序&#x2F;进程&#x2F;内核之间的交互。</p>
+<p>当访问和当前代码段特权相同或特权更高的代码段的时候，通过调用门访问，由调用程序来提供调用门的选择符。</p>
+<h3 id="任务状态段和任务门"><a href="#任务状态段和任务门" class="headerlink" title="任务状态段和任务门"></a>任务状态段和任务门</h3><p>TSS(如图 1)定义了任务执行环境的状态。这些状态包括通用寄存器、段寄存器、EFLAGS寄存器、EIP 寄存器和段选择符以及三个堆 栈段(特权 0、1、2 各一个堆栈)的指针的状态。它也包括了与任务相应的 LDT 的选择符和页表的基地址。<br>所有运行在保护模式下程序，都是一个称作当前任务的上下文中进行的。当前任务的 TSS的段选择符保存在任务寄存器中。切换到一个任务的最简单的方法是进行 CALL 或 JMP 到那个任务中。新任务的 TSS 的段选择符是通过 CALL 或 JMP 指令给出。在进行任务切换 时，处理器按照下面的次序进行:</p>
+<ol>
+<li>保存当前 TSS 中当前任务的状态。</li>
+<li>装载新任务段选择符的任务寄存器。</li>
+<li>通过 GDT 中段选择符访问新的 TSS。</li>
+<li>将新 TSS 中新任务的状态装载到通用寄存器、段寄存器、LDTR、控制寄存器 CR3(页表基地址)、EFLAGS 寄存器和 EIP 寄存器。</li>
+<li>开始执行新任务。</li>
+</ol>
+<p>任务也可以通过任务门访，任务门与调用门很相似，除了它是提供(通过选择符)对 TSS 而不是对代码段的访问。</p>
+<h3 id="中断与异常处理"><a href="#中断与异常处理" class="headerlink" title="中断与异常处理"></a>中断与异常处理</h3><p>外部中断、软件中断和异常是通过中断描述符表(IDT)处理的，</p>
+<p>和GDT表类似，在运行中断或异常处理程序的时候，处理器需要先从内部硬件、外部中断控制器、或通过执行INT、INTO、INT 3或BOUND指令的软件中断中接收到一个中断向量。</p>
+<p>中断向量内有IDT中的门描述符的索引。</p>
+<p>通过IDT表，程序可以执行完中断&#x2F;异常之后正常返回，切换任务执行。</p>
+<h3 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h3><p>主要有两种形式</p>
+<ul>
+<li>直接物理地址</li>
+<li>虚拟内存(通过分页)</li>
+</ul>
+<p>使用分页的方式的时候，所有的代码、堆栈、系统段等段都可以将最近访问过页驻留在内存中而进行分页。</p>
+<p>页的相关信息保存在两个类型的系统数据结构中：页目录和页表</p>
+<p>线性地址则会被分为三个部分：页目录、页表、页框中的偏移量。</p>
+<p>一个系统可以有一个或者多个页目录。</p>
+<h3 id="系统寄存器"><a href="#系统寄存器" class="headerlink" title="系统寄存器"></a>系统寄存器</h3><p>主要分为以下几种</p>
+<ul>
+<li>EFLAGES寄存器</li>
+<li>控制寄存器</li>
+<li>调试寄存器</li>
+<li>GDTR、LDTR和LDTR寄存器</li>
+<li>任务寄存器</li>
+<li>模式相关的寄存器</li>
+</ul>
+<h2 id="运行模式"><a href="#运行模式" class="headerlink" title="运行模式"></a>运行模式</h2><p>主要有四种</p>
+<ul>
+<li><strong>保护模式</strong>—保护模式是处理器的原生模式，在该模式下，拥有处理器的所有特点和指令，具有最好的性能。对所有新应用程序和操作系统推荐使用该模式</li>
+<li><strong>实模式</strong>—这个模式提供了intel8086的变成模式和一些扩展→比如切换到保护模式或系统管理模式</li>
+<li>**系统管理模式(SSM)**—这种模式为操作系统实现电源和OEM专有特征提供了一种透明的机制。SSM模式是通过激活外部系统中断针(SMI#)而进入的，激活产生了一个系统中断(SMI)。在SMM中处理器先保存好当前运行的程序和任务上下文，然后切换到一个单独的地址空间，从SMM返回后处理器再返回SMI之前的状态。</li>
+<li><strong>虚拟8086模式</strong>—在保护模式中，处理器提供了一种准模式叫作虚拟8086模式。这种模式允许在多任务的保护模式下处理执行8086程序。</li>
+</ul>
+<p>下图为处理器运行模式之间的转换</p>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%204.png" alt="Untitled"></p>
+<h2 id="EFLAGES寄存器中的系统标志和域"><a href="#EFLAGES寄存器中的系统标志和域" class="headerlink" title="EFLAGES寄存器中的系统标志和域"></a>EFLAGES寄存器中的系统标志和域</h2><p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%205.png" alt="Untitled"></p>
+<p>EFLAGES中的系统标志和IOPL域用于控制I&#x2F;O、可屏蔽硬件中断、调试、任务切换和虚拟8086模式。只有特权代码（通常是操作系统代码）可以修改这些位。</p>
+<ul>
+<li><strong>TF</strong>: <strong>陷阱</strong>（第8位）置1是调试状态下的单步执行，置0是禁用单步执行。在单步执行模式下处理器在每条指令后产生一个调试异常，这样在每条指令执行后都可以查看执行程序的状态。如果程序用POPF、POPFD或者IRET指令修改TF标志，那么调试异常就在执行POPF、POPFD或者IRET指令后产生。</li>
+<li><strong>IF</strong>: <strong>中断允许</strong>（位9）控制着处理器对可屏蔽硬件中断请求的响应。置1是响应可屏蔽硬件中断，置0为禁止响应可屏蔽硬件中断，IF标志并不影响异常和不可屏蔽中断（NMI）的产生。控制寄存器CR4中的CPL、IOPL和VME标志决定着IF标志是可否可以由指令CLI、STTI、POPF、POPFD和IRET修改。</li>
+<li><strong>IOPL</strong>: <strong>I&#x2F;O特权域</strong>（位12和位13）指出当前程序或任务的I&#x2F;O特权级别。当前程序或任务的CPL必须小于或等于IOPL才可以访问I&#x2F;O地址空间。当运行在0级特权时，该域只能由的POPF和IRET指令修改。</li>
+<li><strong>NT</strong>: <strong>嵌套任务</strong>（位14）控制被中断和被调用的任务的链接。处理器在调用一个由CALL指令、中断或者异常触发的任务时设置该位。当任务因调用IRET指令而返回时，处理器检测并修改该位。该标志可以由POPF&#x2F;POPFD指令直接置位或清零，然而在应用程序中修改该标志的状态会产生不可预料的异常。</li>
+<li><strong>RF</strong>: <strong>恢复</strong>（位16）控制着处理器对断点指令条件的响应。当置1时，该标志可以临时禁用由于指令断点而产生调试异常（＃DE），但是其它的异常条件仍可以产生异常。置0时指令断点产生调试异常。RF标志的主要功能是重新执行由指令断点而引发的调试异常后面的指令。</li>
+<li><strong>VM</strong>: <strong>虚拟8086模式</strong>（位17）置1进入虚拟8086模式，置0返回保护模式。</li>
+<li><strong>AC</strong>: <strong>对齐检查</strong>将该位置1的同时，将控制寄存器中CR0中的AM标志置1就启用了对内存引用的对齐检查。将AC标志和&#x2F;或AM标志清零就禁用了对齐检查。对齐检查异常只在用户模式（3级特权）下产生。默认特权为0的内存引用，比如段描述表的装载，并不产生这个异常。</li>
+<li><strong>VIF</strong>: <strong>虚拟中断</strong>（位 19）包含了一个 IF 标志的虚拟映象。这个标志是和 VIP 标志一起使用的。当控制寄存器 CR4 中的 VME 或者 PVI 标志置为 1 且 IOPL 小于 3 时，处理器只识别 VIF 标志（VME 标志用来启用虚拟 8086 模式扩展，PVI 标志启用保护模式下的虚拟中断）。</li>
+<li><strong>VIP</strong>: <strong>虚拟中断等待</strong>（位20）由软件置1表明有一个中断是正在等待被处理,置0表明没有等待处理的中断,该标志和VIF一起使用。处理器读取该标志但从来不修改它,当VME标志或者控制寄存器CR4中的PVI标志置1且IOPL小于3时，处理器只识别VIP标志。</li>
+<li><strong>ID</strong>: <strong>识别</strong>（位21）软件置1或0表明是否支持CPUID指令。</li>
+</ul>
+<h2 id="内存管理寄存器"><a href="#内存管理寄存器" class="headerlink" title="内存管理寄存器"></a>内存管理寄存器</h2><p>处理器中与内存管理有关的寄存器共有四个—GDTR、LDTR、IDTR和TR</p>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%206.png" alt="Untitled"></p>
+<h3 id="全局描述符表寄存器-GDTR"><a href="#全局描述符表寄存器-GDTR" class="headerlink" title="全局描述符表寄存器(GDTR)"></a>全局描述符表寄存器(GDTR)</h3><p>GDTR寄存器用于保存GDT的32位基地址和16位表界限。基地址指的是GDT的第一个字节的线性地址，而表界限表示GDT中的字节数。LGDT和SGDT指令分别用于加载和保存GDTR寄存器的值。在处理器上电或复位时，基地址默认为0，表界限默认为FFFFH。在进行保护模式的操作时，作为处理器初始化的一部分，需要将新的基地址加载到GDTR中。</p>
+<h3 id="局部描述符表寄存器-LDTR"><a href="#局部描述符表寄存器-LDTR" class="headerlink" title="局部描述符表寄存器(LDTR)"></a>局部描述符表寄存器(LDTR)</h3><p>LDTR寄存器存储了16位的段选择符、32位的基地址、16位的段界限以及LDT描述符的属性。基地址指的是LDT段中第一个字节的线性地址，而段界限表示段中的字节个数。LLDT和SLDT指令专用于加载和保存LDTR寄存器中的段选择符部分。任何包含LDT的段必须在GDT中有一个段描述符。当执行LLDT指令来加载LDTR中的段选择符时，LDT描述符的基地址、界限和属性将自动加载到LDTR中。在进行任务切换时，LDTR会自动加载新任务的段选择符和描述符。在将新的LDT信息写入寄存器之前，LDTR的内容不会自动保存。在处理器上电或复位时，段选择符和基地址都被设为默认值0，段界限被设置为FFFFH。</p>
+<h3 id="IDTR中断描述符表寄存器"><a href="#IDTR中断描述符表寄存器" class="headerlink" title="IDTR中断描述符表寄存器"></a>IDTR中断描述符表寄存器</h3><p>IDTR寄存器用于保存IDT的32位基地址和16位表界限。基地址指的是IDT中第一个字节的线性地址，而表界限表示IDT中的字节个数。LIDT和SIDT指令专门用于加载和保存IDTR寄存器的值。在处理器上电或复位时，基地址默认为0，表界限默认为FFFFH。作为处理器初始化的一部分，可以修改寄存器中的基地址和表界限。</p>
+<h3 id="任务寄存器-TR"><a href="#任务寄存器-TR" class="headerlink" title="任务寄存器(TR)"></a>任务寄存器(TR)</h3><p>任务寄存器保存着16位的段选择符、32位的基地址、16位的段界限以及当前任务的TSS描述符属性。它引用GDT中的TSS描述符。基地址指示TSS中第一个字节的线性地址，段界限指示TSS中的字节数量。LTR和STR指令专门用于加载和保存任务寄存器中的段选择符部分。当使用LTR指令加载任务寄存器中的段选择符时，基地址、界限和TSS描述符会自动加载到任务寄存器中。处理器上电或复位后，基地址被设置为默认值0，界限被设置为FFFFH。在进行任务切换时，任务寄存器会自动加载新任务的段选择符和TSS描述符。在向任务寄存器写入新内容之前，任务寄存器的内容不会自动保存。</p>
+<h2 id="控制寄存器"><a href="#控制寄存器" class="headerlink" title="控制寄存器"></a>控制寄存器</h2><p>控制寄存器主要有五个</p>
+<ul>
+<li>CR0—包含系统控制标志，这些标志控制着处理器的运行模式和状态</li>
+<li>CR1—保留</li>
+<li>CR2—包含缺页的线性地址(引起缺页的线性地址)</li>
+<li>CR3—包含了页目录的基地址和二个标志（PCD和PWT）。该寄存器也被称为页目录基地址寄存器（PDBR）。页目录基地址只有高20位确定，低12位是0，所以页目录地址必须是页边界对齐的（4K字节）。PCD和PWT标志控制着页目录在处理器内部数据缓冲区的缓存（它们不控制TLB页目录信息的缓存）。</li>
+<li>CR4—包含了一组标志，这些标志启用了架构方面的几个扩展，并指明了系统对某些处理器支持的能力。这个寄存器可以通过MOV指令方式进行读取或修改。在保护模式下MOV指令允许读取或者装载控制寄存器(在0级特权下)。这个限制意味着应用程序或者操作系统过程(运行在1、2、3级特权下)不能读取或者装载控制寄存器。装在控制寄存器时，保留位应该保持以前读取的值。</li>
+</ul>
+<p><img src="/./images/os%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%203ca99f0311ef4b6fa13a100e6296dfe4/Untitled%207.png" alt="Untitled"></p>
+<h2 id="CPUID识别控制寄存器标志"><a href="#CPUID识别控制寄存器标志" class="headerlink" title="CPUID识别控制寄存器标志"></a>CPUID识别控制寄存器标志</h2><p>控制寄存器CR4中的VME、PVI、TSD、DE、PSE、PAE、MCE、PGE、PCE、OSFXSR和OSXMMEXCPT都是与模式相关的。所有的这些标志(除了PCE标志)在使用之前都可以通过CPUID指令来检查他们处理器是否已经实现。</p>
+<h2 id="系统指令总汇"><a href="#系统指令总汇" class="headerlink" title="系统指令总汇"></a>系统指令总汇</h2><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>指令描述</th>
+<th>对应用程序是否有用</th>
+<th>应用程序能否执行</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LLDT</td>
+<td>装载LDT寄存器</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>SLDT</td>
+<td>保存LDT寄存器</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td>LGDT</td>
+<td>装载GDT寄存器</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>SGDT</td>
+<td>保存GDT寄存器</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td>LTR</td>
+<td>装载任务寄存器</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>STR</td>
+<td>保存任务寄存器</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td>LIDT</td>
+<td>装载IDT寄存器</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>SIDT</td>
+<td>保存IDT寄存器</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td>MOV CRn</td>
+<td>装载和保存控制寄存器</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>SMSW</td>
+<td>保存MSW</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>LMSW</td>
+<td>装载MSW</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>CLTS</td>
+<td>清空CR0中的TS标志</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>ARPL</td>
+<td>调整RPL</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>LAR</td>
+<td>装载访问特权</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>LSL</td>
+<td>装载段界限</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>VERR</td>
+<td>检验读</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>VERW</td>
+<td>检验写</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>MOV DBn</td>
+<td>装载和保存调试控制器</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>INVD</td>
+<td>使Cache无效，不回写</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>WBINVD</td>
+<td>使Cache无效，回写</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>INVLPG</td>
+<td>使TLB项无效</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>HLT</td>
+<td>停机</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>LOCK(前缀)</td>
+<td>总线锁</td>
+<td>是</td>
+<td></td>
+</tr>
+<tr>
+<td>RSM</td>
+<td>从系统管理模式返回</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>RDMSR3</td>
+<td>读与模式相关寄存器</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>WRMSR3</td>
+<td>写与模式相关寄存器</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>RDPMC4</td>
+<td>读性能监测计数器</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>RDTSC3</td>
+<td>读时间戳计数器</td>
+<td>是</td>
+<td>是</td>
+</tr>
+</tbody></table>
+<p>  tips：</p>
+<p>1．对CPL是1或2的应用程序有用<br>2．由CPL是3的应用程序通过控制寄存器CR4中的TSD和PCE标志访问这些指令<br>3．这些指令是在IA-32架构中的Pentium处理器引入的<br>4．这个指令是在IA-32架构中的Pentium Pro 处理器和Pentium® MMX™ 处理器中引入的。</p>
+<h3 id="装载和保存系统寄存器"><a href="#装载和保存系统寄存器" class="headerlink" title="装载和保存系统寄存器"></a>装载和保存系统寄存器</h3><ul>
+<li><input disabled="" type="checkbox"> LGDT(装载GDTR寄存器) 把GDT基地址和界限从内存中装载到GDTR寄存器中。</li>
+<li><input disabled="" type="checkbox"> SGDT(保存GDTR寄存器) 把GDTR寄存器中的GDT基地址和界限保存到内存中</li>
+<li><input disabled="" type="checkbox"> LIDT(装载IDTR寄存器) 把IDT基地址和界限从内存装载到IDTR寄存器中</li>
+<li><input disabled="" type="checkbox"> SIDT(保存IDTR寄存器) IDTR寄存器的IDT基地址和界限保存到内存中。</li>
+<li><input disabled="" type="checkbox"> LLDT(装载LDT寄存器) 从内存中装载LDT段选择符和段描述符到LDTR。(段选择符操作数也可以位于通用寄存器。)</li>
+<li><input disabled="" type="checkbox"> SLDT(保存LDT寄存器) 把LDTR寄存器中的LDT段选择符保存内存中或者通用寄存器中。</li>
+<li><input disabled="" type="checkbox"> LTR(装载任务寄存器) 把TSS的段选择符和段描述符从内存中装载到任务寄存器中(段选择符操作数也可以位于通用寄存器中)。</li>
+<li><input disabled="" type="checkbox"> STR(保存任务寄存器) 把当前任务的任务寄存器中的段选择符保存到内存或者通用寄存器中。</li>
+<li><input disabled="" type="checkbox"> LMSW(装载机器状态字)和SMWS(保存机器状态字)指令操作控制寄存器CR0的0到15位。这些指令是为兼容16位intel 286处理器而提供的。运行在32位IA-32处理器上的程序不应该再使用这些指令，相反应该用MOV指令来访问CR0。</li>
+<li><input disabled="" type="checkbox"> CLTS(将CR0中的TS标志清零)指令为处理“设备不可使用”异常(#NM)而提供的，该异常在TS标志为1且当处理器试图执行浮点指令时出现。这一指令允许TS标志在x87 FPU上下文保存以后清零，从而避免进一步出现#NM异常。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/30/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B002/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -207,7 +570,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>7 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -445,7 +808,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>2 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -666,7 +1029,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>6 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -859,7 +1222,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>3 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -974,7 +1337,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>3 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -1156,7 +1519,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>2 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -1202,101 +1565,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/19/ssp%E6%94%BB%E5%87%BB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/header.png">
-      <meta itemprop="name" content="hkbin">
-      <meta itemprop="description" content="hkbin hkbin hkbin">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hkbin的小博客~">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/19/ssp%E6%94%BB%E5%87%BB/" class="post-title-link" itemprop="url">ssp攻击</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-19 11:31:10" itemprop="dateCreated datePublished" datetime="2023-09-19T11:31:10+08:00">2023-09-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-09-23 19:56:13" itemprop="dateModified" datetime="2023-09-23T19:56:13+08:00">2023-09-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/pwn/" itemprop="url" rel="index"><span itemprop="name">pwn</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>155</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="ssp攻击"><a href="#ssp攻击" class="headerlink" title="ssp攻击"></a>ssp攻击</h1><p>canary的各种利用方式中，有一种是通过 <code>__stack_chk_fail</code>函数打印报错信息来实现。</p>
-<p><strong>__stack_chk_fail</strong>源码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">void __attribute__ ((noreturn)) __stack_chk_fail (void)</span><br><span class="line">&#123;</span><br><span class="line">  __fortify_fail (<span class="string">&quot;stack smashing detected&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">void __attribute__ ((noreturn)) internal_function __fortify_fail (const char *msg)</span><br><span class="line">&#123;</span><br><span class="line">  /* The loop <span class="keyword">is</span> added only to keep gcc happy.  */</span><br><span class="line">  <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    __libc_message (<span class="number">2</span>, <span class="string">&quot;*** %s ***: %s terminatedn&quot;</span>,</span><br><span class="line">                    msg, __libc_argv[<span class="number">0</span>] ?: <span class="string">&quot;&lt;unknown&gt;&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>据源码可见，报错信息中会打印出<code>libc_argv[0]</code>的值，而<code>libc_argv[0]</code>指向的则是程序名。</p>
-<p>若我们能够<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%A0%88%E6%BA%A2%E5%87%BA&spm=1001.2101.3001.7020">栈溢出</a>足够的长度，覆盖到<code>__libc_argv[0]</code>的位置，那我们就能让程序打印出任意地址的数据，造成任意地址<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%95%B0%E6%8D%AE%E6%B3%84%E9%9C%B2&spm=1001.2101.3001.7020">数据泄露</a>。这就是ssp攻击。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1364,7 +1636,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-count">31</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1412,7 +1684,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -1422,13 +1694,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">51k</span>
+    <span title="站点总字数">83k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">3:07</span>
+    <span title="站点阅读时长">1:15</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
