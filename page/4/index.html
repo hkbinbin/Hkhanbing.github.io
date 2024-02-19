@@ -225,12 +225,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="ssp攻击"><a href="#ssp攻击" class="headerlink" title="ssp攻击"></a>ssp攻击</h1><p>canary的各种利用方式中，有一种是通过 <code>__stack_chk_fail</code>函数打印报错信息来实现。</p>
+          <h1>ssp攻击</h1>
+<p>canary的各种利用方式中，有一种是通过 <code>__stack_chk_fail</code>函数打印报错信息来实现。</p>
 <p><strong>__stack_chk_fail</strong>源码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">void __attribute__ ((noreturn)) __stack_chk_fail (void)</span><br><span class="line">&#123;</span><br><span class="line">  __fortify_fail (<span class="string">&quot;stack smashing detected&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">void __attribute__ ((noreturn)) internal_function __fortify_fail (const char *msg)</span><br><span class="line">&#123;</span><br><span class="line">  /* The loop <span class="keyword">is</span> added only to keep gcc happy.  */</span><br><span class="line">  <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    __libc_message (<span class="number">2</span>, <span class="string">&quot;*** %s ***: %s terminatedn&quot;</span>,</span><br><span class="line">                    msg, __libc_argv[<span class="number">0</span>] ?: <span class="string">&quot;&lt;unknown&gt;&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>据源码可见，报错信息中会打印出<code>libc_argv[0]</code>的值，而<code>libc_argv[0]</code>指向的则是程序名。</p>
-<p>若我们能够<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%A0%88%E6%BA%A2%E5%87%BA&spm=1001.2101.3001.7020">栈溢出</a>足够的长度，覆盖到<code>__libc_argv[0]</code>的位置，那我们就能让程序打印出任意地址的数据，造成任意地址<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%95%B0%E6%8D%AE%E6%B3%84%E9%9C%B2&spm=1001.2101.3001.7020">数据泄露</a>。这就是ssp攻击。</p>
+<p>若我们能够<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%A0%88%E6%BA%A2%E5%87%BA&amp;spm=1001.2101.3001.7020">栈溢出</a>足够的长度，覆盖到<code>__libc_argv[0]</code>的位置，那我们就能让程序打印出任意地址的数据，造成任意地址<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%95%B0%E6%8D%AE%E6%B3%84%E9%9C%B2&amp;spm=1001.2101.3001.7020">数据泄露</a>。这就是ssp攻击。</p>
 
       
     </div>
@@ -375,13 +375,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">55k</span>
+    <span title="站点总字数">51k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">3:22</span>
+    <span title="站点阅读时长">3:05</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>

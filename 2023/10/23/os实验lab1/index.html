@@ -22,32 +22,32 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="bochs调试Linux0.00实验报告请简述 head.s 的工作原理head.s工作中主要包括初始化和任务切换两部分： 初始化部分主要是重新建立和设置IDT和GDT表，以及设置中断计时器，构建IDT表里的中断门描述符和系统调用陷阱门描述符等。 之后执行到任务0，在中断计时器的作用下，实现任务0和任务1之间的切换操作。 head.s 的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存">
+  <meta name="description" content="bochs调试Linux0.00 实验报告 请简述 head.s 的工作原理 head.s工作中主要包括初始化和任务切换两部分： 初始化部分主要是重新建立和设置IDT和GDT表，以及设置中断计时器，构建IDT表里的中断门描述符和系统调用陷阱门描述符等。 之后执行到任务0，在中断计时器的作用下，实现任务0和任务1之间的切换操作。 head.s 的内存分布状况，写明每个数据段，代码段，栈段的起始与终止">
 <meta property="og:type" content="article">
 <meta property="og:title" content="os实验lab1">
 <meta property="og:url" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/index.html">
 <meta property="og:site_name" content="hkbin的小博客~">
-<meta property="og:description" content="bochs调试Linux0.00实验报告请简述 head.s 的工作原理head.s工作中主要包括初始化和任务切换两部分： 初始化部分主要是重新建立和设置IDT和GDT表，以及设置中断计时器，构建IDT表里的中断门描述符和系统调用陷阱门描述符等。 之后执行到任务0，在中断计时器的作用下，实现任务0和任务1之间的切换操作。 head.s 的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存">
+<meta property="og:description" content="bochs调试Linux0.00 实验报告 请简述 head.s 的工作原理 head.s工作中主要包括初始化和任务切换两部分： 初始化部分主要是重新建立和设置IDT和GDT表，以及设置中断计时器，构建IDT表里的中断门描述符和系统调用陷阱门描述符等。 之后执行到任务0，在中断计时器的作用下，实现任务0和任务1之间的切换操作。 head.s 的内存分布状况，写明每个数据段，代码段，栈段的起始与终止">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%201.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%202.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%203.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%204.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%205.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%206.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%207.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%208.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%209.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%2010.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%2011.png">
-<meta property="og:image" content="http://example.com/images/lab01/Untitled%2012.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%201.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%202.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%203.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%204.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%205.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%206.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%207.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%208.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%209.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%2010.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%2011.png">
+<meta property="og:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled%2012.png">
 <meta property="article:published_time" content="2023-10-23T13:03:05.000Z">
-<meta property="article:modified_time" content="2023-10-23T13:04:32.795Z">
+<meta property="article:modified_time" content="2023-10-23T13:05:08.647Z">
 <meta property="article:author" content="hkbin">
 <meta property="article:tag" content="操作系统实验">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/lab01/Untitled.png">
+<meta name="twitter:image" content="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/images/lab01/Untitled.png">
 
 <link rel="canonical" href="http://example.com/2023/10/23/os%E5%AE%9E%E9%AA%8Clab1/">
 
@@ -201,7 +201,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2023-10-23 21:03:05 / 修改时间：21:04:32" itemprop="dateCreated datePublished" datetime="2023-10-23T21:03:05+08:00">2023-10-23</time>
+              <time title="创建时间：2023-10-23 21:03:05 / 修改时间：21:05:08" itemprop="dateCreated datePublished" datetime="2023-10-23T21:03:05+08:00">2023-10-23</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -243,48 +243,54 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="bochs调试Linux0-00"><a href="#bochs调试Linux0-00" class="headerlink" title="bochs调试Linux0.00"></a>bochs调试Linux0.00</h1><h1 id="实验报告"><a href="#实验报告" class="headerlink" title="实验报告"></a>实验报告</h1><h3 id="请简述-head-s-的工作原理"><a href="#请简述-head-s-的工作原理" class="headerlink" title="请简述 head.s 的工作原理"></a>请简述 <code>head.s</code> 的工作原理</h3><p>head.s工作中主要包括初始化和任务切换两部分：</p>
+        <h1>bochs调试Linux0.00</h1>
+<h1>实验报告</h1>
+<h3 id="请简述-head-s-的工作原理">请简述 <code>head.s</code> 的工作原理</h3>
+<p>head.s工作中主要包括初始化和任务切换两部分：</p>
 <p>初始化部分主要是重新建立和设置IDT和GDT表，以及设置中断计时器，构建IDT表里的中断门描述符和系统调用陷阱门描述符等。</p>
 <p>之后执行到任务0，在中断计时器的作用下，实现任务0和任务1之间的切换操作。</p>
-<h3 id="head-s-的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址"><a href="#head-s-的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址" class="headerlink" title="head.s 的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址"></a><code>head.s</code> 的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址</h3><p>刚跳转到0x0的时候：</p>
+<h3 id="head-s-的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址"><code>head.s</code> 的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址</h3>
+<p>刚跳转到0x0的时候：</p>
 <p>数据段起始地址为0x00000000，终止地址为0x007fffff</p>
 <p>代码段起始地址为0x00007c00，终止地址为0x00007c00+0x0000ffff</p>
 <p>栈段起始地址为0x00007c00，终止地址为0x00007c00+0x0000ffff</p>
-<p><img src="/./images/lab01/Untitled.png" alt="Untitled"></p>
+<p><img src="./images/lab01/Untitled.png" alt="Untitled"></p>
 <p>初始化结束：</p>
 <p>数据段起始地址为0x00000000，终止地址为0x007fffff</p>
 <p>代码段起始地址为0x00000000，终止地址为0x007fffff</p>
 <p>栈段起始地址为0x00000000，终止地址为0x007fffff</p>
-<p><img src="/./images/lab01/Untitled%201.png" alt="Untitled"></p>
+<p><img src="./images/lab01/Untitled%201.png" alt="Untitled"></p>
 <p>切换到任务0：</p>
 <p>数据段起始未初始化</p>
 <p>代码段起始地址为0x00000000，终止地址为0x003fffff</p>
 <p>栈段起始地址为0x00000000，终止地址为0x007fffff</p>
-<p><img src="/./images/lab01/Untitled%202.png" alt="Untitled"></p>
+<p><img src="./images/lab01/Untitled%202.png" alt="Untitled"></p>
 <p>初始化完：</p>
 <p>数据段起始地址为0x00000000，终止地址为0x003fffff</p>
 <p>代码段起始地址为0x00000000，终止地址为0x003fffff</p>
 <p>栈段起始地址为0x00000000，终止地址为0x003fffff</p>
-<p><img src="/./images/lab01/Untitled%203.png" alt="Untitled"></p>
-<h3 id="简述-head-s-57-至-62-行在做什么？"><a href="#简述-head-s-57-至-62-行在做什么？" class="headerlink" title="简述 head.s 57 至 62 行在做什么？"></a>简述 <code>head.s</code> <code>57</code> 至 <code>62</code> 行在做什么？</h3><p>汇编指令：</p>
+<p><img src="./images/lab01/Untitled%203.png" alt="Untitled"></p>
+<h3 id="简述-head-s-57-至-62-行在做什么？">简述 <code>head.s</code> <code>57</code> 至 <code>62</code> 行在做什么？</h3>
+<p>汇编指令：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">pushl $0x17 ;任务0当前局部空间数据段(堆栈段)选择符入栈</span><br><span class="line">pushl $init_stack ;将堆栈指针入栈,也可以直接把ESP入栈</span><br><span class="line">pushfl ;将标志寄存器入栈</span><br><span class="line">pushl $0x0f ;把当前局部空间代码段选择符入栈</span><br><span class="line">pushl $task0 ;将代码指针入栈</span><br><span class="line">iret ;执行中断返回指令,从而切换到特权级3的任务0中执行</span><br></pre></td></tr></table></figure>
-
 <p>也就是这个时候要进行内核态到用户态之间的切换，从内核程序将控制权转移给任务0程序。</p>
 <p>所以按顺序压栈了各种寄存器以及段选择符。</p>
 <p>之所以要压栈+iret实现内核态到用户态的访问，</p>
 <p><strong>内核是不会调用用户层的代码，要想实现这逆向的转移，一般做法是在用户进程的核心栈 (tss-&gt;esp0)压入用户态的SS,ESP,EFLAGS,CS,EIP,伪装成用户进程是通过陷阱门进入核心态，之后通过iret返回用户态</strong></p>
-<h3 id="简述-iret-执行后，-pc-如何找到下一条指令？"><a href="#简述-iret-执行后，-pc-如何找到下一条指令？" class="headerlink" title="简述 iret 执行后， pc 如何找到下一条指令？"></a>简述 <code>iret</code> 执行后， <code>pc</code> 如何找到下一条指令？</h3><p>iret等价于</p>
+<h3 id="简述-iret-执行后，-pc-如何找到下一条指令？">简述 <code>iret</code> 执行后， <code>pc</code> 如何找到下一条指令？</h3>
+<p>iret等价于</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pop ip</span><br><span class="line">pop cs</span><br><span class="line">pop eflags</span><br><span class="line">pop esp</span><br><span class="line">pop ss</span><br></pre></td></tr></table></figure>
-
 <p>所以iret执行后，会重置大部分寄存器，这个时候ip寄存器发生变化，pc就能找到下一条指令了。</p>
-<h3 id="记录-iret-执行前后，栈是如何变化的？"><a href="#记录-iret-执行前后，栈是如何变化的？" class="headerlink" title="记录 iret 执行前后，栈是如何变化的？"></a>记录 <code>iret</code> 执行前后，栈是如何变化的？</h3><p>iret前栈帧：</p>
-<p><img src="/./images/lab01/Untitled%204.png" alt="Untitled"></p>
-<p><img src="/./images/lab01/Untitled%205.png" alt="Untitled"></p>
+<h3 id="记录-iret-执行前后，栈是如何变化的？">记录 <code>iret</code> 执行前后，栈是如何变化的？</h3>
+<p>iret前栈帧：</p>
+<p><img src="./images/lab01/Untitled%204.png" alt="Untitled"></p>
+<p><img src="./images/lab01/Untitled%205.png" alt="Untitled"></p>
 <p>iret后：</p>
-<p><img src="/./images/lab01/Untitled%206.png" alt="Untitled"></p>
-<p><img src="/./images/lab01/Untitled%207.png" alt="Untitled"></p>
+<p><img src="./images/lab01/Untitled%206.png" alt="Untitled"></p>
+<p><img src="./images/lab01/Untitled%207.png" alt="Untitled"></p>
 <p>可见，主要的有关栈的变化在于ss段寄存器，这里从0x0010变为了0x0017，段选择子发生了变化，选择了不同的段，对内存访问权限发生了变化等，表明从内核态转移到了用户态，访问的是权限等级为用户等级的栈段。</p>
-<h3 id="当任务进行系统调用时，即-int-0x80-时，记录栈的变化情况。"><a href="#当任务进行系统调用时，即-int-0x80-时，记录栈的变化情况。" class="headerlink" title="当任务进行系统调用时，即 int 0x80 时，记录栈的变化情况。"></a>当任务进行系统调用时，即 <code>int 0x80</code> 时，记录栈的变化情况。</h3><p>切换到任务0之后在0x10e9、0x10fd</p>
+<h3 id="当任务进行系统调用时，即-int-0x80-时，记录栈的变化情况。">当任务进行系统调用时，即 <code>int 0x80</code> 时，记录栈的变化情况。</h3>
+<p>切换到任务0之后在0x10e9、0x10fd</p>
 <p>系统调用号0x41和0x42</p>
 <table>
 <thead>
@@ -293,23 +299,25 @@
 <th>sys_setsid</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>65</td>
 <td>sys_getpgrp</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
 <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiaominthere/article/details/17287965">Linux系统调用 int 80h int 0x80-CSDN博客</a></p>
 <p>不过该系统调用是进入了我们写好的内核段代码，不会执行上面的linux系统调用列表，这里相当于布置了一个陷阱，int80将会进入我们的函数里。</p>
 <p>实际上这段汇编是在无限循环打印A</p>
 <p>每次int80 不都会进入一个函数，这个函数是内核态的，用于打印一个字符。</p>
-<p><img src="/./images/lab01/Untitled%208.png" alt="Untitled"></p>
+<p><img src="./images/lab01/Untitled%208.png" alt="Untitled"></p>
 <p>int80实现了用户态到内核态的切换，随后从内核态通过iret返回用户态</p>
 <p>切换前：</p>
-<p><img src="/./images/lab01/Untitled%209.png" alt="Untitled"></p>
-<p><img src="/./images/lab01/Untitled%2010.png" alt="Untitled"></p>
+<p><img src="./images/lab01/Untitled%209.png" alt="Untitled"></p>
+<p><img src="./images/lab01/Untitled%2010.png" alt="Untitled"></p>
 <p>切换后：</p>
-<p><img src="/./images/lab01/Untitled%2011.png" alt="Untitled"></p>
-<p><img src="/./images/lab01/Untitled%2012.png" alt="Untitled"></p>
+<p><img src="./images/lab01/Untitled%2011.png" alt="Untitled"></p>
+<p><img src="./images/lab01/Untitled%2012.png" alt="Untitled"></p>
 <p>发生了四个寄存器的切换，切换到了中断处理函数那里，所以cs、ss段寄存器发生了变化。</p>
 
     </div>
@@ -394,7 +402,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#bochs%E8%B0%83%E8%AF%95Linux0-00"><span class="nav-number">1.</span> <span class="nav-text">bochs调试Linux0.00</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A"><span class="nav-number">2.</span> <span class="nav-text">实验报告</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B7%E7%AE%80%E8%BF%B0-head-s-%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">2.0.1.</span> <span class="nav-text">请简述 head.s 的工作原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#head-s-%E7%9A%84%E5%86%85%E5%AD%98%E5%88%86%E5%B8%83%E7%8A%B6%E5%86%B5%EF%BC%8C%E5%86%99%E6%98%8E%E6%AF%8F%E4%B8%AA%E6%95%B0%E6%8D%AE%E6%AE%B5%EF%BC%8C%E4%BB%A3%E7%A0%81%E6%AE%B5%EF%BC%8C%E6%A0%88%E6%AE%B5%E7%9A%84%E8%B5%B7%E5%A7%8B%E4%B8%8E%E7%BB%88%E6%AD%A2%E7%9A%84%E5%86%85%E5%AD%98%E5%9C%B0%E5%9D%80"><span class="nav-number">2.0.2.</span> <span class="nav-text">head.s 的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E8%BF%B0-head-s-57-%E8%87%B3-62-%E8%A1%8C%E5%9C%A8%E5%81%9A%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">2.0.3.</span> <span class="nav-text">简述 head.s 57 至 62 行在做什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E8%BF%B0-iret-%E6%89%A7%E8%A1%8C%E5%90%8E%EF%BC%8C-pc-%E5%A6%82%E4%BD%95%E6%89%BE%E5%88%B0%E4%B8%8B%E4%B8%80%E6%9D%A1%E6%8C%87%E4%BB%A4%EF%BC%9F"><span class="nav-number">2.0.4.</span> <span class="nav-text">简述 iret 执行后， pc 如何找到下一条指令？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%B0%E5%BD%95-iret-%E6%89%A7%E8%A1%8C%E5%89%8D%E5%90%8E%EF%BC%8C%E6%A0%88%E6%98%AF%E5%A6%82%E4%BD%95%E5%8F%98%E5%8C%96%E7%9A%84%EF%BC%9F"><span class="nav-number">2.0.5.</span> <span class="nav-text">记录 iret 执行前后，栈是如何变化的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%93%E4%BB%BB%E5%8A%A1%E8%BF%9B%E8%A1%8C%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E6%97%B6%EF%BC%8C%E5%8D%B3-int-0x80-%E6%97%B6%EF%BC%8C%E8%AE%B0%E5%BD%95%E6%A0%88%E7%9A%84%E5%8F%98%E5%8C%96%E6%83%85%E5%86%B5%E3%80%82"><span class="nav-number">2.0.6.</span> <span class="nav-text">当任务进行系统调用时，即 int 0x80 时，记录栈的变化情况。</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">bochs调试Linux0.00</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">实验报告</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B7%E7%AE%80%E8%BF%B0-head-s-%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">2.0.1.</span> <span class="nav-text">请简述 head.s 的工作原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#head-s-%E7%9A%84%E5%86%85%E5%AD%98%E5%88%86%E5%B8%83%E7%8A%B6%E5%86%B5%EF%BC%8C%E5%86%99%E6%98%8E%E6%AF%8F%E4%B8%AA%E6%95%B0%E6%8D%AE%E6%AE%B5%EF%BC%8C%E4%BB%A3%E7%A0%81%E6%AE%B5%EF%BC%8C%E6%A0%88%E6%AE%B5%E7%9A%84%E8%B5%B7%E5%A7%8B%E4%B8%8E%E7%BB%88%E6%AD%A2%E7%9A%84%E5%86%85%E5%AD%98%E5%9C%B0%E5%9D%80"><span class="nav-number">2.0.2.</span> <span class="nav-text">head.s 的内存分布状况，写明每个数据段，代码段，栈段的起始与终止的内存地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E8%BF%B0-head-s-57-%E8%87%B3-62-%E8%A1%8C%E5%9C%A8%E5%81%9A%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">2.0.3.</span> <span class="nav-text">简述 head.s 57 至 62 行在做什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E8%BF%B0-iret-%E6%89%A7%E8%A1%8C%E5%90%8E%EF%BC%8C-pc-%E5%A6%82%E4%BD%95%E6%89%BE%E5%88%B0%E4%B8%8B%E4%B8%80%E6%9D%A1%E6%8C%87%E4%BB%A4%EF%BC%9F"><span class="nav-number">2.0.4.</span> <span class="nav-text">简述 iret 执行后， pc 如何找到下一条指令？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%B0%E5%BD%95-iret-%E6%89%A7%E8%A1%8C%E5%89%8D%E5%90%8E%EF%BC%8C%E6%A0%88%E6%98%AF%E5%A6%82%E4%BD%95%E5%8F%98%E5%8C%96%E7%9A%84%EF%BC%9F"><span class="nav-number">2.0.5.</span> <span class="nav-text">记录 iret 执行前后，栈是如何变化的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%93%E4%BB%BB%E5%8A%A1%E8%BF%9B%E8%A1%8C%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E6%97%B6%EF%BC%8C%E5%8D%B3-int-0x80-%E6%97%B6%EF%BC%8C%E8%AE%B0%E5%BD%95%E6%A0%88%E7%9A%84%E5%8F%98%E5%8C%96%E6%83%85%E5%86%B5%E3%80%82"><span class="nav-number">2.0.6.</span> <span class="nav-text">当任务进行系统调用时，即 int 0x80 时，记录栈的变化情况。</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -468,13 +476,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">55k</span>
+    <span title="站点总字数">51k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">3:22</span>
+    <span title="站点阅读时长">3:05</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
